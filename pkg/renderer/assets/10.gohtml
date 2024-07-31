@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .NewsAnchor }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            margin: 0;
+            background-color: #fbfbfb;
+        }
+        header {
+            background-color: #ff4500;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        nav {
+            background-color: #ff6347;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #ff6347;
+        }
+        main {
+            display: flex;
+            margin: 20px;
+        }
+        .content {
+            flex: 3;
+            padding: 20px;
+            background-color: white;
+            margin-right: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .content:hover {
+            transform: scale(1.02);
+        }
+        .sidebar {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .sidebar:hover {
+            transform: scale(1.02);
+        }
+        footer {
+            background-color: #ff4500;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>{{ .NewsAnchor }}</h1>
+</header>
+
+<nav>
+    <a href="{{ index .HeadlineLinks 0 }}">Home</a>
+    <a href="{{ index .HeadlineLinks 1 }}">World</a>
+    <a href="{{ index .HeadlineLinks 2 }}">Politics</a>
+    <a href="{{ index .HeadlineLinks 3 }}">Business</a>
+    <a href="{{ index .HeadlineLinks 4 }}">Technology</a>
+    <a href="{{ index .HeadlineLinks 5 }}">Sports</a>
+    <a href="{{ index .HeadlineLinks 6 }}">Entertainment</a>
+</nav>
+
+<main>
+    <div class="content">
+        <h2>{{ .Headline }}</h2>
+        <p>{{ .Content }}</p>
+        <p>{{ .FollowUpLink }}</p>
+    </div>
+    <aside class="sidebar">
+        <h3>Trending Now</h3>
+        <ul>
+            {{ range .RandomTopics }}
+            <li><a href="{{ .Link }}">{{ .Topic }}</a></li>
+            {{ end }}
+        </ul>
+    </aside>
+</main>
+
+<footer>
+    &copy; {{ .Year }} - {{ .CurrentYear }} {{ .NewsAnchor }}. All rights reserved.
+</footer>
+
+</body>
+</html>

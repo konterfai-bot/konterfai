@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net" modified="2024-07-31T11:31:33.183Z" agent="Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" etag="5xRvktL1P_6akjSKmtXr" version="24.6.4" type="device">
+  <diagram name="Page-1" id="wbz9Q6I6OSg0E99Gc6po">
+    <mxGraphModel dx="633" dy="938" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p_tWoKxtT4D85ynEQIA--6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="p_tWoKxtT4D85ynEQIA--2" target="p_tWoKxtT4D85ynEQIA--4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--10" value="Valid Requests" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="p_tWoKxtT4D85ynEQIA--6" vertex="1" connectable="0">
+          <mxGeometry x="0.0569" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="p_tWoKxtT4D85ynEQIA--2" target="p_tWoKxtT4D85ynEQIA--7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--11" value="Unwanted AI-Crawlers" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="p_tWoKxtT4D85ynEQIA--8" vertex="1" connectable="0">
+          <mxGeometry x="0.1675" y="5" relative="1" as="geometry">
+            <mxPoint x="1" y="-26" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--2" value="Reverse-Proxy&lt;br&gt;&lt;div&gt;(e.g. nginx, traefik)&lt;/div&gt;" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/generic_server.svg;" parent="1" vertex="1">
+          <mxGeometry x="150" y="190" width="67.2" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--3" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint y="250" as="sourcePoint" />
+            <mxPoint x="150" y="249.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--9" value="&lt;div&gt;Request&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="p_tWoKxtT4D85ynEQIA--3" vertex="1" connectable="0">
+          <mxGeometry x="-0.4668" y="-3" relative="1" as="geometry">
+            <mxPoint x="20" y="-3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--4" value="&lt;div&gt;Application&lt;/div&gt;" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/web_server.svg;" parent="1" vertex="1">
+          <mxGeometry x="410" y="70" width="96" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p_tWoKxtT4D85ynEQIA--7" value="&lt;div&gt;konterfAI (tar-pit)&lt;/div&gt;" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/generic_server.svg;" parent="1" vertex="1">
+          <mxGeometry x="410" y="310" width="67.2" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

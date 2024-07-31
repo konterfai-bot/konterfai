@@ -1,0 +1,72 @@
+---
+services:
+    ollama:
+        image: ollama/ollama:latest
+        environment:
+          - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2:0.5b}
+        volumes:
+          - ollama-data:/root/.ollama
+        ports:
+          - 11434:11434
+        networks:
+          - konterfai-net
+        healthcheck:
+          test: ollama --version || exit 1
+          interval: 10s
+        deploy:
+          resources:
+            reservations:
+              devices:
+                - driver: nvidia
+                  capabilities: ["gpu"]
+                  count: all
+        entrypoint:
+          - /bin/sh
+          - -c
+          - |
+            ollama serve &
+            sleep 5
+            ollama run "${OLLAMA_MODEL:-qwen2:0.5b}"
+            sleep infinity
+    konterfai:
+        image: konterfai:${DOCKER_TAG:-dev}
+        restart: always
+        ports:
+          - 8080:8080
+        networks:
+         - konterfai-net
+        healthcheck:
+          test: curl -f http://localhost:8080/robots.txt || exit 1
+          interval: 30s
+          timeout: 5s
+          retries: 3
+        depends_on:
+          ollama:
+            condition: service_healthy
+        environment:
+          - ADDRESS=${ADDRESS:-0.0.0.0}
+          - PORT=${PORT:-8080}
+          - HALLUCINATOR_URL=${HALLUCINATOR_URL:-http://localhost:8080}
+          - GENERATE_INTERVAL=${GENERATE_INTERVAL:-2s}
+          - HALLUCINATION_CACHE_SIZE=${HALLUCINATION_CACHE_SIZE:-10}
+          - HALLUCINATION_PROMPT_WORD_COUNT=${HALLUCINATION_PROMPT_WORD_COUNT:-5}
+          - HALLUCINATION_WORD_COUNT=${HALLUCINATION_WORD_COUNT:-500}
+          - HALLUCINATION_REQUEST_COUNT=${HALLUCINATION_REQUEST_COUNT:-5}
+          - HALLUCINATOR_LINK_PERCENTAGE=${HALLUCINATOR_LINK_PERCENTAGE:-10}
+          - HALLUCINATOR_LINK_MAX_SUBDIRECTORY_DEPTH=${HALLUCINATOR_LINK_MAX_SUBDIRECTORY_DEPTH:-5}
+          - HALLUCINATOR_LINK_HAS_VARIABLES_PROBABILITY=${HALLUCINATOR_LINK_HAS_VARIABLES_PROBABILITY:-0.5}
+          - HALLUCINATOR_LINK_MAX_VARIABLES=${HALLUCINATOR_LINK_MAX_VARIABLES:-5}
+          - OLLAMA_ADDRESS=${OLLAMA_ADDRESS:-http://ollama:11434}
+          - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2:0.5b}
+          - OLLAMA_REQUEST_TIMEOUT=${OLLAMA_REQUEST_TIMEOUT:-60s}
+          - AI_TEMPERATURE=${AI_TEMPERATURE:-30.0}
+          - AI_SEED=${AI_SEED:-0}
+          - WEBSERVER_200_PROBABILITY=${WEBSERVER_200_PROBABILITY:-0.95}
+          - WEBSERVER_ERROR_CACHE_SIZE=${WEBSERVER_ERROR_CACHE_SIZE:-1000}
+          - RANDOM_UNCERTAINTY=${RANDOM_UNCERTAINTY:-0.1}
+
+volumes:
+  ollama-data:
+
+networks:
+  konterfai-net:
