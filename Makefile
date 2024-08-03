@@ -13,7 +13,6 @@ build:
 	@echo "Building..."
 	@go build -o bin/$(APP_NAME) cmd/$(APP_NAME)/main.go
 	@echo "Done."
-	@ls -lh bin
 
 .PHONY: clean
 clean:
@@ -40,12 +39,12 @@ run:
 	@go run -race cmd/$(APP_NAME)/main.go --ollama-model $(OLLAMA_MODEL)
 
 .PHONY: docker-build
-docker-build: build
-	@docker buildx build -t $(APP_NAME):$(DOCKER_TAG) .
+docker-build:
+	@docker buildx build -t $(APP_NAME)/$(APP_NAME):$(DOCKER_TAG) .
 
 .PHONY: docker-run
 docker-run:
-	@docker run --net=host -e OLLAMA_MODEL=$(OLLAMA_MODEL) -p 8080:8080 --name ${APP_NAME} $(APP_NAME):$(DOCKER_TAG)
+	@docker run --net=host -e OLLAMA_MODEL=$(OLLAMA_MODEL) -p 8080:8080 --name ${APP_NAME} $(APP_NAME)/$(APP_NAME):$(DOCKER_TAG)
 
 .PHONY: docker-stop
 docker-stop:
@@ -65,17 +64,14 @@ build-amd64:
 	@echo "Building for amd64..."
 	@GOOS=linux GOARCH=amd64 go build -o bin/$(APP_NAME)_amd64 cmd/$(APP_NAME)/main.go
 	@echo "Done."
-	@ls -lh bin
 
 .PHONY: build-arm64
 build-arm64:
 	@echo "Building for arm64..."
 	@GOOS=linux GOARCH=arm64 go build -o bin/$(APP_NAME)_arm64 cmd/$(APP_NAME)/main.go
 	@echo "Done."
-	@ls -lh bin
 
 build-armv7:
 	@echo "Building for armv7..."
 	@GOOS=linux GOARCH=arm go build -o bin/$(APP_NAME)_armv7 cmd/$(APP_NAME)/main.go
 	@echo "Done."
-	@ls -lh bin

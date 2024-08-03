@@ -106,6 +106,10 @@ $> make docker-compose-down
 
 For more complex examples edit [docker-compose.yml](docker-compose-dev.yml) to suit your needs.
 
+#### Pre-built Docker-Image
+
+You can also use the pre-built docker-image from [Docker-Hub](https://hub.docker.com/r/konterfai/konterfai).
+
 ## Configuration
 
 konterfAI is configured via cli-flags. For a full list of supported flags run (after [building](#building)):
