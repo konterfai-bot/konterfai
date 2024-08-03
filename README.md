@@ -1,16 +1,16 @@
-[![Matrix](https://img.shields.io/matrix/konterfAI%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#konterfAI:matrix.org)
+[![Matrix](https://img.shields.io/matrix/konterfai%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#konterfai:matrix.org)
 [![License](https://img.shields.io/badge/License-AGPL-v3.svg)](LICENSE)
 
 # konterfAI
 
 (c) 2024 konterfAI
 
-konterfAI is an attempt to create a model-poisoner for LLM (Large Language Models) to generate bullshit-content to degenerate these models.
-It is work in progress and not yet ready for production. It uses the concept fight-fire with fire. The backend queries a tiny
+konterfAI is a proof-of-concept for a model-poisoner for LLM (Large Language Models) to generate nonsense("bullshit") content suitable to degenerate these models.
+
+Although it's still work in progress and not yet ready for production, it already shows the concept of fighting fire with fire: The backend queries a tiny
 LLM running in [ollama](https://ollama.com/) with a high ai-temperature setting to generate hallucinatory content.
 
-**NOTE:** konterfAI is not an offensive hacking tool, it is a countermeasure to fight back against AI-Crawlers,
-that ignore robots.txt and other rules.
+**NOTE:** The developers created konterfAI not as an offensive (hacking) tool, but a countermeasure against AI-crawlers that ignore robots.txt and other rules. The Tool was inspired by reports of web admins suffering from TeraByte of Data caused by AI crawlers - cost that can be avoided.
 
 ## License
 
@@ -114,5 +114,5 @@ konterfAI is configured via cli-flags. For a full list of supported flags run (a
 $> ./bin/konterfai --help
 ```
 
-The docker-image is configured via environment-variables. 
+The docker-image is configured via environment-variables.
 For a full list of supported variables see [docker-compose.yml](docker-compose-dev.yml) and [entrypoint.sh](entrypoint.sh).
