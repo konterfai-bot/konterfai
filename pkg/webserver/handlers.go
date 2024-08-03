@@ -31,7 +31,7 @@ func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 				r.URL.Path != "" &&
 				// we do not want to store 200 OK responses
 				httpCode != http.StatusOK &&
-				// these are non persistant errors we do not want to save
+				// these are non-persistent errors we do not want to save
 				httpCode != http.StatusTooManyRequests &&
 				httpCode != http.StatusServiceUnavailable &&
 				httpCode != http.StatusTooEarly {
