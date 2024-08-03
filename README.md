@@ -1,5 +1,6 @@
 [![Matrix](https://img.shields.io/matrix/konterfai%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#konterfai:matrix.org)
 [![License](https://img.shields.io/badge/License-AGPL-v3.svg)](LICENSE)
+[![status-badge](https://ci.codeberg.org/api/badges/13605/status.svg)](https://ci.codeberg.org/repos/13605)
 
 # konterfAI
 
