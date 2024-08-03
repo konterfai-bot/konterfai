@@ -1,0 +1,25 @@
+when:
+  branch: main
+  event: [ push, pull_request ]
+
+steps:
+  dry-run:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      dockerfile: Dockerfile
+      platforms: linux/amd64
+      dry_run: true
+      repo: codeberg.org/konterfai/konterfai
+      tags: latest-main
+
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      platforms: linux/amd64,linux/arm64,linux/arm/v7
+      repo: konterfai/konterfai
+      tag: latest-main
+      logins:
+        - registry: https://index.docker.io/v1/
+          username: konterfai
+          password:
+            from_secret: docker_token

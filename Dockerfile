@@ -1,4 +1,12 @@
+FROM golang:1.22 AS builder
+ARG TARGETARCH
+ADD . /src
+WORKDIR /src
+RUN go mod vendor
+RUN mkdir -p /src/bin
+RUN GOOS=linux GOARCH="${TARGETARCH}" go build -o bin/konterfai cmd/konterfai/main.go
+
 FROM debian:sid-slim
 COPY entrypoint.sh /entrypoint.sh
-COPY bin/konterfai /usr/local/bin/konterfai
+COPY --from=builder /src/bin/konterfai /usr/local/bin/konterfai
 ENTRYPOINT ["/entrypoint.sh"]

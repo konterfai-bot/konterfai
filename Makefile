@@ -6,12 +6,14 @@ DOCKER_TAG ?= "dev"
 all: build
 
 .PHONY: all-arch-build
-all-arch-build: build build-arm64 build-arm
+all-arch-build: build-amd64 build-arm64 build-armv7
 
 .PHONY: build
 build:
 	@echo "Building..."
 	@go build -o bin/$(APP_NAME) cmd/$(APP_NAME)/main.go
+	@echo "Done."
+	@ls -lh bin
 
 .PHONY: clean
 clean:
@@ -62,12 +64,18 @@ docker-compose-down:
 build-amd64:
 	@echo "Building for amd64..."
 	@GOOS=linux GOARCH=amd64 go build -o bin/$(APP_NAME)_amd64 cmd/$(APP_NAME)/main.go
+	@echo "Done."
+	@ls -lh bin
 
 .PHONY: build-arm64
 build-arm64:
 	@echo "Building for arm64..."
 	@GOOS=linux GOARCH=arm64 go build -o bin/$(APP_NAME)_arm64 cmd/$(APP_NAME)/main.go
+	@echo "Done."
+	@ls -lh bin
 
-build-arm:
-	@echo "Building for arm..."
-	@GOOS=linux GOARCH=arm go build -o bin/$(APP_NAME)_arm cmd/$(APP_NAME)/main.go
+build-armv7:
+	@echo "Building for armv7..."
+	@GOOS=linux GOARCH=arm go build -o bin/$(APP_NAME)_armv7 cmd/$(APP_NAME)/main.go
+	@echo "Done."
+	@ls -lh bin
