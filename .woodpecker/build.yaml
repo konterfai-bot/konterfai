@@ -1,0 +1,11 @@
+when:
+  branch: main
+  event: [ push, pull_request ]
+
+steps:
+  all-arch-build:
+    image: golang:1.22
+    commands:
+      - make all-arch-build
+      - echo 'Build artifacts:'
+      - ls bin/
