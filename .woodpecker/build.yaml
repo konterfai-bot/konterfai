@@ -1,6 +1,6 @@
 when:
   branch: main
-  event: [ push, pull_request ]
+  event: [ pull_request ]
 
 steps:
   all-arch-build:
