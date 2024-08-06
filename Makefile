@@ -52,7 +52,7 @@ docker-stop:
 	-docker rm $(APP_NAME)
 
 .PHONY: docker-compose-up
-docker-compose-up: build docker-build
+docker-compose-up: docker-build
 	@docker-compose -f docker-compose-dev.yml up -d
 
 .PHONY: docker-compose-down

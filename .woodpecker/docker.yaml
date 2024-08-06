@@ -23,3 +23,7 @@ steps:
           username: konterfai
           password:
             from_secret: docker_token
+        - registry: https://quay.io/
+          username: konterfai
+          password:
+            from_secret: quay_token
