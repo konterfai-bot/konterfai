@@ -11,6 +11,7 @@ konterfAI is a proof-of-concept for a model-poisoner for LLM (Large Language Mod
 
 Although it's still work in progress and not yet ready for production, it already shows the concept of fighting fire with fire: The backend queries a tiny
 LLM running in [ollama](https://ollama.com/) with a high ai-temperature setting to generate hallucinatory content.
+If you wonder how this looks like, check out the [example-hallucination.md](docs/example-hallucination.md) file.
 
 **NOTE:** The developers created konterfAI not as an offensive (hacking) tool, but a countermeasure against AI-crawlers that ignore robots.txt and other rules. The Tool was inspired by reports of web admins suffering from TeraByte of Data caused by AI crawlers - cost that can be avoided.
 
