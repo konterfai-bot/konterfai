@@ -11,7 +11,7 @@ konterfAI is a proof-of-concept for a model-poisoner for LLM (Large Language Mod
 
 Although it's still work in progress and not yet ready for production, it already shows the concept of fighting fire with fire: The backend queries a tiny
 LLM running in [ollama](https://ollama.com/) with a high ai-temperature setting to generate hallucinatory content.
-If you wonder how this looks like, check out the [example-hallucination.md](docs/example-hallucination.md) file.
+If you wonder how this looks like, check out the [example-hallucination.md](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/example-hallucination.md) file.
 
 **NOTE:** The developers created konterfAI not as an offensive (hacking) tool, but a countermeasure against AI-crawlers that ignore robots.txt and other rules. The Tool was inspired by reports of web admins suffering from TeraByte of Data caused by AI crawlers - cost that can be avoided.
 
@@ -25,11 +25,11 @@ Join the [Matrix-Chat](https://app.element.io/#/room/#konterfai:matrix.org) to g
 
 ## Contributing
 
-see [CONTRIBUTING](docs/contributing.md).
+see [CONTRIBUTING](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/contributing.md).
 
 ## FAQ (Frequently Asked Questions)
 
-see [FAQ](docs/faq.md).
+see [FAQ](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/faq.md).
 
 ## How does it work?
 
@@ -38,7 +38,7 @@ The reverse proxy needs the ability to detect the user-agent of the incoming req
 If there is a match the crawler will not be presented with the original content, but with the poisoned content.
 The poisoned content is also cluttered with randomized self-references to catch the crawlers in some kind of tar-pit.
 
-![A diagram showing the basic concept of konterfAI](docs/img/how_it_works.png)
+![A diagram showing the basic concept of konterfAI](https://codeberg.org/konterfai/konterfai/raw/branch/main/docs/img/how_it_works.png)
 
 **Note:** Those are examples and not intended for copy & paste usage. Make sure to read them carefully and adjust them to your needs.
 
@@ -54,14 +54,14 @@ adapt your configuration accordingly.
 $> make build
 ```
 
-For a full list of build targets see [Makefile](Makefile).
+For a full list of build targets see [Makefile](https://codeberg.org/konterfai/konterfai/src/branch/main/Makefile).
 
 ## How to run it?
 
 ### Production deployment
 
 If you are really brave and want to try konterfAI in a production environment, see there are two examples for
-[nginx](deployments/nginx) and [traefik](deployments/traefik) in the deployment-folder.
+[nginx](https://codeberg.org/konterfai/konterfai/src/branch/main/deployments/nginx) and [traefik](https://codeberg.org/konterfai/konterfai/src/branch/main/deployments/traefik) in the deployment-folder.
 
 **Note:** These examples are not intended for copy & paste usage.
 Make sure to read them carefully and adjust them to your needs.
@@ -107,11 +107,11 @@ $> make docker-compose-up
 $> make docker-compose-down
 ```
 
-For more complex examples edit [docker-compose.yml](docker-compose-dev.yml) to suit your needs.
+For more complex examples edit [docker-compose.yml](https://codeberg.org/konterfai/konterfai/src/branch/main/docker-compose-dev.yml) to suit your needs.
 
 #### Pre-built Docker-Image
 
-You can also use the pre-built docker-image from [Docker-Hub](https://hub.docker.com/r/konterfai/konterfai).
+You can also use the pre-built docker-image from [Docker-Hub](https://hub.docker.com/r/konterfai/konterfai) or [Quay.io](https://quay.io/repository/konterfai/konterfai).
 
 ## Configuration
 
@@ -122,4 +122,4 @@ $> ./bin/konterfai --help
 ```
 
 The docker-image is configured via environment-variables.
-For a full list of supported variables see [docker-compose.yml](docker-compose-dev.yml) and [entrypoint.sh](entrypoint.sh).
+For a full list of supported variables see [docker-compose.yml](https://codeberg.org/konterfai/konterfai/src/branch/main/docker-compose-dev.yml) and [entrypoint.sh](https://codeberg.org/konterfai/konterfai/src/branch/main/entrypoint.sh).
