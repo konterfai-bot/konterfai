@@ -9,21 +9,21 @@ steps:
       dockerfile: Dockerfile
       platforms: linux/amd64
       dry_run: true
-      repo: codeberg.org/konterfai/konterfai
+      repo: konterfai/konterfai
       tags: latest-main
 
   publish:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       platforms: linux/amd64,linux/arm64,linux/arm/v7
-      repo: konterfai/konterfai
+      repo: konterfai/konterfai, quay.io/konterfai/konterfai
       tag: latest-main
       logins:
         - registry: https://index.docker.io/v1/
           username: konterfai
           password:
             from_secret: docker_token
-        - registry: https://quay.io/
+        - registry: https://quay.io/api/v1/
           username: konterfai
           password:
             from_secret: quay_token
