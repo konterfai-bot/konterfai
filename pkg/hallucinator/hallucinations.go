@@ -18,6 +18,14 @@ func (h *Hallucinator) GetHallucinationCount() int {
 	return h.hallucinationCount
 }
 
+func (h *Hallucinator) DecreaseHallucinationRequestCount(id int) {
+	go func() {
+		h.hallucinations[id].Lock.Lock()
+		defer h.hallucinations[id].Lock.Unlock()
+		h.hallucinations[id].RequestCount--
+	}()
+}
+
 // PopHallucination withdraws the first hallucination from the list of hallucinations.
 func (h *Hallucinator) PopHallucination() string {
 	h.hallucinationLock.Lock()
@@ -50,7 +58,7 @@ func (h *Hallucinator) PopHallucination() string {
 	} else {
 		metaDescription = currentHallucination[:255]
 	}
-	h.hallucinations[0].RequestCount--
+	h.DecreaseHallucinationRequestCount(0)
 	hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
 		NewsAnchor:   textblocks.RandomNewsPaperName(),
 		Headline:     textblocks.RandomHeadline(),
@@ -97,7 +105,7 @@ func (h *Hallucinator) PopRandomHallucination() string {
 		return hallucination
 	}
 	randomIndex := rand.Intn(len(h.hallucinations))
-	h.hallucinations[randomIndex].RequestCount--
+	h.DecreaseHallucinationRequestCount(randomIndex)
 	currentHallucination := h.hallucinations[randomIndex].Text
 	var metaDescription string
 	if len(currentHallucination) < 255 {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	
+
 	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 )
