@@ -1,13 +1,14 @@
 package hallucinator
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/helpers/dictionaries"
-	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
-	"codeberg.org/konterfai/konterfai/pkg/helpers/textblocks"
-	"codeberg.org/konterfai/konterfai/pkg/renderer"
 	"fmt"
 	"html/template"
 	"math/rand"
+
+	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
+	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
+	"codeberg.org/konterfai/konterfai/pkg/helpers/textblocks"
+	"codeberg.org/konterfai/konterfai/pkg/renderer"
 )
 
 // GetHallucinationCount returns the current hallucination count.

@@ -1,11 +1,12 @@
 package links
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/helpers/dictionaries"
-	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"fmt"
 	"net/url"
 	"strings"
+	
+	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
+	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 )
 
 // RandomLink generates a random link based on the given base URL, the number of random subdirectories and the number of random variables.

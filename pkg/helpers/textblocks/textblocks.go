@@ -1,10 +1,11 @@
 package textblocks
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/helpers/dictionaries"
-	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"fmt"
 	"strings"
+
+	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
+	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 )
 
 // RandomHeadline returns a random headline.

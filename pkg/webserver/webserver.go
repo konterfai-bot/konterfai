@@ -1,11 +1,12 @@
 package webserver
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"net/http"
 	"net/url"
 	"strconv"
 	"sync"
+
+	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 )
 
 // WebServer is the structure for the WebServer.

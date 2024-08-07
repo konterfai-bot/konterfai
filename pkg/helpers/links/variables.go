@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"strings"
 
-	"codeberg.org/konterfai/konterfai/pkg/helpers/dictionaries"
+	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/types"
 )
