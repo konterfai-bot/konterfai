@@ -106,13 +106,13 @@ func (h *Hallucinator) generatePrompt() string {
 		rnd := rand.Intn(100) % 3
 		switch rnd {
 		case 0:
-			prompt += functions.PickRandomFromSlice(&dictionaries.Verbs) + " "
+			prompt += functions.PickRandomStringFromSlice(&dictionaries.Verbs) + " "
 		case 1:
-			prompt += functions.PickRandomFromSlice(&dictionaries.Cities) + " "
+			prompt += functions.PickRandomStringFromSlice(&dictionaries.Cities) + " "
 		case 2:
 			fallthrough
 		default:
-			prompt += functions.PickRandomFromSlice(&dictionaries.Nouns) + " "
+			prompt += functions.PickRandomStringFromSlice(&dictionaries.Nouns) + " "
 		}
 	}
 	return strings.Trim(prompt, " ") + fmt.Sprintf(", write at least %d words about this. Do not add any comments.", h.hallucinationWordCount)

@@ -16,10 +16,19 @@ func PickRandomDate() string {
 	return fmt.Sprintf("%d-%d-%d", year, month, day)
 }
 
-// PickRandomFromSlice picks a random element from the given slice.
-func PickRandomFromSlice(slice *[]string) string {
+// PickRandomStringFromSlice picks a random element from the given slice.
+func PickRandomStringFromSlice(slice *[]string) string {
 	if len(*slice) == 0 {
 		return ""
+	}
+	randIndex := rand.Intn(len(*slice))
+	return (*slice)[randIndex]
+}
+
+// PickRandomSliceFromSlice picks a random slice from the given slice.
+func PickRandomSliceFromSlice(slice *[][]string) []string {
+	if len(*slice) == 0 {
+		return []string{}
 	}
 	randIndex := rand.Intn(len(*slice))
 	return (*slice)[randIndex]

@@ -23,8 +23,8 @@ func RandomLink(baseUrl url.URL, subdirectories, variablesCount int, linkHasVari
 // RandomSimpleLink generates a random link based on the given base URL.
 func RandomSimpleLink(baseUrl url.URL) string {
 	name := strings.ToLower(strings.Join([]string{
-		functions.PickRandomFromSlice(&dictionaries.Nouns),
-		functions.PickRandomFromSlice(&dictionaries.Nouns),
+		functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+		functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 	}, "-"))
 	return fmt.Sprintf("%s://%s/%s", baseUrl.Scheme, baseUrl.Host, name)
 }

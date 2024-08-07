@@ -41,45 +41,45 @@ func getVariableNameString() string {
 		charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		return string(charset[rand.Intn(len(charset))])
 	case types.VerbVariable:
-		return functions.PickRandomFromSlice(&dictionaries.Verbs)
+		return functions.PickRandomStringFromSlice(&dictionaries.Verbs)
 	case types.NounVariable:
-		return functions.PickRandomFromSlice(&dictionaries.Nouns)
+		return functions.PickRandomStringFromSlice(&dictionaries.Nouns)
 	case types.TwoNounVariable:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.ThreeNounVariable:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.TwoNounDashedVariable:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "-")
 	case types.ThreeNounDashedVariable:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "-")
 	case types.VerbNounCombinationVariable:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Verbs),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Verbs),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.NounVerbCombinationVariable:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			strings.ToUpper(functions.PickRandomFromSlice(&dictionaries.Verbs)),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			strings.ToUpper(functions.PickRandomStringFromSlice(&dictionaries.Verbs)),
 		}, "")
 	case types.MonthVariable:
-		return functions.PickRandomFromSlice(&dictionaries.Months)
+		return functions.PickRandomStringFromSlice(&dictionaries.Months)
 	case types.DayVariable:
-		return functions.PickRandomFromSlice(&dictionaries.Weekdays)
+		return functions.PickRandomStringFromSlice(&dictionaries.Weekdays)
 	default:
 		return "default"
 	}
@@ -90,49 +90,49 @@ func getVariableValueString() string {
 	typeRand := rand.Intn(types.VariableValuesCount) + 1
 	switch types.VariableValues(typeRand) {
 	case types.VerbValue:
-		return functions.PickRandomFromSlice(&dictionaries.Verbs)
+		return functions.PickRandomStringFromSlice(&dictionaries.Verbs)
 	case types.NounValue:
-		return functions.PickRandomFromSlice(&dictionaries.Nouns)
+		return functions.PickRandomStringFromSlice(&dictionaries.Nouns)
 	case types.TwoNounValue:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.ThreeNounValue:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.TwoNounDashedValue:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "-")
 	case types.ThreeNounDashedValue:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "-")
 	case types.VerbNounCombinationValue:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Verbs),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Verbs),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.NounVerbCombinationValue:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			strings.ToUpper(functions.PickRandomFromSlice(&dictionaries.Verbs)),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			strings.ToUpper(functions.PickRandomStringFromSlice(&dictionaries.Verbs)),
 		}, "")
 	case types.DateValue:
 		return functions.PickRandomDate()
 	case types.YearValue:
 		return functions.PickRandomYear()
 	case types.MonthValue:
-		return functions.PickRandomFromSlice(&dictionaries.Months)
+		return functions.PickRandomStringFromSlice(&dictionaries.Months)
 	case types.DayValue:
-		return functions.PickRandomFromSlice(&dictionaries.Weekdays)
+		return functions.PickRandomStringFromSlice(&dictionaries.Weekdays)
 	case types.Base64Value:
 		return functions.RandomBase64String()
 	default:

@@ -27,44 +27,44 @@ func getSubDirectoryString() string {
 	case types.UUIDPath:
 		return uuid.NewString()
 	case types.NounPath:
-		return functions.PickRandomFromSlice(&dictionaries.Nouns)
+		return functions.PickRandomStringFromSlice(&dictionaries.Nouns)
 	case types.TwoNounPath:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.ThreeNounPath:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.TwoNounDashedPath:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "-")
 	case types.ThreeNounDashedPath:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "-")
 	case types.VerbPath:
-		return functions.PickRandomFromSlice(&dictionaries.Verbs)
+		return functions.PickRandomStringFromSlice(&dictionaries.Verbs)
 	case types.VerbNounPath:
 		return strings.Join([]string{
-			functions.PickRandomFromSlice(&dictionaries.Verbs),
-			functions.PickRandomFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(&dictionaries.Verbs),
+			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
 		}, "")
 	case types.DatePath:
 		return functions.PickRandomDate()
 	case types.YearPath:
 		return functions.PickRandomYear()
 	case types.MonthPath:
-		return functions.PickRandomFromSlice(&dictionaries.Months)
+		return functions.PickRandomStringFromSlice(&dictionaries.Months)
 	case types.DayPath:
-		return functions.PickRandomFromSlice(&dictionaries.Weekdays)
+		return functions.PickRandomStringFromSlice(&dictionaries.Weekdays)
 	default:
 		return "default"
 	}
