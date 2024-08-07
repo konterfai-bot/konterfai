@@ -19,6 +19,13 @@ type Renderer struct {
 	headlineLinks []string
 }
 
+// MetaData is the structure for the meta-tags.
+type MetaData struct {
+	Description string
+	Keywords    string
+	Charset     string
+}
+
 // RenderData is the structure for the RenderData.
 type RenderData struct {
 	NewsAnchor    string
@@ -29,6 +36,7 @@ type RenderData struct {
 	RandomTopics  []RandomTopic
 	Year          string
 	CurrentYear   string
+	MetaData      MetaData
 }
 
 // RandomTopic is the structure for the RandomTopic.

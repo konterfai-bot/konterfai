@@ -1,6 +1,6 @@
 package dictionaries
 
-var metaKeywordsGroups = [][]string{
+var MetaKeywordsGroups = [][]string{
 	// It-related keywords
 	{
 		"it",

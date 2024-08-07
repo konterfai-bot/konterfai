@@ -1,6 +1,6 @@
 package dictionaries
 
-var charsets = []string{
+var Charsets = []string{
 	"UTF-8",
 	"ISO-8859-1",
 	"UTF-16",

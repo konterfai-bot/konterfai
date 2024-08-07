@@ -3,7 +3,6 @@ package hallucinator
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -13,7 +12,6 @@ import (
 
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
-	"codeberg.org/konterfai/konterfai/pkg/helpers/textblocks"
 	"codeberg.org/konterfai/konterfai/pkg/renderer"
 )
 
@@ -91,75 +89,6 @@ func NewHallucinator(interval time.Duration,
 		},
 		renderer: renderer.NewRenderer(headLineLinks[:]),
 	}
-}
-
-// PopHallucination withdraws the first hallucination from the list of hallucinations.
-func (h *Hallucinator) PopHallucination() string {
-	h.hallucinationLock.Lock()
-	defer h.hallucinationLock.Unlock()
-	h.cleanHallucinations()
-	if len(h.hallucinations) == 0 {
-		hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
-			NewsAnchor:   textblocks.RandomNewsPaperName(),
-			Headline:     textblocks.RandomHeadline(),
-			Content:      dreamString,
-			FollowUpLink: template.HTML(h.generateFollowUpLink(backToStartString)),
-			RandomTopics: h.generateRandomTopicLinks(10),
-			Year:         functions.PickRandomYear(),
-		})
-		if err != nil {
-			return "Could not render...."
-		}
-		return hallucination
-	}
-	h.hallucinations[0].RequestCount--
-	hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
-		NewsAnchor:   textblocks.RandomNewsPaperName(),
-		Headline:     textblocks.RandomHeadline(),
-		Content:      template.HTML(h.clutterTextWithRandomHref(h.hallucinations[0].Text)),
-		FollowUpLink: template.HTML(h.generateFollowUpLink(continueString)),
-		RandomTopics: h.generateRandomTopicLinks(10),
-		Year:         functions.PickRandomYear(),
-	})
-	if err != nil {
-		return "Could not render...."
-	}
-	return hallucination
-}
-
-// PopRandomHallucination withdraws a random hallucination from the list of hallucinations.
-func (h *Hallucinator) PopRandomHallucination() string {
-	h.hallucinationLock.Lock()
-	defer h.hallucinationLock.Unlock()
-	h.cleanHallucinations()
-	if len(h.hallucinations) == 0 {
-		hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
-			NewsAnchor:   textblocks.RandomNewsPaperName(),
-			Headline:     textblocks.RandomHeadline(),
-			Content:      dreamString,
-			FollowUpLink: template.HTML(h.generateFollowUpLink(backToStartString)),
-			RandomTopics: h.generateRandomTopicLinks(10),
-			Year:         functions.PickRandomYear(),
-		})
-		if err != nil {
-			return "Could not render...."
-		}
-		return hallucination
-	}
-	randomIndex := rand.Intn(len(h.hallucinations))
-	h.hallucinations[randomIndex].RequestCount--
-	hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
-		NewsAnchor:   textblocks.RandomNewsPaperName(),
-		Headline:     textblocks.RandomHeadline(),
-		Content:      template.HTML(h.clutterTextWithRandomHref(h.hallucinations[randomIndex].Text)),
-		FollowUpLink: template.HTML(h.generateFollowUpLink(continueString)),
-		RandomTopics: h.generateRandomTopicLinks(10),
-		Year:         functions.PickRandomYear(),
-	})
-	if err != nil {
-		return "Could not render...."
-	}
-	return hallucination
 }
 
 // Start starts the Hallucinator.
