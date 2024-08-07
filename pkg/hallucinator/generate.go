@@ -101,21 +101,26 @@ func (h *Hallucinator) generateHallucination() (string, error) {
 
 // generatePrompt generates a prompt for the Hallucinator.
 func (h *Hallucinator) generatePrompt() string {
-	prompt := "write me a story about "
+	words := ""
 	for i := 0; i < h.promptWordCount; i++ {
 		rnd := rand.Intn(100) % 3
 		switch rnd {
 		case 0:
-			prompt += functions.PickRandomStringFromSlice(&dictionaries.Verbs) + " "
+			words += functions.PickRandomStringFromSlice(&dictionaries.Verbs) + " "
 		case 1:
-			prompt += functions.PickRandomStringFromSlice(&dictionaries.Cities) + " "
+			words += functions.PickRandomStringFromSlice(&dictionaries.Cities) + " "
 		case 2:
 			fallthrough
 		default:
-			prompt += functions.PickRandomStringFromSlice(&dictionaries.Nouns) + " "
+			words += functions.PickRandomStringFromSlice(&dictionaries.Nouns) + " "
 		}
 	}
-	return strings.Trim(prompt, " ") + fmt.Sprintf(", write at least %d words about this. Do not add any comments.", h.hallucinationWordCount)
+	return fmt.Sprintf(functions.PickRandomStringFromSlice(&dictionaries.Prompts),
+		functions.PickRandomStringFromSlice(&dictionaries.ArticleTypes),
+		words,
+		h.hallucinationWordCount,
+		functions.PickRandomStringFromSlice(&dictionaries.Languages),
+	)
 }
 
 // generateRandomTopicLinks generates random topic links.

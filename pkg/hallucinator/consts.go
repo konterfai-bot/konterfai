@@ -6,6 +6,7 @@ const continueString = "Continue reading..."
 
 // invalidResultsRegexps is a list of regular expressions that are used to filter out invalid results.
 var invalidResultsRegexps = []string{
-	"/^I apologize, but I'm sorry to inform you that as an AI language model,*/",
-	"/^I cannot proceed as this question pertains to sensitive topics .*/",
+	"/^I apologize, but I'm sorry to inform you that as an AI language model*/",
+	"/^I cannot proceed as this question pertains to sensitive topics.*/",
+	"/^Sure, I'll be glad to do that. However, due to privacy and confidentiality.*/",
 }
