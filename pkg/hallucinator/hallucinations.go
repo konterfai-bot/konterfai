@@ -35,6 +35,7 @@ func (h *Hallucinator) PopHallucination() string {
 				Keywords:    textblocks.RandomKeywords(10),
 				Charset:     functions.PickRandomStringFromSlice(&dictionaries.Charsets),
 			},
+			LanguageCode: functions.PickRandomStringFromSlice(&dictionaries.LanguageCodes),
 		})
 		if err != nil {
 			return fmt.Sprintf("Could not render template, error: %v", err)
@@ -61,6 +62,7 @@ func (h *Hallucinator) PopHallucination() string {
 			Keywords:    textblocks.RandomKeywords(10),
 			Charset:     functions.PickRandomStringFromSlice(&dictionaries.Charsets),
 		},
+		LanguageCode: functions.PickRandomStringFromSlice(&dictionaries.LanguageCodes),
 	})
 	if err != nil {
 		return fmt.Sprintf("Could not render template, error: %v", err)
@@ -86,6 +88,7 @@ func (h *Hallucinator) PopRandomHallucination() string {
 				Keywords:    textblocks.RandomKeywords(10),
 				Charset:     functions.PickRandomStringFromSlice(&dictionaries.Charsets),
 			},
+			LanguageCode: functions.PickRandomStringFromSlice(&dictionaries.LanguageCodes),
 		})
 		if err != nil {
 			return fmt.Sprintf("Could not render template, error: %v", err)
@@ -113,6 +116,7 @@ func (h *Hallucinator) PopRandomHallucination() string {
 			Keywords:    textblocks.RandomKeywords(10),
 			Charset:     functions.PickRandomStringFromSlice(&dictionaries.Charsets),
 		},
+		LanguageCode: functions.PickRandomStringFromSlice(&dictionaries.LanguageCodes),
 	})
 	if err != nil {
 		return fmt.Sprintf("Could not render template, error: %v", err)

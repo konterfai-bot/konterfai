@@ -37,6 +37,7 @@ type RenderData struct {
 	Year          string
 	CurrentYear   string
 	MetaData      MetaData
+	LanguageCode  string
 }
 
 // RandomTopic is the structure for the RandomTopic.
