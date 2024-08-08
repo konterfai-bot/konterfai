@@ -17,7 +17,7 @@ steps:
       platforms: linux/amd64
       dry_run: true
       repo: konterfai/konterfai
-      tags: latest-main
+      auto_tag: true
 
   publish:
     image: woodpeckerci/plugin-docker-buildx

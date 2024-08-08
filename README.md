@@ -7,17 +7,24 @@
 
 (c) 2024 konterfAI
 
-konterfAI is a proof-of-concept for a model-poisoner for LLM (Large Language Models) to generate nonsense("bullshit") content suitable to degenerate these models.
+konterfAI is a proof-of-concept for a model-poisoner for LLM (Large Language Models) to generate nonsense("bullshit")
+content suitable to degenerate these models.
 
-Although it's still work in progress and not yet ready for production, it already shows the concept of fighting fire with fire: The backend queries a tiny
+Although it's still work in progress and not yet ready for production, it already shows the concept of fighting fire
+with fire: The backend queries a tiny
 LLM running in [ollama](https://ollama.com/) with a high ai-temperature setting to generate hallucinatory content.
-If you wonder how this looks like, check out the [example-hallucination.md](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/example-hallucination.md) file.
+If you wonder how this looks like, check out
+the [example-hallucination.md](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/example-hallucination.md)
+file.
 
-**NOTE:** The developers created konterfAI not as an offensive (hacking) tool, but a countermeasure against AI-crawlers that ignore robots.txt and other rules. The Tool was inspired by reports of web admins suffering from TeraByte of Data caused by AI crawlers - cost that can be avoided.
+**NOTE:** The developers created konterfAI not as an offensive (hacking) tool, but a countermeasure against AI-crawlers
+that ignore robots.txt and other rules. The Tool was inspired by reports of web admins suffering from TeraByte of Data
+caused by AI crawlers - cost that can be avoided.
 
 ## License
 
-konterfAI is licensed under the AGPL (GNU AFFERO GENERAL PUBLIC LICENSE). See [LICENSE](LICENSE) for the full license text.
+konterfAI is licensed under the AGPL (GNU AFFERO GENERAL PUBLIC LICENSE). See [LICENSE](LICENSE) for the full license
+text.
 
 ## Get in touch
 
@@ -40,7 +47,8 @@ The poisoned content is also cluttered with randomized self-references to catch 
 
 ![A diagram showing the basic concept of konterfAI](https://codeberg.org/konterfai/konterfai/raw/branch/main/docs/img/how_it_works.png)
 
-**Note:** Those are examples and not intended for copy & paste usage. Make sure to read them carefully and adjust them to your needs.
+**Note:** Those are examples and not intended for copy & paste usage. Make sure to read them carefully and adjust them
+to your needs.
 
 ## What ollama models does konterfAI ship?
 
@@ -61,7 +69,8 @@ For a full list of build targets see [Makefile](https://codeberg.org/konterfai/k
 ### Production deployment
 
 If you are really brave and want to try konterfAI in a production environment, see there are two examples for
-[nginx](https://codeberg.org/konterfai/konterfai/src/branch/main/deployments/nginx) and [traefik](https://codeberg.org/konterfai/konterfai/src/branch/main/deployments/traefik) in the deployment-folder.
+[nginx](https://codeberg.org/konterfai/konterfai/src/branch/main/deployments/nginx)
+and [traefik](https://codeberg.org/konterfai/konterfai/src/branch/main/deployments/traefik) in the deployment-folder.
 
 **Note:** These examples are not intended for copy & paste usage.
 Make sure to read them carefully and adjust them to your needs.
@@ -107,11 +116,22 @@ $> make docker-compose-up
 $> make docker-compose-down
 ```
 
-For more complex examples edit [docker-compose.yml](https://codeberg.org/konterfai/konterfai/src/branch/main/docker-compose-dev.yml) to suit your needs.
+For more complex examples
+edit [docker-compose.yml](https://codeberg.org/konterfai/konterfai/src/branch/main/docker-compose-dev.yml) to suit your
+needs.
 
 #### Pre-built Docker-Image
 
-You can also use the pre-built docker-image from [Docker-Hub](https://hub.docker.com/r/konterfai/konterfai) or [Quay.io](https://quay.io/repository/konterfai/konterfai).
+You can also use the pre-built docker-image from [Docker-Hub](https://hub.docker.com/r/konterfai/konterfai)
+or [Quay.io](https://quay.io/repository/konterfai/konterfai).
+
+#### Pre-built Docker-Images tags
+
+| Tag           | Description                           |
+|---------------|---------------------------------------|
+| `latest`      | The latest stable release             |
+| `v*.*.*`      | A specific version  (e.g. 0.1.0, 0.1) |
+| `latest-main` | The latest main branch build          |
 
 ## Configuration
 
@@ -122,4 +142,6 @@ $> ./bin/konterfai --help
 ```
 
 The docker-image is configured via environment-variables.
-For a full list of supported variables see [docker-compose.yml](https://codeberg.org/konterfai/konterfai/src/branch/main/docker-compose-dev.yml) and [entrypoint.sh](https://codeberg.org/konterfai/konterfai/src/branch/main/entrypoint.sh).
+For a full list of supported variables
+see [docker-compose.yml](https://codeberg.org/konterfai/konterfai/src/branch/main/docker-compose-dev.yml)
+and [entrypoint.sh](https://codeberg.org/konterfai/konterfai/src/branch/main/entrypoint.sh).
