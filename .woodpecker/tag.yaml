@@ -1,0 +1,36 @@
+when:
+  event: tag
+  ref: refs/tags/v*
+
+steps:
+  all-arch-build:
+    image: golang:1.22
+    commands:
+      - make all-arch-build
+      - echo 'Build artifacts:'
+      - ls bin/
+
+  dry-run:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      dockerfile: Dockerfile
+      platforms: linux/amd64
+      dry_run: true
+      repo: konterfai/konterfai
+      tags: latest-main
+
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      platforms: linux/amd64,linux/arm64,linux/arm/v7
+      repo: konterfai/konterfai, quay.io/konterfai/konterfai
+      auto_tag: true
+      logins:
+        - registry: https://index.docker.io/v1/
+          username: konterfai
+          password:
+            from_secret: docker_token
+        - registry: https://quay.io/api/v1/
+          username: konterfai
+          password:
+            from_secret: quay_token
