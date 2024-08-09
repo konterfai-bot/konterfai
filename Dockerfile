@@ -9,4 +9,8 @@ RUN GOOS=linux GOARCH="${TARGETARCH}" go build -o bin/konterfai cmd/konterfai/ma
 FROM debian:sid-slim
 COPY entrypoint.sh /entrypoint.sh
 COPY --from=builder /src/bin/konterfai /usr/local/bin/konterfai
+
+EXPOSE 8080/tcp
+EXPOSE 8081/tcp
+
 ENTRYPOINT ["/entrypoint.sh"]
