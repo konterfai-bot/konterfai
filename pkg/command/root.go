@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"
 	"codeberg.org/konterfai/konterfai/pkg/webserver"
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
@@ -36,6 +38,12 @@ func Initialize() error {
 				Usage:       "The FQDN of the hallicinator, e.g. http://localhost:8080",
 				Value:       "http://localhost:8080",
 				DefaultText: "http://localhost:8080",
+			},
+			&cli.IntFlag{
+				Name:        "statistics-port",
+				Usage:       "The port to listen on for statistics.",
+				Value:       8081,
+				DefaultText: "8081",
 			},
 			&cli.DurationFlag{
 				Name:        "generate-interval",
@@ -183,6 +191,8 @@ func Run(c *cli.Context) error {
 		c.Int("ai-seed"),
 	)
 
+	st := statistics.NewStatistics()
+
 	gr := run.Group{}
 	gr.Add(func() error {
 		select {
@@ -200,6 +210,7 @@ func Run(c *cli.Context) error {
 		ws := webserver.NewWebServer(c.String("address"),
 			c.Int("port"),
 			hal,
+			st,
 			*hcUrl,
 			c.Float64("webserver-200-probability"),
 			c.Float64("random-uncertainty"),
@@ -216,6 +227,22 @@ func Run(c *cli.Context) error {
 		cancel()
 	})
 
+	gr.Add(func() error {
+		ss := statisticsserver.NewStatisticsServer(c.String("address"),
+			c.Int("statistics-port"),
+			st,
+		)
+		select {
+		case <-ctx.Done():
+			return nil
+		case syncer <- ss.Serve():
+			return <-syncer
+		}
+	}, func(_ error) {
+		fmt.Println("shutting down statistics server")
+		cancel()
+	})
+
 	return gr.Run()
 }
 
@@ -228,6 +255,7 @@ func printHeader(c *cli.Context) {
 	fmt.Println("Configuration:")
 	fmt.Println("  - Address: \t\t\t\t", c.String("address"))
 	fmt.Println("  - Port: \t\t\t\t", c.Int("port"))
+	fmt.Println("  - Statistics Port: \t\t\t", c.Int("statistics-port"))
 	fmt.Println("  - Generate Interval: \t\t\t", c.Duration("generate-interval"))
 	fmt.Println("  - Hallucination Cache Size: \t\t", c.Int("hallucination-cache-size"))
 	fmt.Println("  - Hallucination Prompt Word Count: \t", c.Int("hallucination-prompt-word-count"))

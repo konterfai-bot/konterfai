@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
 )
 
 // WebServer is the structure for the WebServer.
@@ -14,6 +15,7 @@ type WebServer struct {
 	Host                  string
 	Port                  int
 	Hallucinator          *hallucinator.Hallucinator
+	Statistics            *statistics.Statistics
 	HttpOkProbability     float64
 	Uncertainty           float64
 	HttpResponseCache     []WebServerCacheItem
@@ -29,11 +31,12 @@ type WebServerCacheItem struct {
 }
 
 // NewWebServer creates a new WebServer instance.
-func NewWebServer(host string, port int, hallucinator *hallucinator.Hallucinator, baseUrl url.URL, HttpOkProbability, Uncertainty float64, errorCacheSize int) *WebServer {
+func NewWebServer(host string, port int, hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseUrl url.URL, HttpOkProbability, Uncertainty float64, errorCacheSize int) *WebServer {
 	return &WebServer{
 		Host:                  host,
 		Port:                  port,
 		Hallucinator:          hallucinator,
+		Statistics:            statistics,
 		HttpOkProbability:     HttpOkProbability,
 		Uncertainty:           Uncertainty,
 		HttpResponseCache:     []WebServerCacheItem{},
@@ -44,11 +47,12 @@ func NewWebServer(host string, port int, hallucinator *hallucinator.Hallucinator
 
 // Serve starts the web server.
 func (ws *WebServer) Serve() error {
-	http.HandleFunc("/robots.txt", ws.handleRobotsTxt)
+	server := http.NewServeMux()
+	server.HandleFunc("/robots.txt", ws.handleRobotsTxt)
 
-	http.HandleFunc("/", ws.handleRoot)
+	server.HandleFunc("/", ws.handleRoot)
 
-	err := http.ListenAndServe(ws.Host+":"+strconv.Itoa(ws.Port), nil)
+	err := http.ListenAndServe(ws.Host+":"+strconv.Itoa(ws.Port), server)
 	if err != nil {
 		return err
 	}

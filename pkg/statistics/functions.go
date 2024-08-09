@@ -42,11 +42,7 @@ func (s *Statistics) GetRequestsByTimeRange(start, end time.Time) []Request {
 	defer s.mutex.Unlock()
 	var requests []Request
 	for _, r := range s.Requests {
-		t, err := time.Parse(time.RFC3339, r.Timestamp)
-		if err != nil {
-			continue
-		}
-		if t.After(start) && t.Before(end) {
+		if r.Timestamp.After(start) && r.Timestamp.Before(end) {
 			requests = append(requests, r)
 		}
 	}
