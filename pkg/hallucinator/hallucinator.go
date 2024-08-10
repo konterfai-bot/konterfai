@@ -100,11 +100,8 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not generate hallucination (%v)", err))
 			} else {
-				if h.isValidResult(hal) {
-					h.appendHallucination(Hallucination{
-						Text:         hal,
-						RequestCount: h.hallucinationRequestCount,
-					})
+				if h.isValidResult(hal.Text) {
+					h.appendHallucination(hal)
 				} else {
 					fmt.Println("invalid hallucination, skipping...")
 				}

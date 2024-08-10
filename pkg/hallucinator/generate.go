@@ -33,7 +33,7 @@ func (h *Hallucinator) generateFollowUpLink(continueText string) string {
 }
 
 // generateHallucination generates a hallucination from the Ollama API.
-func (h *Hallucinator) generateHallucination() (string, error) {
+func (h *Hallucinator) generateHallucination() (Hallucination, error) {
 	requestUrl, err := url.JoinPath(h.ollamaAddress, "/api/chat")
 	if err != nil {
 		fmt.Println("could not join url path")
@@ -66,18 +66,18 @@ func (h *Hallucinator) generateHallucination() (string, error) {
 	res, err := h.httpClient.Post(requestUrl, "application/json", bytes.NewReader(requestBodyJson))
 	if err != nil {
 		fmt.Println(fmt.Errorf("could not get hallucination from ollama (%v)", err))
-		return "", err
+		return Hallucination{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
 		fmt.Println("ollama did not return 200 OK")
-		return "", errors.New("ollama did not return 200 OK")
+		return Hallucination{}, errors.New("ollama did not return 200 OK")
 	}
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("could not read response body")
-		return "", err
+		return Hallucination{}, err
 	}
 	responses := strings.Split(string(resBody), "\n")
 	payload := []string{}
@@ -96,7 +96,11 @@ func (h *Hallucinator) generateHallucination() (string, error) {
 		}
 	}
 	pl := strings.Join(payload, " ")
-	return pl, nil
+	return Hallucination{
+		Text:         pl,
+		Prompt:       prompt,
+		RequestCount: h.hallucinationRequestCount,
+	}, nil
 }
 
 // generatePrompt generates a prompt for the Hallucinator.
