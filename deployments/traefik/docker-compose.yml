@@ -4,7 +4,7 @@
 # It uses traefik as a reverse proxy and ollama as AI backend.
 # If you want to experiment with it add the following to your /etc/hosts file:
 #
-# 127.0.0.1 konterfai.localhost traefik.localhost
+# 127.0.0.1 konterfai.localhost traefik.localhost statistics.konterfai.localhost
 #
 # This example does not include the necessary configuration for HTTPS, you should add that if you want to use it in
 # production. See https://doc.traefik.io/traefik/https/tls/ for more information.
@@ -77,6 +77,12 @@ services:
       - "traefik.http.middlewares.useragent-intercept.headers.customrequestheaders.X-Intercepted-UserAgent: intercepted"
       - "traefik.http.routers.konterfai.middlewares=useragent-intercept"
       - "traefik.http.services.konterfai.loadbalancer.server.port=8080"
+
+      # You probably want to add some kinde of authentication here, like auth-basic or your openid provider
+      # unless you are running this in an internal network.
+      - "traefik.http.routers.konterfai-statistics.rule=Host(`statistics.konterfai.localhost`)"
+      - "traefik.http.routers.konterfai-statistics.loadbalancer.server.port=8081"
+
       - "traefik.constraint-label=traefik-public"
     depends_on:
       ollama:
@@ -86,6 +92,7 @@ services:
       - PORT=${PORT:-8080}
       # Adjust the rule to match the hostname you want to use
       - HALLUCINATOR_URL=${HALLUCINATOR_URL:-http://konterfai.localhost}
+      - STATISTICS_PORT=${STATISTICS_PORT:-8081}
       - GENERATE_INTERVAL=${GENERATE_INTERVAL:-2s}
       - HALLUCINATION_CACHE_SIZE=${HALLUCINATION_CACHE_SIZE:-10}
       - HALLUCINATION_PROMPT_WORD_COUNT=${HALLUCINATION_PROMPT_WORD_COUNT:-5}

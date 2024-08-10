@@ -4,6 +4,7 @@
     --address="${ADDRESS:-0.0.0.0}" \
     --port="${PORT:-8080}" \
     --hallucinator-url=${HALLUCINATOR_URL:-"https://localhost:8080"} \
+    --statistics-port=${STATISTICS_PORT:-8081} \
     --generate-interval="${GENERATE_INTERVAL:-2s}" \
     --hallucination-cache-size="${HALLUCINATION_CACHE_SIZE:-10}" \
     --hallucination-prompt-word-count="${HALLUCINATION_PROMPT_WORD_COUNT:-5}" \

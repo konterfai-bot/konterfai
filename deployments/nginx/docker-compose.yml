@@ -2,6 +2,9 @@
 
 # This is an example configuration to use konterfAI as a tar-pit for ai-crawlers.
 # It uses nginx as a reverse proxy and ollama as AI backend.
+# If you want to experiment with it add the following to your /etc/hosts file:
+#
+# 127.0.0.1 konterfai.localhost statistics.konterfai.localhost
 
 services:
   nginx:
@@ -64,6 +67,7 @@ services:
       - PORT=${PORT:-8080}
       # Adjust the rule to match the hostname you want to use
       - HALLUCINATOR_URL=${HALLUCINATOR_URL:-http://localhost}
+      - STATISTICS_PORT=${STATISTICS_PORT:-8081}
       - GENERATE_INTERVAL=${GENERATE_INTERVAL:-2s}
       - HALLUCINATION_CACHE_SIZE=${HALLUCINATION_CACHE_SIZE:-10}
       - HALLUCINATION_PROMPT_WORD_COUNT=${HALLUCINATION_PROMPT_WORD_COUNT:-5}
