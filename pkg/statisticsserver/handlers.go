@@ -1,11 +1,23 @@
 package statisticsserver
 
-import "net/http"
+import (
+	"html/template"
+	"net/http"
+	"strings"
+)
 
 // handleRoot is the handler for the root path.
 func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("Hello, World!"))
+	tpl, err := template.New("t").Parse(ss.htmlTemplates["index.gohtml"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	buffer := &strings.Builder{}
+	err = tpl.Execute(buffer, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(buffer.String()))
 }
