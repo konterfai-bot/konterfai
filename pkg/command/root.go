@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
@@ -160,7 +161,7 @@ func Initialize() error {
 
 // Run is the entry point for running konterfAI.
 func Run(c *cli.Context) error {
-	printHeader(c)
+	fmt.Println(generateHeader(c))
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
 		return context.WithCancel(context.Background())
 	}()
@@ -191,7 +192,7 @@ func Run(c *cli.Context) error {
 		c.Int("ai-seed"),
 	)
 
-	st := statistics.NewStatistics()
+	st := statistics.NewStatistics(generateHeader(c))
 
 	gr := run.Group{}
 	gr.Add(func() error {
@@ -246,25 +247,29 @@ func Run(c *cli.Context) error {
 	return gr.Run()
 }
 
-// printHeader prints the header of the konterfAI cli command.
-func printHeader(c *cli.Context) {
-	fmt.Println("#############################")
-	fmt.Println("# konterfAI - the anti-AI-AI #")
-	fmt.Println("#############################")
-	fmt.Println()
-	fmt.Println("Configuration:")
-	fmt.Println("  - Address: \t\t\t\t", c.String("address"))
-	fmt.Println("  - Port: \t\t\t\t", c.Int("port"))
-	fmt.Println("  - Statistics Port: \t\t\t", c.Int("statistics-port"))
-	fmt.Println("  - Generate Interval: \t\t\t", c.Duration("generate-interval"))
-	fmt.Println("  - Hallucination Cache Size: \t\t", c.Int("hallucination-cache-size"))
-	fmt.Println("  - Hallucination Prompt Word Count: \t", c.Int("hallucination-prompt-word-count"))
-	fmt.Println("  - Hallucination Word Count: \t\t", c.Int("hallucination-word-count"))
-	fmt.Println("  - Hallucination Request Count:  \t", c.Int("hallucination-request-count"))
-	fmt.Println("  - Ollama Address: \t\t\t", c.String("ollama-address"))
-	fmt.Println("  - Ollama Model: \t\t\t", c.String("ollama-model"))
-	fmt.Println("  - AI Temperature: \t\t\t", c.Float64("ai-temperature"))
-	fmt.Println("  - AI Seed: \t\t\t\t", c.Int("ai-seed"))
-	fmt.Println("  - Hallucinator URL: \t\t\t", c.String("hallucinator-url"))
-	fmt.Println()
+// gernerateHeader prints the header of the konterfAI cli command.
+func generateHeader(c *cli.Context) string {
+	return strings.Join([]string{
+		fmt.Sprintln("#############################"),
+		fmt.Sprintln("# konterfAI - the anti-AI-AI #"),
+		fmt.Sprintln("#############################"),
+		fmt.Sprintln(),
+		fmt.Sprintln("Configuration:"),
+		fmt.Sprintln("\t- Address: \t\t\t\t", c.String("address")),
+		fmt.Sprintln("\t- Port: \t\t\t\t", c.Int("port")),
+		fmt.Sprintln("\t- Statistics Port: \t\t\t", c.Int("statistics-port")),
+		fmt.Sprintln("\t- Generate Interval: \t\t\t", c.Duration("generate-interval")),
+		fmt.Sprintln("\t- Hallucination Cache Size: \t\t", c.Int("hallucination-cache-size")),
+		fmt.Sprintln("\t- Hallucination Prompt Word Count: \t", c.Int("hallucination-prompt-word-count")),
+		fmt.Sprintln("\t- Hallucination Word Count: \t\t", c.Int("hallucination-word-count")),
+		fmt.Sprintln("\t- Hallucination Request Count:  \t", c.Int("hallucination-request-count")),
+		fmt.Sprintln("\t- Ollama Address: \t\t\t", c.String("ollama-address")),
+		fmt.Sprintln("\t- Ollama Model: \t\t\t", c.String("ollama-model")),
+		fmt.Sprintln("\t- AI Temperature: \t\t\t", c.Float64("ai-temperature")),
+		fmt.Sprintln("\t- AI Seed: \t\t\t\t", c.Int("ai-seed")),
+		fmt.Sprintln("\t- Hallucinator URL: \t\t\t", c.String("hallucinator-url")),
+		fmt.Sprintln(),
+	},
+		"",
+	)
 }

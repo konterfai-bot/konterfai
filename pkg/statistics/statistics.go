@@ -7,8 +7,9 @@ import (
 
 // Statistics is the structure for the Statistics.
 type Statistics struct {
-	Requests []Request
-	mutex    sync.Mutex
+	Requests          []Request
+	mutex             sync.Mutex
+	configurationInfo string
 }
 
 // Request is the structure for the Request.
@@ -20,8 +21,9 @@ type Request struct {
 }
 
 // NewStatistics creates a new Statistics instance.
-func NewStatistics() *Statistics {
+func NewStatistics(configurationInfo string) *Statistics {
 	return &Statistics{
-		Requests: []Request{},
+		Requests:          []Request{},
+		configurationInfo: configurationInfo,
 	}
 }
