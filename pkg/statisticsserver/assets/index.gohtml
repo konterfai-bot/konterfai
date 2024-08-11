@@ -33,5 +33,48 @@
     No active prompts at the moment, hallucinator is probably still filling up the cache.
 {{ end }}
 <hr>
+<h2>Requests by User-Agent</h2>
+{{ if .ByUserAgent }}
+    <table>
+        <thead>
+        <tr>
+            <th>User-Agent</th>
+            <th>Request Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range $userAgent, $requestCount := .ByUserAgent }}
+            <tr>
+                <td>{{ $userAgent }}</td>
+                <td>{{ $requestCount }}</td>
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+{{ else }}
+    No requests by user-agent yet.
+{{ end }}
+<hr>
+<h2>Requests by IP</h2>
+{{ if .ByIpAddress }}
+    <table>
+        <thead>
+        <tr>
+            <th>IP</th>
+            <th>Request Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range $ip, $requestCount := .ByIpAddress }}
+            <tr>
+                <td>{{ $ip }}</td>
+                <td>{{ $requestCount }}</td>
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+{{ else }}
+    No requests by IP yet.
+{{ end }}
 </body>
 </html>

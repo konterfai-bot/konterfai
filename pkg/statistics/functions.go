@@ -1,6 +1,7 @@
 package statistics
 
 import (
+	"strings"
 	"time"
 )
 
@@ -8,6 +9,7 @@ import (
 func (s *Statistics) AppendRequest(r Request) {
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
+	r.IpAddress = strings.Split(r.IpAddress, ":")[0]
 	s.Requests = append(s.Requests, r)
 }
 
