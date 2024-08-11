@@ -115,13 +115,12 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 		} else {
 			fmt.Println("hallucinations cache is full, waiting for next interval...")
 			if promptNeedsUpdate {
-				// TODO: this causes a race condition, needs improvement
 				go func() {
-					var prompts []string
+					prompts := map[string]int{}
 					h.hallucinationLock.Lock()
 					for idx := range h.GetHallucinationCount() {
 						h.hallucinationCountLock.Lock()
-						prompts = append(prompts, h.hallucinations[idx].Prompt)
+						prompts[h.hallucinations[idx].Prompt] = h.hallucinations[idx].RequestCount
 						h.hallucinationCountLock.Unlock()
 					}
 					h.hallucinationLock.Unlock()

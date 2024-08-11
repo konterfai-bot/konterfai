@@ -105,7 +105,7 @@ func (s *Statistics) Load() error {
 }
 
 // UpdatePrompts updates the prompts.
-func (s *Statistics) UpdatePrompts(prompts []string) {
+func (s *Statistics) UpdatePrompts(prompts map[string]int) {
 	s.PromptsMutex.Lock()
 	defer s.PromptsMutex.Unlock()
 	s.Prompts = prompts

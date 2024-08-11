@@ -12,15 +12,26 @@
 </pre>
 <hr>
 <h2>Active Prompts</h2>
-<ul>
-    {{ if .Prompts }}
-        {{ range .Prompts }}
-            <li>{{ . }}</li>
+{{ if .Prompts }}
+    <table>
+        <thead>
+        <tr>
+            <th>Prompt</th>
+            <th>Remaining Requests</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range $prompt, $requestCount := .Prompts }}
+            <tr>
+                <td>{{ $prompt }}</td>
+                <td>{{ $requestCount }}</td>
+            </tr>
         {{ end }}
-    {{ else }}
-        <li>No active prompts at the moment, hallucinator is probably still filling up the cache.</li>
-    {{ end }}
-</ul>
+        </tbody>
+    </table>
+{{ else }}
+    No active prompts at the moment, hallucinator is probably still filling up the cache.
+{{ end }}
 <hr>
 </body>
 </html>

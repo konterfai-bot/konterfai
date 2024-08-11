@@ -18,7 +18,7 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	defer ss.Statistics.PromptsMutex.Unlock()
 	err = tpl.Execute(buffer, struct {
 		ConfigurationInfo string
-		Prompts           []string
+		Prompts           map[string]int
 	}{
 		ConfigurationInfo: ss.Statistics.ConfigurationInfo,
 		Prompts:           ss.Statistics.Prompts,
