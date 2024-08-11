@@ -18,6 +18,7 @@ func (h *Hallucinator) GetHallucinationCount() int {
 	return h.hallucinationCount
 }
 
+// DecreaseHallucinationRequestCount decreases the request count of a hallucination by 1.
 func (h *Hallucinator) DecreaseHallucinationRequestCount(id int) {
 	go func() {
 		if id < 0 || h.GetHallucinationCount() <= id {
@@ -34,10 +35,10 @@ func (h *Hallucinator) PopHallucination() string {
 	h.hallucinationLock.Lock()
 	defer h.hallucinationLock.Unlock()
 	h.cleanHallucinations()
-	if len(h.hallucinations) == 0 {
+	if h.GetHallucinationCount() < 1 {
 		hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
 			NewsAnchor:   textblocks.RandomNewsPaperName(),
-			Headline:     textblocks.RandomHeadline(),
+			Headline:     dream404String,
 			Content:      dreamString,
 			FollowUpLink: template.HTML(h.generateFollowUpLink(backToStartString)),
 			RandomTopics: h.generateRandomTopicLinks(10),
@@ -87,10 +88,10 @@ func (h *Hallucinator) PopRandomHallucination() string {
 	h.hallucinationLock.Lock()
 	defer h.hallucinationLock.Unlock()
 	h.cleanHallucinations()
-	if len(h.hallucinations) == 0 {
+	if h.GetHallucinationCount() < 1 {
 		hallucination, err := h.renderer.RenderInRandomTemplate(renderer.RenderData{
 			NewsAnchor:   textblocks.RandomNewsPaperName(),
-			Headline:     textblocks.RandomHeadline(),
+			Headline:     dream404String,
 			Content:      dreamString,
 			FollowUpLink: template.HTML(h.generateFollowUpLink(backToStartString)),
 			RandomTopics: h.generateRandomTopicLinks(10),
@@ -107,7 +108,7 @@ func (h *Hallucinator) PopRandomHallucination() string {
 		}
 		return hallucination
 	}
-	randomIndex := rand.Intn(len(h.hallucinations))
+	randomIndex := rand.Intn(h.GetHallucinationCount())
 	h.DecreaseHallucinationRequestCount(randomIndex)
 	currentHallucination := h.hallucinations[randomIndex].Text
 	var metaDescription string

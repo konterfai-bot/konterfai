@@ -10,8 +10,9 @@ type Statistics struct {
 	Requests          []Request
 	Mutex             sync.Mutex
 	ConfigurationInfo string
-	Prompts           []string
-	PromptsMutex      sync.Mutex
+	// TODO: maybe use map map[string]int here to count the remaining requests
+	Prompts      []string
+	PromptsMutex sync.Mutex
 }
 
 // Request is the structure for the Request.

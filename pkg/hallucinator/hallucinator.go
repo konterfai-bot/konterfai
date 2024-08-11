@@ -97,8 +97,10 @@ func NewHallucinator(interval time.Duration,
 
 // Start starts the Hallucinator.
 func (h *Hallucinator) Start(ctx context.Context) error {
+	promptNeedsUpdate := false
 	for {
 		if h.GetHallucinationCount() < h.hallucinationCacheSize {
+			promptNeedsUpdate = true
 			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n", len(h.hallucinations)+1, h.hallucinationCacheSize)
 			hal, err := h.generateHallucination()
 			if err != nil {
@@ -106,21 +108,26 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			} else {
 				if h.isValidResult(hal.Text) {
 					h.appendHallucination(hal)
-					go func() {
-						var prompts []string
-						h.hallucinationLock.Lock()
-						defer h.hallucinationLock.Unlock()
-						for _, hallucination := range h.hallucinations {
-							prompts = append(prompts, hallucination.Prompt)
-						}
-						h.statistics.UpdatePrompts(prompts)
-					}()
 				} else {
 					fmt.Println("invalid hallucination, skipping...")
 				}
 			}
 		} else {
 			fmt.Println("hallucinations cache is full, waiting for next interval...")
+			if promptNeedsUpdate {
+				// TODO: this causes a race condition, needs improvement
+				go func() {
+					var prompts []string
+					h.hallucinationLock.Lock()
+					for idx := range h.GetHallucinationCount() {
+						h.hallucinationCountLock.Lock()
+						prompts = append(prompts, h.hallucinations[idx].Prompt)
+						h.hallucinationCountLock.Unlock()
+					}
+					h.hallucinationLock.Unlock()
+					h.statistics.UpdatePrompts(prompts)
+				}()
+			}
 			functions.SleepWithContext(ctx, h.Interval)
 		}
 	}

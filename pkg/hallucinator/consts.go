@@ -1,6 +1,7 @@
 package hallucinator
 
 const dreamString = "We are sorry, but the requested article could be not found!"
+const dream404String = "Error 404: Article not found."
 const backToStartString = "Back to start."
 const continueString = "Continue reading..."
 

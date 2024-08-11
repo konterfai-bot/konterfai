@@ -13,9 +13,13 @@
 <hr>
 <h2>Active Prompts</h2>
 <ul>
-{{ range .Prompts }}
-    <li>{{ . }}</li>
-{{ end }}
+    {{ if .Prompts }}
+        {{ range .Prompts }}
+            <li>{{ . }}</li>
+        {{ end }}
+    {{ else }}
+        <li>No active prompts at the moment, hallucinator is probably still filling up the cache.</li>
+    {{ end }}
 </ul>
 <hr>
 </body>
