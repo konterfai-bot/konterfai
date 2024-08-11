@@ -125,6 +125,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 					}
 					h.hallucinationLock.Unlock()
 					h.statistics.UpdatePrompts(prompts)
+					promptNeedsUpdate = false
 				}()
 			}
 			functions.SleepWithContext(ctx, h.Interval)

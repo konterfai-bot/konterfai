@@ -8,10 +8,10 @@ import (
 // Statistics is the structure for the Statistics.
 type Statistics struct {
 	Requests          []Request
-	Mutex             sync.Mutex
+	StatisticsLock    sync.Mutex
 	ConfigurationInfo string
 	Prompts           map[string]int
-	PromptsMutex      sync.Mutex
+	PromptsLock       sync.Mutex
 }
 
 // Request is the structure for the Request.
