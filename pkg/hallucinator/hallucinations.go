@@ -20,6 +20,9 @@ func (h *Hallucinator) GetHallucinationCount() int {
 
 func (h *Hallucinator) DecreaseHallucinationRequestCount(id int) {
 	go func() {
+		if id < 0 || h.GetHallucinationCount() <= id {
+			return
+		}
 		h.hallucinations[id].Lock.Lock()
 		defer h.hallucinations[id].Lock.Unlock()
 		h.hallucinations[id].RequestCount--
