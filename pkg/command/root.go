@@ -161,7 +161,7 @@ func Initialize() error {
 
 // Run is the entry point for running konterfAI.
 func Run(c *cli.Context) error {
-	fmt.Println(generateHeader(c))
+	fmt.Println(generateHeader(c, true))
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
 		return context.WithCancel(context.Background())
 	}()
@@ -174,7 +174,7 @@ func Run(c *cli.Context) error {
 		return err
 	}
 
-	st := statistics.NewStatistics(generateHeader(c))
+	st := statistics.NewStatistics(generateHeader(c, false))
 
 	hal := hallucinator.NewHallucinator(
 		c.Duration("generate-interval"),
@@ -249,13 +249,18 @@ func Run(c *cli.Context) error {
 }
 
 // gernerateHeader prints the header of the konterfAI cli command.
-func generateHeader(c *cli.Context) string {
-	return strings.Join([]string{
-		fmt.Sprintln("#############################"),
-		fmt.Sprintln("# konterfAI - the anti-AI-AI #"),
-		fmt.Sprintln("#############################"),
-		fmt.Sprintln(),
-		fmt.Sprintln("Configuration:"),
+func generateHeader(c *cli.Context, withHeadline bool) string {
+	var header string
+	if withHeadline {
+		header += strings.Join([]string{
+			fmt.Sprintln("#############################"),
+			fmt.Sprintln("# konterfAI - the anti-AI-AI #"),
+			fmt.Sprintln("#############################"),
+			fmt.Sprintln(),
+			fmt.Sprintln("Configuration:"),
+		}, "")
+	}
+	header += strings.Join([]string{
 		fmt.Sprintln("\t- Address: \t\t\t\t", c.String("address")),
 		fmt.Sprintln("\t- Port: \t\t\t\t", c.Int("port")),
 		fmt.Sprintln("\t- Statistics Port: \t\t\t", c.Int("statistics-port")),
@@ -273,4 +278,5 @@ func generateHeader(c *cli.Context) string {
 	},
 		"",
 	)
+	return header
 }

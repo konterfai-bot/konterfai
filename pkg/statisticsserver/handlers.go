@@ -16,11 +16,13 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	buffer := &strings.Builder{}
 	ss.Statistics.PromptsLock.Lock()
 	defer ss.Statistics.PromptsLock.Unlock()
+	// TODO: sort by count
 	byUserAgent := map[string]int{}
 	for userAgent, requests := range ss.Statistics.GetRequestsGroupedByUserAgent() {
 		byUserAgent[userAgent] = len(requests)
 	}
 
+	// TODO: sort by count
 	byIpAddress := map[string]int{}
 	for ipAddress, requests := range ss.Statistics.GetRequestsGroupedByIpAddress() {
 		byIpAddress[ipAddress] = len(requests)
