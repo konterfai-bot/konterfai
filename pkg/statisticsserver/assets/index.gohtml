@@ -4,6 +4,19 @@
     <title>Statistics Server</title>
 </head>
 <body>
-    <h1>Statistics Server</h1>
+<h1>Statistics Server</h1>
+<hr>
+<h2>Configuration</h2>
+<pre>
+{{ .ConfigurationInfo }}
+</pre>
+<hr>
+<h2>Active Prompts</h2>
+<ul>
+{{ range .Prompts }}
+    <li>{{ . }}</li>
+{{ end }}
+</ul>
+<hr>
 </body>
 </html>

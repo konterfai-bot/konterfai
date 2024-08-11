@@ -8,8 +8,10 @@ import (
 // Statistics is the structure for the Statistics.
 type Statistics struct {
 	Requests          []Request
-	mutex             sync.Mutex
-	configurationInfo string
+	Mutex             sync.Mutex
+	ConfigurationInfo string
+	Prompts           []string
+	PromptsMutex      sync.Mutex
 }
 
 // Request is the structure for the Request.
@@ -24,6 +26,6 @@ type Request struct {
 func NewStatistics(configurationInfo string) *Statistics {
 	return &Statistics{
 		Requests:          []Request{},
-		configurationInfo: configurationInfo,
+		ConfigurationInfo: configurationInfo,
 	}
 }

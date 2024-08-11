@@ -13,6 +13,7 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
 	"codeberg.org/konterfai/konterfai/pkg/renderer"
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
 )
 
 // Hallucinator is the structure for the Hallucinator.
@@ -38,6 +39,7 @@ type Hallucinator struct {
 
 	httpClient *http.Client
 	renderer   *renderer.Renderer
+	statistics *statistics.Statistics
 }
 
 // NewHallucinator creates a new Hallucinator instance.
@@ -56,6 +58,7 @@ func NewHallucinator(interval time.Duration,
 	ollamaRequestTimeOut time.Duration,
 	aiTemperature float64,
 	aiSeed int,
+	statistics *statistics.Statistics,
 ) *Hallucinator {
 	headLineLinks := [10]string{}
 	for i := 0; i < len(headLineLinks); i++ {
@@ -87,7 +90,8 @@ func NewHallucinator(interval time.Duration,
 		httpClient: &http.Client{
 			Timeout: ollamaRequestTimeOut,
 		},
-		renderer: renderer.NewRenderer(headLineLinks[:]),
+		renderer:   renderer.NewRenderer(headLineLinks[:]),
+		statistics: statistics,
 	}
 }
 
@@ -102,6 +106,15 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			} else {
 				if h.isValidResult(hal.Text) {
 					h.appendHallucination(hal)
+					go func() {
+						var prompts []string
+						h.hallucinationLock.Lock()
+						defer h.hallucinationLock.Unlock()
+						for _, hallucination := range h.hallucinations {
+							prompts = append(prompts, hallucination.Prompt)
+						}
+						h.statistics.UpdatePrompts(prompts)
+					}()
 				} else {
 					fmt.Println("invalid hallucination, skipping...")
 				}

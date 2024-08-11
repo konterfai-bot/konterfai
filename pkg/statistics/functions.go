@@ -1,32 +1,34 @@
 package statistics
 
-import "time"
+import (
+	"time"
+)
 
 // AppendRequest appends a request to the statistics.
 func (s *Statistics) AppendRequest(r Request) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	s.Requests = append(s.Requests, r)
 }
 
 // Clear clears the statistics.
 func (s *Statistics) Clear() {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	s.Requests = []Request{}
 }
 
 // GetRequests returns the requests.
 func (s *Statistics) GetRequests() []Request {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	return s.Requests
 }
 
 // GetRequestsByIpAddress returns the requests by IP address.
 func (s *Statistics) GetRequestsByIpAddress(ipAddress string) []Request {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	var requests []Request
 	for _, r := range s.Requests {
 		if r.IpAddress == ipAddress {
@@ -38,8 +40,8 @@ func (s *Statistics) GetRequestsByIpAddress(ipAddress string) []Request {
 
 // GetRequestsByTimeRange returns the requests by time range.
 func (s *Statistics) GetRequestsByTimeRange(start, end time.Time) []Request {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	var requests []Request
 	for _, r := range s.Requests {
 		if r.Timestamp.After(start) && r.Timestamp.Before(end) {
@@ -51,8 +53,8 @@ func (s *Statistics) GetRequestsByTimeRange(start, end time.Time) []Request {
 
 // GetRequestsByUserAgent returns the requests by user agent.
 func (s *Statistics) GetRequestsByUserAgent(userAgent string) []Request {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	var requests []Request
 	for _, r := range s.Requests {
 		if r.UserAgent == userAgent {
@@ -64,8 +66,8 @@ func (s *Statistics) GetRequestsByUserAgent(userAgent string) []Request {
 
 // GetRequestsGroupedByIpAddress returns the requests grouped by IP address.
 func (s *Statistics) GetRequestsGroupedByIpAddress() map[string][]Request {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	grouped := make(map[string][]Request)
 	for _, r := range s.Requests {
 		grouped[r.IpAddress] = append(grouped[r.IpAddress], r)
@@ -75,8 +77,8 @@ func (s *Statistics) GetRequestsGroupedByIpAddress() map[string][]Request {
 
 // GetRequestsGroupedByUserAgent returns the requests grouped by user agent.
 func (s *Statistics) GetRequestsGroupedByUserAgent() map[string][]Request {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	grouped := make(map[string][]Request)
 	for _, r := range s.Requests {
 		grouped[r.UserAgent] = append(grouped[r.UserAgent], r)
@@ -100,4 +102,10 @@ func (s *Statistics) Persist() error {
 func (s *Statistics) Load() error {
 	// TODO: Implement
 	return nil
+}
+
+func (s *Statistics) UpdatePrompts(prompts []string) {
+	s.PromptsMutex.Lock()
+	defer s.PromptsMutex.Unlock()
+	s.Prompts = prompts
 }

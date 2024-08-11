@@ -1,12 +1,13 @@
 package statisticsserver
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"embed"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
+
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
 )
 
 //go:embed assets

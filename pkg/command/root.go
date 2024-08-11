@@ -174,6 +174,8 @@ func Run(c *cli.Context) error {
 		return err
 	}
 
+	st := statistics.NewStatistics(generateHeader(c))
+
 	hal := hallucinator.NewHallucinator(
 		c.Duration("generate-interval"),
 		c.Int("hallucination-cache-size"),
@@ -190,9 +192,8 @@ func Run(c *cli.Context) error {
 		c.Duration("ollama-request-timeout"),
 		c.Float64("ai-temperature"),
 		c.Int("ai-seed"),
+		st,
 	)
-
-	st := statistics.NewStatistics(generateHeader(c))
 
 	gr := run.Group{}
 	gr.Add(func() error {

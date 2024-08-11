@@ -14,10 +14,20 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	buffer := &strings.Builder{}
-	err = tpl.Execute(buffer, nil)
+	err = tpl.Execute(buffer, struct {
+		ConfigurationInfo string
+		Prompts           []string
+	}{
+		ConfigurationInfo: ss.Statistics.ConfigurationInfo,
+		Prompts:           ss.Statistics.Prompts,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(buffer.String()))
+	_, err = w.Write([]byte(buffer.String()))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
