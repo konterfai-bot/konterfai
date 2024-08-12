@@ -13,15 +13,17 @@ import (
 
 // handleRobotsTxt handles the /robots.txt request.
 func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	responseData := robots.RobotsTxt(r)
 	go func() {
 		ws.Statistics.AppendRequest(statistics.Request{
 			IpAddress:   r.RemoteAddr,
 			Timestamp:   time.Now(),
 			UserAgent:   r.Header.Get("User-Agent"),
 			IsRobotsTxt: true,
+			Size:        len(responseData),
 		})
 	}()
-	_, err := w.Write(robots.RobotsTxt(r))
+	_, err := w.Write(responseData)
 	if err != nil {
 		fmt.Println(fmt.Errorf("error writing robots.txt: %w", err))
 	}
@@ -29,14 +31,6 @@ func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 
 // handleRoot handles the root request.
 func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) {
-	go func() {
-		ws.Statistics.AppendRequest(statistics.Request{
-			IpAddress:   r.RemoteAddr,
-			Timestamp:   time.Now(),
-			UserAgent:   r.Header.Get("User-Agent"),
-			IsRobotsTxt: false,
-		})
-	}()
 	httpCode := ws.getErrorFromCache(r.URL)
 	if httpCode < 1 {
 		if r.URL.Path == "/" || r.URL.Path == ws.HttpBaseUrl.Path || r.URL.Path == "" {

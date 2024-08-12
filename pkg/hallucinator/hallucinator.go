@@ -104,6 +104,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n", len(h.hallucinations)+1, h.hallucinationCacheSize)
 			hal, err := h.generateHallucination()
 			if err != nil {
+				functions.SleepWithContext(ctx, h.Interval)
 				fmt.Println(fmt.Errorf("could not generate hallucination (%v)", err))
 			} else {
 				if h.isValidResult(hal.Text) {

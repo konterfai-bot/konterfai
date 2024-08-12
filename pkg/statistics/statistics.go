@@ -20,6 +20,7 @@ type Request struct {
 	IpAddress   string    `yaml:"ipAddress"`
 	Timestamp   time.Time `yaml:"timestamp"`
 	IsRobotsTxt bool      `yaml:"isRobotsTxt"`
+	Size        int       `yaml:"size"`
 }
 
 // NewStatistics creates a new Statistics instance.

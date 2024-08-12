@@ -1,15 +1,147 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <meta http-equiv="refresh" content="30">
     <title>Statistics Server</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 2px solid #2c3e50;
+        }
+
+        /* Configuration Info */
+        pre {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-family: "Courier New", Courier, monospace;
+            overflow-x: auto;
+        }
+
+        /* Tables */
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        thead {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        tbody {
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Lists */
+        ul {
+            list-style-type: disc;
+            padding-left: 40px;
+            margin: 10px auto;
+            width: 80%;;
+        }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+        /* Paragraphs */
+        p {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .alignright {
+            text-align: right;
+            width: 10%;
+            border-left: 1px solid #bdc3c7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            table {
+                width: 100%;
+                margin: 10px auto;
+            }
+
+            ul {
+                padding-left: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
 <h1>Statistics Server</h1>
 <hr>
-<h2>Configuration</h2>
-<pre>
+<table>
+    <thead>
+    <tr>
+        <th>Configuration</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+                <pre>
 {{ .ConfigurationInfo }}
-</pre>
+                </pre>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 <hr>
 <h2>Active Prompts</h2>
 {{ if .Prompts }}
@@ -17,21 +149,26 @@
         <thead>
         <tr>
             <th>Prompt</th>
-            <th>Remaining Requests</th>
+            <th class="alignright">Remaining Requests</th>
         </tr>
         </thead>
         <tbody>
         {{ range $prompt, $requestCount := .Prompts }}
             <tr>
                 <td>{{ $prompt }}</td>
-                <td>{{ $requestCount }}</td>
+                <td class="alignright">{{ $requestCount }}</td>
             </tr>
         {{ end }}
         </tbody>
     </table>
 {{ else }}
-    No active prompts at the moment, hallucinator is probably still filling up the cache.
+    <pre>No active prompts at the moment, hallucinator is probably still filling up the cache.</pre>
 {{ end }}
+<b>Note:</b> This will only update in two cases:
+<ul>
+    <li>The cache has been filled 100%.</li>
+    <li>The cache had empty slots and has been refilled.</li>
+</ul>
 <hr>
 <h2>Requests by User-Agent</h2>
 {{ if .ByUserAgent }}
@@ -39,20 +176,22 @@
         <thead>
         <tr>
             <th>User-Agent</th>
-            <th>Request Count</th>
+            <th class="alignright">Request Count</th>
+            <th class="alignright">Data fed</th>
         </tr>
         </thead>
         <tbody>
-        {{ range $userAgent, $requestCount := .ByUserAgent }}
+        {{ range $userAgent, $data := .ByUserAgent }}
             <tr>
                 <td>{{ $userAgent }}</td>
-                <td>{{ $requestCount }}</td>
+                <td class="alignright">{{ $data.Count }}</td>
+                <td class="alignright">{{ $data.Size }}</td>
             </tr>
         {{ end }}
         </tbody>
     </table>
 {{ else }}
-    No requests by user-agent yet.
+    <pre>No requests by user-agent yet.</pre>
 {{ end }}
 <hr>
 <h2>Requests by IP</h2>
@@ -61,20 +200,22 @@
         <thead>
         <tr>
             <th>IP</th>
-            <th>Request Count</th>
+            <th class="alignright">Request Count</th>
+            <th class="alignright">Data fed</th>
         </tr>
         </thead>
         <tbody>
-        {{ range $ip, $requestCount := .ByIpAddress }}
+        {{ range $ip, $data := .ByIpAddress }}
             <tr>
                 <td>{{ $ip }}</td>
-                <td>{{ $requestCount }}</td>
+                <td class="alignright">{{ $data.Count }}</td>
+                <td class="alignright">{{ $data.Size }}</td>
             </tr>
         {{ end }}
         </tbody>
     </table>
 {{ else }}
-    No requests by IP yet.
+    <pre>No requests by IP yet.</pre>
 {{ end }}
 </body>
 </html>
