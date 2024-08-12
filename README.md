@@ -2,6 +2,7 @@
 [![License](https://img.shields.io/badge/License-AGPL-v3.svg)](LICENSE)
 [![status-badge](https://ci.codeberg.org/api/badges/13605/status.svg)](https://ci.codeberg.org/repos/13605)
 [![Go Report Card](https://goreportcard.com/badge/codeberg.org/konterfai/konterfai)](https://goreportcard.com/report/codeberg.org/konterfai/konterfai)
+![Gitea Release](https://img.shields.io/gitea/v/release/konterfai/konterfai?gitea_url=https%3A%2F%2Fcodeberg.org&sort=semver)
 
 # konterfAI
 
