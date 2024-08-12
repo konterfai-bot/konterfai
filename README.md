@@ -86,6 +86,12 @@ $> make start-ollama[-gpu]
 $> make run
 ```
 
+### Default Ports
+
+konterfAI will start two webservers, one is the service itself, listening on port 8080.
+The other is the statistics server, listening on port 8081. If you are running this locally from source,
+you cann access both servers via [http://localhost:8080](http://localhost:8080) and [http://localhost:8081](http://localhost:8081).
+
 ### Docker
 
 **Start:**
