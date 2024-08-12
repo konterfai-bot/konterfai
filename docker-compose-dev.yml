@@ -33,6 +33,7 @@ services:
         restart: always
         ports:
           - 8080:8080
+          - 8081:8081
         networks:
          - konterfai-net
         healthcheck:
@@ -47,6 +48,7 @@ services:
           - ADDRESS=${ADDRESS:-0.0.0.0}
           - PORT=${PORT:-8080}
           - HALLUCINATOR_URL=${HALLUCINATOR_URL:-http://localhost:8080}
+          - STATISTICS_PORT=${STATISTICS_PORT:-8081}
           - GENERATE_INTERVAL=${GENERATE_INTERVAL:-2s}
           - HALLUCINATION_CACHE_SIZE=${HALLUCINATION_CACHE_SIZE:-10}
           - HALLUCINATION_PROMPT_WORD_COUNT=${HALLUCINATION_PROMPT_WORD_COUNT:-5}
