@@ -176,6 +176,7 @@
         <thead>
         <tr>
             <th>User-Agent</th>
+            <th class="alignright">Violates robots.txt</th>
             <th class="alignright">Request Count</th>
             <th class="alignright">Data fed</th>
         </tr>
@@ -184,6 +185,7 @@
         {{ range $userAgent, $data := .ByUserAgent }}
             <tr>
                 <td>{{ $userAgent }}</td>
+                <td class="alignright">{{ $data.IsRobotsTxtViolator }}</td>
                 <td class="alignright">{{ $data.Count }}</td>
                 <td class="alignright">{{ $data.Size }}</td>
             </tr>
@@ -200,6 +202,7 @@
         <thead>
         <tr>
             <th>IP</th>
+            <th class="alignright">Violates robots.txt</th>
             <th class="alignright">Request Count</th>
             <th class="alignright">Data fed</th>
         </tr>
@@ -208,6 +211,7 @@
         {{ range $ip, $data := .ByIpAddress }}
             <tr>
                 <td>{{ $ip }}</td>
+                <td class="alignright">{{ $data.IsRobotsTxtViolator }}</td>
                 <td class="alignright">{{ $data.Count }}</td>
                 <td class="alignright">{{ $data.Size }}</td>
             </tr>

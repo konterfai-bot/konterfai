@@ -20,18 +20,24 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
 	defer ss.Statistics.PromptsLock.Unlock()
 	// TODO: sort by count
 	type Data struct {
-		Count int
-		Size  string
+		Count               int
+		Size                string
+		IsRobotsTxtViolator string
 	}
 	byUserAgent := map[string]Data{}
 	for userAgent, requests := range ss.Statistics.GetRequestsGroupedByUserAgent() {
 		size := 0
+		isRobotsTxtViolator := "no"
 		for _, request := range requests {
 			size += request.Size
+			if request.IsRobotsTxt && len(requests) > 1 {
+				isRobotsTxtViolator = "yes"
+			}
 		}
 		byUserAgent[userAgent] = Data{
-			Count: len(requests),
-			Size:  convertByteSizeToSIUnits(size),
+			Count:               len(requests),
+			Size:                convertByteSizeToSIUnits(size),
+			IsRobotsTxtViolator: isRobotsTxtViolator,
 		}
 	}
 
@@ -39,12 +45,18 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
 	byIpAddress := map[string]Data{}
 	for ipAddress, requests := range ss.Statistics.GetRequestsGroupedByIpAddress() {
 		size := 0
+		isRobotsTxtViolator := "no"
 		for _, request := range requests {
 			size += request.Size
+			if request.IsRobotsTxt && len(requests) > 1 {
+				isRobotsTxtViolator = "yes"
+			}
+
 		}
 		byIpAddress[ipAddress] = Data{
-			Count: len(requests),
-			Size:  convertByteSizeToSIUnits(size),
+			Count:               len(requests),
+			Size:                convertByteSizeToSIUnits(size),
+			IsRobotsTxtViolator: isRobotsTxtViolator,
 		}
 	}
 
