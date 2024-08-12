@@ -1,12 +1,19 @@
 package statisticsserver
 
 import (
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"fmt"
 	"html/template"
 	"math"
 	"net/http"
 	"strings"
 )
+
+type Data struct {
+	Count               int
+	Size                string
+	IsRobotsTxtViolator string
+}
 
 // handleRoot is the handler for the root path.
 func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
@@ -19,46 +26,10 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
 	ss.Statistics.PromptsLock.Lock()
 	defer ss.Statistics.PromptsLock.Unlock()
 	// TODO: sort by count
-	type Data struct {
-		Count               int
-		Size                string
-		IsRobotsTxtViolator string
-	}
-	byUserAgent := map[string]Data{}
-	for userAgent, requests := range ss.Statistics.GetRequestsGroupedByUserAgent() {
-		size := 0
-		isRobotsTxtViolator := "no"
-		for _, request := range requests {
-			size += request.Size
-			if request.IsRobotsTxt && len(requests) > 1 {
-				isRobotsTxtViolator = "yes"
-			}
-		}
-		byUserAgent[userAgent] = Data{
-			Count:               len(requests),
-			Size:                convertByteSizeToSIUnits(size),
-			IsRobotsTxtViolator: isRobotsTxtViolator,
-		}
-	}
+	byUserAgent := analyseStatistics(ss.Statistics.GetRequestsGroupedByUserAgent())
 
 	// TODO: sort by count
-	byIpAddress := map[string]Data{}
-	for ipAddress, requests := range ss.Statistics.GetRequestsGroupedByIpAddress() {
-		size := 0
-		isRobotsTxtViolator := "no"
-		for _, request := range requests {
-			size += request.Size
-			if request.IsRobotsTxt && len(requests) > 1 {
-				isRobotsTxtViolator = "yes"
-			}
-
-		}
-		byIpAddress[ipAddress] = Data{
-			Count:               len(requests),
-			Size:                convertByteSizeToSIUnits(size),
-			IsRobotsTxtViolator: isRobotsTxtViolator,
-		}
-	}
+	byIpAddress := analyseStatistics(ss.Statistics.GetRequestsGroupedByIpAddress())
 
 	err = tpl.Execute(buffer, struct {
 		ConfigurationInfo string
@@ -80,6 +51,34 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// analyseStatistics is a helper function to analyze the statistics.
+func analyseStatistics(requestData map[string][]statistics.Request) map[string]Data {
+	data := map[string]Data{}
+	for ipAddress, requests := range requestData {
+		size := 0
+		isRobotsTxtViolator := "no"
+		robotsTxtCounter := 0
+		for _, request := range requests {
+			size += request.Size
+			if request.IsRobotsTxt {
+				robotsTxtCounter++
+			}
+		}
+		if robotsTxtCounter == 0 {
+			isRobotsTxtViolator = "ignored"
+		}
+		if robotsTxtCounter > 0 && robotsTxtCounter < len(requests) {
+			isRobotsTxtViolator = "yes"
+		}
+		data[ipAddress] = Data{
+			Count:               len(requests),
+			Size:                convertByteSizeToSIUnits(size),
+			IsRobotsTxtViolator: isRobotsTxtViolator,
+		}
+	}
+	return data
 }
 
 // convertByteSizeToSIUnits converts the byte size to SI units.
