@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 //go:embed assets
@@ -52,6 +53,7 @@ func NewStatisticsServer(host string, port int, statistics *statistics.Statistic
 // Serve starts the statistics server.
 func (ss *StatisticsServer) Serve() error {
 	server := http.NewServeMux()
+	server.Handle("/metrics", promhttp.Handler())
 	server.HandleFunc("/", ss.handleRoot)
 	err := http.ListenAndServe(ss.Host+":"+strconv.Itoa(ss.Port), server)
 	if err != nil {

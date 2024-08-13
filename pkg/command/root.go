@@ -163,18 +163,18 @@ func Initialize() error {
 func Run(c *cli.Context) error {
 	fmt.Println(generateHeader(c, true))
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
-		return context.WithCancel(context.Background())
+		return context.WithCancel(c.Context)
 	}()
 	defer cancel()
 	syncer := make(chan error)
+
+	st := statistics.NewStatistics(ctx, generateHeader(c, false))
 
 	hcUrl, err := url.Parse(c.String("hallucinator-url"))
 	if err != nil {
 		fmt.Println("could not parse hallucinator-url")
 		return err
 	}
-
-	st := statistics.NewStatistics(generateHeader(c, false))
 
 	hal := hallucinator.NewHallucinator(
 		c.Duration("generate-interval"),

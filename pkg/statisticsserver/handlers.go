@@ -67,7 +67,7 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
 // analyseStatistics is a helper function to analyze the statistics.
 func analyseStatistics(requestData map[string][]statistics.Request) map[string]Data {
 	data := map[string]Data{}
-	for ipAddress, requests := range requestData {
+	for identifier, requests := range requestData {
 		size := 0
 		isRobotsTxtViolator := "no"
 		robotsTxtCounter := 0
@@ -83,7 +83,7 @@ func analyseStatistics(requestData map[string][]statistics.Request) map[string]D
 		if robotsTxtCounter > 0 && robotsTxtCounter < len(requests) {
 			isRobotsTxtViolator = "yes"
 		}
-		data[ipAddress] = Data{
+		data[identifier] = Data{
 			Count:               len(requests),
 			Size:                convertByteSizeToSIUnits(size),
 			IsRobotsTxtViolator: isRobotsTxtViolator,

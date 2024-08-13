@@ -1,6 +1,7 @@
 package statistics
 
 import (
+	"context"
 	"sync"
 	"time"
 )
@@ -13,6 +14,7 @@ type Statistics struct {
 	Prompts           map[string]int
 	PromptsLock       sync.Mutex
 	PromptsCount      int
+	Context           context.Context
 }
 
 // Request is the structure for the Request.
@@ -25,9 +27,12 @@ type Request struct {
 }
 
 // NewStatistics creates a new Statistics instance.
-func NewStatistics(configurationInfo string) *Statistics {
-	return &Statistics{
+func NewStatistics(ctx context.Context, configurationInfo string) *Statistics {
+	st := &Statistics{
 		Requests:          []Request{},
 		ConfigurationInfo: configurationInfo,
+		Context:           ctx,
 	}
+	st.recordStatistics()
+	return st
 }

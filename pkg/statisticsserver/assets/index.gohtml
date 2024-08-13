@@ -198,7 +198,7 @@
         <thead>
         <tr>
             <th>User-Agent</th>
-            <th class="alignright">Violates robots.txt</th>
+            <th class="alignright">Violates robots.txt<sup>*</sup></th>
             <th class="alignright">Request Count</th>
             <th class="alignright">Data fed</th>
         </tr>
@@ -224,7 +224,7 @@
         <thead>
         <tr>
             <th>IP</th>
-            <th class="alignright">Violates robots.txt</th>
+            <th class="alignright">Violates robots.txt<sup>*</sup></th>
             <th class="alignright">Request Count</th>
             <th class="alignright">Data fed</th>
         </tr>
@@ -243,5 +243,14 @@
 {{ else }}
     <pre>No requests by IP yet.</pre>
 {{ end }}
+<hr>
+<small>
+    *) Meaning of robots.txt Violations
+    <ul>
+        <li><b>YES</b> - has red robots.txt, but made requests to the content</li>
+        <li><b>NO</b> - has red robots.txt, has made no requests to the content</li>
+        <li><b>ignored</b> - has made just requests to the content</li>
+    </ul>
+</small>
 </body>
 </html>

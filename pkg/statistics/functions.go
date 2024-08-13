@@ -11,6 +11,10 @@ func (s *Statistics) AppendRequest(r Request) {
 	defer s.StatisticsLock.Unlock()
 	r.IpAddress = strings.Split(r.IpAddress, ":")[0]
 	s.Requests = append(s.Requests, r)
+
+	// Update Prometheus metrics
+	RequestTotal.Inc()
+	DataFedTotal.Add(float64(r.Size))
 }
 
 // Clear clears the statistics.
@@ -117,6 +121,24 @@ func (s *Statistics) GetTotalRequests() int {
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	return len(s.Requests)
+}
+
+// GetTotalRobotsTxtViolators returns the total robots.txt violators.
+func (s *Statistics) GetTotalRobotsTxtViolators() int {
+	requests := s.GetRequestsGroupedByUserAgent()
+	violators := map[string]struct{}{}
+	for identifier, requests := range requests {
+		robotsTxtCounter := 0
+		for _, request := range requests {
+			if request.IsRobotsTxt {
+				robotsTxtCounter++
+			}
+		}
+		if robotsTxtCounter > 0 && robotsTxtCounter < len(requests) {
+			violators[identifier] = struct{}{}
+		}
+	}
+	return len(violators)
 }
 
 // UpdatePrompts updates the prompts.
