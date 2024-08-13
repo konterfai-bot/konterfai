@@ -88,27 +88,47 @@ func (s *Statistics) GetRequestsGroupedByUserAgent() map[string][]Request {
 	return grouped
 }
 
-// ClearPersistent clears the persistent statistics.
-func (s *Statistics) ClearPersistent() error {
-	// TODO: Implement
-	return nil
+// GetTotalDataSizeServed returns the data size served.
+func (s *Statistics) GetTotalDataSizeServed() int {
+	s.StatisticsLock.Lock()
+	defer s.StatisticsLock.Unlock()
+	var size int
+	for _, r := range s.Requests {
+		size += r.Size
+	}
+	return size
 }
 
-// Persist persists the statistics.
-func (s *Statistics) Persist() error {
-	// TODO: Implement
-	return nil
+// GetTotalDataSizeServedByTimeRange returns the data size served by time range.
+func (s *Statistics) GetTotalDataSizeServedByTimeRange(start, end time.Time) int {
+	s.StatisticsLock.Lock()
+	defer s.StatisticsLock.Unlock()
+	var size int
+	for _, r := range s.Requests {
+		if r.Timestamp.After(start) && r.Timestamp.Before(end) {
+			size += r.Size
+		}
+	}
+	return size
 }
 
-// Load loads the statistics.
-func (s *Statistics) Load() error {
-	// TODO: Implement
-	return nil
+// GetTotalRequests returns the total requests.
+func (s *Statistics) GetTotalRequests() int {
+	s.StatisticsLock.Lock()
+	defer s.StatisticsLock.Unlock()
+	return len(s.Requests)
 }
 
 // UpdatePrompts updates the prompts.
 func (s *Statistics) UpdatePrompts(prompts map[string]int) {
 	s.PromptsLock.Lock()
 	defer s.PromptsLock.Unlock()
+	delta := 0
+	for prompt := range prompts {
+		if _, contains := s.Prompts[prompt]; !contains {
+			delta++
+		}
+	}
+	s.PromptsCount += delta
 	s.Prompts = prompts
 }

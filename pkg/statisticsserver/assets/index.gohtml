@@ -141,7 +141,29 @@
     </tr>
     </tbody>
 </table>
-
+<hr>
+<h2>Totals</h2>
+<table>
+    <thead>
+    <tr>
+        <th></th>
+        <th class="alignright">Count</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Total Requests</td>
+        <td class="alignright">{{ .TotalRequests }}</td>
+    </tr>
+    <tr>
+        <td>Total Data Fed</td>
+        <td class="alignright">{{ .TotalDataSize }}</td>
+    </tr>
+    <tr>
+        <td>Prompts generated</td>
+        <td class="alignright">{{ .TotalPrompts }}</td>
+    </tr>
+</table>
 <hr>
 <h2>Active Prompts</h2>
 {{ if .Prompts }}

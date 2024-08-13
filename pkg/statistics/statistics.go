@@ -12,6 +12,7 @@ type Statistics struct {
 	ConfigurationInfo string
 	Prompts           map[string]int
 	PromptsLock       sync.Mutex
+	PromptsCount      int
 }
 
 // Request is the structure for the Request.

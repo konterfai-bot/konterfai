@@ -23,24 +23,35 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 	buffer := &strings.Builder{}
-	ss.Statistics.PromptsLock.Lock()
-	defer ss.Statistics.PromptsLock.Unlock()
 	// TODO: sort by count
 	byUserAgent := analyseStatistics(ss.Statistics.GetRequestsGroupedByUserAgent())
 
 	// TODO: sort by count
 	byIpAddress := analyseStatistics(ss.Statistics.GetRequestsGroupedByIpAddress())
 
+	totalDataSize := convertByteSizeToSIUnits(ss.Statistics.GetTotalDataSizeServed())
+
+	totalRequests := len(ss.Statistics.Requests)
+
+	ss.Statistics.PromptsLock.Lock()
+	defer ss.Statistics.PromptsLock.Unlock()
+
 	err = tpl.Execute(buffer, struct {
 		ConfigurationInfo string
 		Prompts           map[string]int
 		ByUserAgent       map[string]Data
 		ByIpAddress       map[string]Data
+		TotalDataSize     string
+		TotalRequests     int
+		TotalPrompts      int
 	}{
 		ConfigurationInfo: ss.Statistics.ConfigurationInfo,
 		Prompts:           ss.Statistics.Prompts,
 		ByUserAgent:       byUserAgent,
 		ByIpAddress:       byIpAddress,
+		TotalDataSize:     totalDataSize,
+		TotalRequests:     totalRequests,
+		TotalPrompts:      ss.Statistics.PromptsCount,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
