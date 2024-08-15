@@ -42,7 +42,7 @@ see [FAQ](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/faq.md).
 
 ## How does it work?
 
-konterfAI is supposed to run behind an reverse-proxy, like nginx or traefik.
+konterfAI is supposed to run behind a reverse-proxy, like nginx or traefik.
 The reverse proxy needs the ability to detect the user-agent of the incoming request and filter it by a given list.
 If there is a match the crawler will not be presented with the original content, but with the poisoned content.
 The poisoned content is also cluttered with randomized self-references to catch the crawlers in some kind of tar-pit.
@@ -81,7 +81,7 @@ Make sure to read them carefully and adjust them to your needs.
 
 ### Development
 
-**Note:** `-gpu` is optional, if you do not have a ollama-capable GPU, you can omit it.
+**Note:** `-gpu` is optional, if you do not have an ollama-capable GPU, you can omit it.
 
 ```bash
 $> make start-ollama[-gpu]
@@ -92,8 +92,13 @@ $> make run
 
 konterfAI will start two webservers, one is the service itself, listening on port 8080.
 The other is the statistics server, listening on port 8081. If you are running this locally from source,
-you cann access both servers via [http://localhost:8080](http://localhost:8080) and [http://localhost:8081](http://localhost:8081).
+you can access both servers via [http://localhost:8080](http://localhost:8080) and [http://localhost:8081](http://localhost:8081).
 These ports can be changed via the `--port` and `--statistics-port` flags.
+
+### Prometheus Metrics
+
+konterfAI exposes prometheus metrics on the `/metrics` endpoint from the statistics server.
+You can access them via [http://localhost:8081/metrics](http://localhost:8081/metrics).
 
 ### Docker
 
