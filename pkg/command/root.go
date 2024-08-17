@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"net/url"
 	"os"
 	"strings"
@@ -151,6 +152,11 @@ func Initialize() error {
 				Usage: "The uncertainty for the random generator. Use a high number for more randomness",
 				Value: 0.1,
 			},
+			&cli.StringFlag{
+				Name:  "tracing-endpoint",
+				Usage: "The endpoint for the tracing server (open telemetry). If empty, tracing is disabled.",
+				Value: "",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			return Run(c)
@@ -159,19 +165,29 @@ func Initialize() error {
 	return app.Run(os.Args)
 }
 
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/command")
+
 // Run is the entry point for running konterfAI.
 func Run(c *cli.Context) error {
-	fmt.Println(generateHeader(c, true))
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
 		return context.WithCancel(c.Context)
 	}()
 	defer cancel()
+
+	// TODO: this value will be used for passing the traceprovider to the different threads
+	_ = GetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
+
+	ctx, span := tracer.Start(ctx, "Run")
+	defer span.End()
+
+	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)
 
 	st := statistics.NewStatistics(ctx, generateHeader(c, false))
 
 	hcUrl, err := url.Parse(c.String("hallucinator-url"))
 	if err != nil {
+		span.RecordError(err)
 		fmt.Println("could not parse hallucinator-url")
 		return err
 	}
@@ -204,6 +220,7 @@ func Run(c *cli.Context) error {
 			return <-syncer
 		}
 	}, func(_ error) {
+		span.AddEvent("shutting down hallucinator")
 		fmt.Println("shutting down hallucinator")
 		cancel()
 	})
@@ -225,6 +242,7 @@ func Run(c *cli.Context) error {
 			return <-syncer
 		}
 	}, func(_ error) {
+		span.AddEvent("shutting down webserver")
 		fmt.Println("shutting down webserver")
 		cancel()
 	})
@@ -241,6 +259,7 @@ func Run(c *cli.Context) error {
 			return <-syncer
 		}
 	}, func(_ error) {
+		span.AddEvent("shutting down statistics server")
 		fmt.Println("shutting down statistics server")
 		cancel()
 	})
@@ -274,6 +293,15 @@ func generateHeader(c *cli.Context, withHeadline bool) string {
 		fmt.Sprintln("\t- AI Temperature: \t\t\t", c.Float64("ai-temperature")),
 		fmt.Sprintln("\t- AI Seed: \t\t\t\t", c.Int("ai-seed")),
 		fmt.Sprintln("\t- Hallucinator URL: \t\t\t", c.String("hallucinator-url")),
+	}, "")
+
+	if c.String("tracing-endpoint") != "" {
+		header += strings.Join([]string{
+			fmt.Sprintln("\t- Tracing Endpoint: \t\t\t", c.String("tracing-endpoint")),
+		}, "")
+	}
+
+	header += strings.Join([]string{
 		fmt.Sprintln(),
 	},
 		"",

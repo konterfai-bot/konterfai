@@ -88,6 +88,10 @@ $> make start-ollama[-gpu]
 $> make run
 ```
 
+### Tracing
+
+see [Tracing](https://codeberg.org/konterfai/konterfai/src/branch/main/docs/tracing.md).
+
 ### Default Ports
 
 konterfAI will start two webservers, one is the service itself, listening on port 8080.

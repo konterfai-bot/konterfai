@@ -7,3 +7,4 @@
 - [Example hallucination](example-hallucination.md)
 - [FAQ](faq.md)
 - [Roadmap](roadmap.md)
+- [Tracing](tracing.md)
