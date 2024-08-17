@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"go.opentelemetry.io/otel"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -29,6 +30,8 @@ type WebServerCacheItem struct {
 	Url  string
 	Code int
 }
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/webserver")
 
 // NewWebServer creates a new WebServer instance.
 func NewWebServer(host string, port int, hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseUrl url.URL, HttpOkProbability, Uncertainty float64, errorCacheSize int) *WebServer {

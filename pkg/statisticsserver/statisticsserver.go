@@ -3,6 +3,7 @@ package statisticsserver
 import (
 	"embed"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"net/http"
 	"os"
 	"strconv"
@@ -13,6 +14,8 @@ import (
 
 //go:embed assets
 var assets embed.FS
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/statisticsserver")
 
 // StatisticsServer is the structure for the StatisticsServer.
 type StatisticsServer struct {

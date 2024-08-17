@@ -2,6 +2,7 @@ package statistics
 
 import (
 	"context"
+	"go.opentelemetry.io/otel"
 	"sync"
 	"time"
 )
@@ -25,6 +26,8 @@ type Request struct {
 	IsRobotsTxt bool      `yaml:"isRobotsTxt"`
 	Size        int       `yaml:"size"`
 }
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/statistics")
 
 // NewStatistics creates a new Statistics instance.
 func NewStatistics(ctx context.Context, configurationInfo string) *Statistics {

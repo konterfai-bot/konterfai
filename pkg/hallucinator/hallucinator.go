@@ -3,6 +3,7 @@ package hallucinator
 import (
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -41,6 +42,8 @@ type Hallucinator struct {
 	renderer   *renderer.Renderer
 	statistics *statistics.Statistics
 }
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/hallucinator")
 
 // NewHallucinator creates a new Hallucinator instance.
 func NewHallucinator(interval time.Duration,

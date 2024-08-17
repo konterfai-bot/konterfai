@@ -3,6 +3,7 @@ package renderer
 import (
 	"embed"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"html/template"
 	"math/rand"
 	"os"
@@ -12,6 +13,8 @@ import (
 
 //go:embed assets
 var assets embed.FS
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/renderer")
 
 // Renderer is the structure for the Renderer.
 type Renderer struct {
