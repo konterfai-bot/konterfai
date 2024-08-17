@@ -17,13 +17,6 @@ func (s *Statistics) AppendRequest(r Request) {
 	DataFedTotal.Add(float64(r.Size))
 }
 
-// Clear clears the statistics.
-func (s *Statistics) Clear() {
-	s.StatisticsLock.Lock()
-	defer s.StatisticsLock.Unlock()
-	s.Requests = []Request{}
-}
-
 // GetRequests returns the requests.
 func (s *Statistics) GetRequests() []Request {
 	s.StatisticsLock.Lock()
