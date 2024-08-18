@@ -50,8 +50,8 @@ func Initialize() error {
 			&cli.DurationFlag{
 				Name:        "generate-interval",
 				Usage:       "The interval in seconds to generate a new hallucination",
-				Value:       2 * time.Second,
-				DefaultText: "2",
+				Value:       5 * time.Second,
+				DefaultText: "5",
 			},
 			&cli.IntFlag{
 				Name: "hallucination-cache-size",

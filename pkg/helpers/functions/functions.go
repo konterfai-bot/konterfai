@@ -27,7 +27,7 @@ func PickRandomDate(ctx context.Context) string {
 func PickRandomStringFromSlice(ctx context.Context, slice *[]string) string {
 	ctx, span := tracer.Start(ctx, "PickRandomStringFromSlice")
 	defer span.End()
-	
+
 	if len(*slice) == 0 {
 		return ""
 	}
@@ -83,9 +83,8 @@ func RecalculateProbabilityWithUncertainity(ctx context.Context, baseProbability
 
 // SleepWithContext sleeps for the given duration or until the context is done.
 func SleepWithContext(ctx context.Context, duration time.Duration) {
-	ctx, span := tracer.Start(ctx, "SleepWithContext")
-	defer span.End()
-
+	// No need to trace this function as it has a fixed runtime.
+	
 	t := time.NewTimer(duration)
 	select {
 	case <-ctx.Done():

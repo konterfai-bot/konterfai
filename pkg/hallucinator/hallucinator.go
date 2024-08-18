@@ -103,8 +103,7 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 
 // Start starts the Hallucinator.
 func (h *Hallucinator) Start(ctx context.Context) error {
-	ctx, span := tracer.Start(ctx, "Hallucinator.Start")
-	defer span.End()
+	// No need to trace this function as it is the entry point and an endless loop.
 
 	promptNeedsUpdate := false
 	for {
