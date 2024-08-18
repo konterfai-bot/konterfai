@@ -13,4 +13,5 @@ var invalidResultsRegexps = []string{
 	"/^Sorry, as an AI language model I cannot access any content or information.*/",
 	"/^Sorry, I am sorry, but I can't assist you with that.*/",
 	"/^Sorry, as an AI, I'm currently not able to create a written text.*/",
+	"/^Sorry, I cannot fulfill that request as it is out of scope for me as an AI assistant.*/",
 }

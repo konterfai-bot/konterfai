@@ -46,7 +46,7 @@ type Hallucinator struct {
 var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/hallucinator")
 
 // NewHallucinator creates a new Hallucinator instance.
-func NewHallucinator(interval time.Duration,
+func NewHallucinator(ctx context.Context, interval time.Duration,
 	hallucinationCacheSize int,
 	hallucinatorPromptWordCount int,
 	hallucinationRequestCount int,
@@ -63,9 +63,12 @@ func NewHallucinator(interval time.Duration,
 	aiSeed int,
 	statistics *statistics.Statistics,
 ) *Hallucinator {
+	ctx, span := tracer.Start(ctx, "Hallucinator.NewHallucinator")
+	defer span.End()
+
 	headLineLinks := [10]string{}
 	for i := 0; i < len(headLineLinks); i++ {
-		headLineLinks[i] = links.RandomLink(
+		headLineLinks[i] = links.RandomLink(ctx,
 			hallucinatorUrl,
 			hallucinatorLinkMaxSubdirectories,
 			hallucinatorLinkMaxVariables,
@@ -93,7 +96,7 @@ func NewHallucinator(interval time.Duration,
 		httpClient: &http.Client{
 			Timeout: ollamaRequestTimeOut,
 		},
-		renderer:   renderer.NewRenderer(headLineLinks[:]),
+		renderer:   renderer.NewRenderer(ctx, headLineLinks[:]),
 		statistics: statistics,
 	}
 }
@@ -105,16 +108,16 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 
 	promptNeedsUpdate := false
 	for {
-		if h.GetHallucinationCount() < h.hallucinationCacheSize {
+		if h.GetHallucinationCount(ctx) < h.hallucinationCacheSize {
 			promptNeedsUpdate = true
 			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n", len(h.hallucinations)+1, h.hallucinationCacheSize)
-			hal, err := h.generateHallucination()
+			hal, err := h.generateHallucination(ctx)
 			if err != nil {
 				functions.SleepWithContext(ctx, h.Interval)
 				fmt.Println(fmt.Errorf("could not generate hallucination (%v)", err))
 			} else {
-				if h.isValidResult(hal.Text) {
-					h.appendHallucination(hal)
+				if h.isValidResult(ctx, hal.Text) {
+					h.appendHallucination(ctx, hal)
 
 					//Update Prometheus metrics
 					statistics.PromptsGeneratedTotal.Inc()
@@ -128,13 +131,13 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 				go func() {
 					prompts := map[string]int{}
 					h.hallucinationLock.Lock()
-					for idx := range h.GetHallucinationCount() {
+					for idx := range h.GetHallucinationCount(ctx) {
 						h.hallucinationCountLock.Lock()
 						prompts[h.hallucinations[idx].Prompt] = h.hallucinations[idx].RequestCount
 						h.hallucinationCountLock.Unlock()
 					}
 					h.hallucinationLock.Unlock()
-					h.statistics.UpdatePrompts(prompts)
+					h.statistics.UpdatePrompts(ctx, prompts)
 				}()
 				promptNeedsUpdate = false
 			}
@@ -144,7 +147,10 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 }
 
 // clutterTextWithRandomHref clutters the given text with random hrefs.
-func (h *Hallucinator) clutterTextWithRandomHref(text string) string {
+func (h *Hallucinator) clutterTextWithRandomHref(ctx context.Context, text string) string {
+	ctx, span := tracer.Start(ctx, "Hallucinator.clutterTextWithRandomHref")
+	defer span.End()
+
 	textSlice := strings.Split(text, " ")
 	percentile := len(textSlice) * h.hallucinationLinkPercentage / 100
 	generated := map[int]bool{}
@@ -155,7 +161,7 @@ func (h *Hallucinator) clutterTextWithRandomHref(text string) string {
 		i := rand.Intn(len(textSlice))
 		if !generated[i] {
 			textSlice[i] = fmt.Sprintf("<a href=\"%s\">%s</a>",
-				links.RandomLink(
+				links.RandomLink(ctx,
 					h.hallucinatorUrl,
 					h.hallucinatorLinkMaxSubdirectories,
 					h.hallucinatorLinkMaxVariables,

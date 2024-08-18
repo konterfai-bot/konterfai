@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -12,7 +13,10 @@ import (
 )
 
 // getRandomHttpResonseCode returns a random http response code.
-func getRandomHttpResonseCode(okProbability float64) int {
+func getRandomHttpResonseCode(ctx context.Context, okProbability float64) int {
+	ctx, span := tracer.Start(ctx, "WebServer.getRandomHttpResonseCode")
+	defer span.End()
+
 	if rand.Float64() < okProbability {
 		return http.StatusOK
 	}
@@ -27,12 +31,14 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 	span.SetAttributes(
 		attribute.String("http.method", r.Method),
 		attribute.String("http.url", r.URL.String()),
+		attribute.String("http.user-agent", r.UserAgent()),
+		attribute.String("http.remote-addr", r.RemoteAddr),
 	)
 	r = r.WithContext(ctx)
 
-	hallucination := ws.Hallucinator.PopRandomHallucination()
+	hallucination := ws.Hallucinator.PopRandomHallucination(ctx)
 	go func() {
-		ws.Statistics.AppendRequest(statistics.Request{
+		ws.Statistics.AppendRequest(ctx, statistics.Request{
 			IpAddress:   r.RemoteAddr,
 			Timestamp:   time.Now(),
 			UserAgent:   r.Header.Get("User-Agent"),
@@ -47,7 +53,10 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 }
 
 // getErrorFromCache returns the error code from the cache.
-func (ws *WebServer) getErrorFromCache(requestUrl *url.URL) int {
+func (ws *WebServer) getErrorFromCache(ctx context.Context, requestUrl *url.URL) int {
+	ctx, span := tracer.Start(ctx, "WebServer.getErrorFromCache")
+	defer span.End()
+
 	ws.HttpResponseCacheLock.Lock()
 	defer ws.HttpResponseCacheLock.Unlock()
 	for _, item := range ws.HttpResponseCache {
@@ -59,7 +68,10 @@ func (ws *WebServer) getErrorFromCache(requestUrl *url.URL) int {
 }
 
 // putErrorToCache puts the error code to the cache.
-func (ws *WebServer) putErrorToCache(requestUrl *url.URL, errorCode int) {
+func (ws *WebServer) putErrorToCache(ctx context.Context, requestUrl *url.URL, errorCode int) {
+	ctx, span := tracer.Start(ctx, "WebServer.putErrorToCache")
+	defer span.End()
+
 	ws.HttpResponseCacheLock.Lock()
 	defer ws.HttpResponseCacheLock.Unlock()
 	if len(ws.HttpResponseCache) >= ws.HttpResponseCacheSize {

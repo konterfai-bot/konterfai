@@ -2,6 +2,7 @@ package hallucinator
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,9 +21,13 @@ import (
 )
 
 // generateFollowUpLink returns a follow-up link for the Hallucinator.
-func (h *Hallucinator) generateFollowUpLink(continueText string) string {
+func (h *Hallucinator) generateFollowUpLink(ctx context.Context, continueText string) string {
+	ctx, span := tracer.Start(ctx, "Hallucinator.generateFollowUpLink")
+	defer span.End()
+
 	return fmt.Sprintf("<br/><br/><a href=\"%s\">%s</a>",
 		links.RandomLink(
+			ctx,
 			h.hallucinatorUrl,
 			h.hallucinatorLinkMaxSubdirectories,
 			h.hallucinatorLinkMaxVariables,
@@ -33,14 +38,16 @@ func (h *Hallucinator) generateFollowUpLink(continueText string) string {
 }
 
 // generateHallucination generates a hallucination from the Ollama API.
-func (h *Hallucinator) generateHallucination() (Hallucination, error) {
+func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination, error) {
+	ctx, span := tracer.Start(ctx, "Hallucinator.generateHallucination")
+	defer span.End()
 	requestUrl, err := url.JoinPath(h.ollamaAddress, "/api/chat")
 	if err != nil {
 		fmt.Println("could not join url path")
 		os.Exit(1)
 	}
 
-	prompt := h.generatePrompt()
+	prompt := h.generatePrompt(ctx)
 	fmt.Printf("generating hallucination with prompt: \"%s\"\n", prompt)
 
 	requestBody := OllamaJsonRequest{
@@ -104,36 +111,45 @@ func (h *Hallucinator) generateHallucination() (Hallucination, error) {
 }
 
 // generatePrompt generates a prompt for the Hallucinator.
-func (h *Hallucinator) generatePrompt() string {
+func (h *Hallucinator) generatePrompt(ctx context.Context) string {
+	ctx, span := tracer.Start(ctx, "Hallucinator.generatePrompt")
+	defer span.End()
 	words := ""
 	for i := 0; i < h.promptWordCount; i++ {
 		rnd := rand.Intn(100) % 3
 		switch rnd {
 		case 0:
-			words += functions.PickRandomStringFromSlice(&dictionaries.Verbs) + " "
+			words += functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs) + " "
 		case 1:
-			words += functions.PickRandomStringFromSlice(&dictionaries.Cities) + " "
+			words += functions.PickRandomStringFromSlice(ctx, &dictionaries.Cities) + " "
 		case 2:
 			fallthrough
 		default:
-			words += functions.PickRandomStringFromSlice(&dictionaries.Nouns) + " "
+			words += functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns) + " "
 		}
 	}
-	return fmt.Sprintf(functions.PickRandomStringFromSlice(&dictionaries.Prompts),
-		functions.PickRandomStringFromSlice(&dictionaries.ArticleTypes),
+	return fmt.Sprintf(functions.PickRandomStringFromSlice(ctx, &dictionaries.Prompts),
+		functions.PickRandomStringFromSlice(ctx, &dictionaries.ArticleTypes),
 		words,
 		h.hallucinationWordCount,
-		functions.PickRandomStringFromSlice(&dictionaries.Languages),
+		functions.PickRandomStringFromSlice(ctx, &dictionaries.Languages),
 	)
 }
 
 // generateRandomTopicLinks generates random topic links.
-func (h *Hallucinator) generateRandomTopicLinks(count int) []renderer.RandomTopic {
+func (h *Hallucinator) generateRandomTopicLinks(ctx context.Context, count int) []renderer.RandomTopic {
+	ctx, span := tracer.Start(ctx, "Hallucinator.generateRandomTopicLinks")
+	defer span.End()
 	var topics []renderer.RandomTopic
 	for i := 0; i < count; i++ {
 		topics = append(topics, renderer.RandomTopic{
-			Topic: textblocks.RandomTopic(),
-			Link:  links.RandomLink(h.hallucinatorUrl, h.hallucinatorLinkMaxSubdirectories, h.hallucinatorLinkMaxVariables, h.hallucinatorLinkHasVariablesProbability),
+			Topic: textblocks.RandomTopic(ctx),
+			Link: links.RandomLink(ctx,
+				h.hallucinatorUrl,
+				h.hallucinatorLinkMaxSubdirectories,
+				h.hallucinatorLinkMaxVariables,
+				h.hallucinatorLinkHasVariablesProbability,
+			),
 		})
 	}
 	return topics

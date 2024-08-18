@@ -2,13 +2,28 @@ package robots
 
 import (
 	"fmt"
+	"go.opentelemetry.io/otel/attribute"
 	"math/rand"
 	"net/http"
 	"slices"
+
+	"go.opentelemetry.io/otel"
 )
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/helpers/robots")
 
 // RobotsTxt generates the robots.txt content.
 func RobotsTxt(r *http.Request) []byte {
+	ctx, span := tracer.Start(r.Context(), "RobotsTxt")
+	span.SetAttributes(
+		attribute.String("http.method", r.Method),
+		attribute.String("http.url", r.URL.String()),
+		attribute.String("http.user-agent", r.UserAgent()),
+		attribute.String("http.remote-addr", r.RemoteAddr),
+	)
+	defer span.End()
+
+	r = r.WithContext(ctx)
 	// This list has been inspired by https://hellocoding.de/blog/seo/ki-ausschliessen-von-webseite
 	// and https://www.cyberciti.biz/web-developer/block-openai-bard-bing-ai-crawler-bots-using-robots-txt-file/
 	// We print that out to tell the ai crawlers to not index this site.

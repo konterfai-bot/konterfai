@@ -1,6 +1,7 @@
 package statisticsserver
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"math"
@@ -24,6 +25,8 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	span.SetAttributes(
 		attribute.String("http.method", r.Method),
 		attribute.String("http.url", r.URL.String()),
+		attribute.String("http.user-agent", r.UserAgent()),
+		attribute.String("http.remote-addr", r.RemoteAddr),
 	)
 	r = r.WithContext(ctx)
 
@@ -34,12 +37,12 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 	buffer := &strings.Builder{}
 	// TODO: sort by count
-	byUserAgent := analyseStatistics(ss.Statistics.GetRequestsGroupedByUserAgent())
+	byUserAgent := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByUserAgent(ctx))
 
 	// TODO: sort by count
-	byIpAddress := analyseStatistics(ss.Statistics.GetRequestsGroupedByIpAddress())
+	byIpAddress := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByIpAddress(ctx))
 
-	totalDataSize := convertByteSizeToSIUnits(ss.Statistics.GetTotalDataSizeServed())
+	totalDataSize := convertByteSizeToSIUnits(ctx, ss.Statistics.GetTotalDataSizeServed(ctx))
 
 	totalRequests := len(ss.Statistics.Requests)
 
@@ -75,7 +78,10 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 // analyseStatistics is a helper function to analyze the statistics.
-func analyseStatistics(requestData map[string][]statistics.Request) map[string]Data {
+func analyseStatistics(ctx context.Context, requestData map[string][]statistics.Request) map[string]Data {
+	ctx, span := tracer.Start(ctx, "StatisticsServer.analyseStatistics")
+	defer span.End()
+
 	data := map[string]Data{}
 	for identifier, requests := range requestData {
 		size := 0
@@ -95,7 +101,7 @@ func analyseStatistics(requestData map[string][]statistics.Request) map[string]D
 		}
 		data[identifier] = Data{
 			Count:               len(requests),
-			Size:                convertByteSizeToSIUnits(size),
+			Size:                convertByteSizeToSIUnits(ctx, size),
 			IsRobotsTxtViolator: isRobotsTxtViolator,
 		}
 	}
@@ -103,7 +109,10 @@ func analyseStatistics(requestData map[string][]statistics.Request) map[string]D
 }
 
 // convertByteSizeToSIUnits converts the byte size to SI units.
-func convertByteSizeToSIUnits(bytes int) string {
+func convertByteSizeToSIUnits(ctx context.Context, bytes int) string {
+	ctx, span := tracer.Start(ctx, "StatisticsServer.convertByteSizeToSIUnits")
+	defer span.End()
+
 	byteToFloat64 := float64(bytes)
 	for _, siUnits := range []string{"", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"} {
 		if math.Abs(byteToFloat64) < 1024.0 {

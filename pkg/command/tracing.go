@@ -25,7 +25,6 @@ func SetTraceProvider(ctx context.Context, endpoint, serviceName string) {
 
 	conn, err := grpc.NewClient(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 
 	if err != nil {

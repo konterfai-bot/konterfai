@@ -1,6 +1,7 @@
 package statistics
 
 import (
+	"context"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -58,7 +59,10 @@ var (
 )
 
 // recordStatistics records the statistics.
-func (s *Statistics) recordStatistics() {
+func (s *Statistics) recordStatistics(ctx context.Context) {
+	ctx, span := tracer.Start(ctx, "Statistics.recordStatistics")
+	defer span.End()
+
 	go func() {
 		isProcessing := false
 		for {
@@ -68,10 +72,10 @@ func (s *Statistics) recordStatistics() {
 			case <-time.After(5 * time.Second):
 				if !isProcessing {
 					isProcessing = true
-					RobotsTxtViolatorsTotal.Set(float64(s.GetTotalRobotsTxtViolators()))
+					RobotsTxtViolatorsTotal.Set(float64(s.GetTotalRobotsTxtViolators(ctx)))
 
 					// TODO: needs optimization, as it is not efficient to calculate the total size and requests every 5 seconds
-					for agent, requests := range s.GetRequestsGroupedByUserAgent() {
+					for agent, requests := range s.GetRequestsGroupedByUserAgent(ctx) {
 						size := 0
 						for _, req := range requests {
 							size += req.Size
@@ -80,7 +84,7 @@ func (s *Statistics) recordStatistics() {
 						AgentRequests.WithLabelValues(agent).Set(float64(len(requests)))
 					}
 
-					for ip, requests := range s.GetRequestsGroupedByIpAddress() {
+					for ip, requests := range s.GetRequestsGroupedByIpAddress(ctx) {
 						size := 0
 						for _, req := range requests {
 							size += req.Size

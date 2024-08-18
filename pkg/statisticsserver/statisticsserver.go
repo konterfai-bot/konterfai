@@ -1,6 +1,7 @@
 package statisticsserver
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"net/http"
@@ -27,7 +28,10 @@ type StatisticsServer struct {
 }
 
 // NewStatisticsServer creates a new StatisticsServer instance.
-func NewStatisticsServer(host string, port int, statistics *statistics.Statistics) *StatisticsServer {
+func NewStatisticsServer(ctx context.Context, host string, port int, statistics *statistics.Statistics) *StatisticsServer {
+	ctx, span := tracer.Start(ctx, "NewStatisticsServer")
+	defer span.End()
+
 	htmlTemplates := map[string]string{}
 	templates, err := assets.ReadDir("assets")
 	if err != nil {
@@ -54,7 +58,10 @@ func NewStatisticsServer(host string, port int, statistics *statistics.Statistic
 }
 
 // Serve starts the statistics server.
-func (ss *StatisticsServer) Serve() error {
+func (ss *StatisticsServer) Serve(ctx context.Context) error {
+	ctx, span := tracer.Start(ctx, "StatisticsServer.Serve")
+	defer span.End()
+
 	server := http.NewServeMux()
 	server.Handle("/metrics", promhttp.Handler())
 	server.HandleFunc("/", ss.handleRoot)

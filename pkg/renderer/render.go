@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"html/template"
@@ -50,7 +51,10 @@ type RandomTopic struct {
 	Link  string
 }
 
-func NewRenderer(headLineLinks []string) *Renderer {
+func NewRenderer(ctx context.Context, headLineLinks []string) *Renderer {
+	ctx, span := tracer.Start(ctx, "NewRenderer")
+	defer span.End()
+
 	htmlTemplates := []string{}
 	templates, err := assets.ReadDir("assets")
 	if err != nil {
@@ -75,8 +79,11 @@ func NewRenderer(headLineLinks []string) *Renderer {
 }
 
 // RenderInRandomTemplate renders the given text in a random template using go templates.
-func (r *Renderer) RenderInRandomTemplate(rd RenderData) (string, error) {
-	tpl, err := template.New("t").Parse(r.getRandomTemplate())
+func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (string, error) {
+	ctx, span := tracer.Start(ctx, "Renderer.RenderInRandomTemplate")
+	defer span.End()
+
+	tpl, err := template.New("t").Parse(r.getRandomTemplate(ctx))
 	if err != nil {
 		return "", err
 	}
@@ -94,6 +101,9 @@ func (r *Renderer) RenderInRandomTemplate(rd RenderData) (string, error) {
 }
 
 // getRandomTemplate returns a random template.
-func (r *Renderer) getRandomTemplate() string {
+func (r *Renderer) getRandomTemplate(ctx context.Context) string {
+	ctx, span := tracer.Start(ctx, "Renderer.getRandomTemplate")
+	defer span.End()
+
 	return r.htmlTemplates[rand.Intn(len(r.htmlTemplates))]
 }

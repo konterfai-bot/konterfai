@@ -1,6 +1,7 @@
 package links
 
 import (
+	"context"
 	"math/rand"
 	"strings"
 
@@ -11,60 +12,66 @@ import (
 )
 
 // generateSubDirectories generates a random number of subdirectories.
-func generateSubDirectories(subdirectories int) string {
+func generateSubDirectories(ctx context.Context, subdirectories int) string {
+	ctx, span := tracer.Start(ctx, "generateSubDirectories")
+	defer span.End()
+
 	sd := []string{}
 	subcount := rand.Intn(subdirectories) + 1
 	for i := 0; i < subcount; i++ {
-		sd = append(sd, getSubDirectoryString())
+		sd = append(sd, getSubDirectoryString(ctx))
 	}
 	return strings.Join(sd, "/")
 }
 
 // getSubDirectoryString returns a random subdirectory string.
-func getSubDirectoryString() string {
+func getSubDirectoryString(ctx context.Context) string {
+	ctx, span := tracer.Start(ctx, "getSubDirectoryString")
+	defer span.End()
+
 	typeRand := rand.Intn(types.PathTypesCount) + 1
 	switch types.PathTypes(typeRand) {
 	case types.UUIDPath:
 		return uuid.NewString()
 	case types.NounPath:
-		return functions.PickRandomStringFromSlice(&dictionaries.Nouns)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns)
 	case types.TwoNounPath:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.ThreeNounPath:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.TwoNounDashedPath:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "-")
 	case types.ThreeNounDashedPath:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "-")
 	case types.VerbPath:
-		return functions.PickRandomStringFromSlice(&dictionaries.Verbs)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)
 	case types.VerbNounPath:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Verbs),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.DatePath:
-		return functions.PickRandomDate()
+		return functions.PickRandomDate(ctx)
 	case types.YearPath:
-		return functions.PickRandomYear()
+		return functions.PickRandomYear(ctx)
 	case types.MonthPath:
-		return functions.PickRandomStringFromSlice(&dictionaries.Months)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Months)
 	case types.DayPath:
-		return functions.PickRandomStringFromSlice(&dictionaries.Weekdays)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Weekdays)
 	default:
 		return "default"
 	}

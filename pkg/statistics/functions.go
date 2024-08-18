@@ -1,12 +1,16 @@
 package statistics
 
 import (
+	"context"
 	"strings"
 	"time"
 )
 
 // AppendRequest appends a request to the statistics.
-func (s *Statistics) AppendRequest(r Request) {
+func (s *Statistics) AppendRequest(ctx context.Context, r Request) {
+	ctx, span := tracer.Start(ctx, "Statistics.AppendRequest")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	r.IpAddress = strings.Split(r.IpAddress, ":")[0]
@@ -18,14 +22,20 @@ func (s *Statistics) AppendRequest(r Request) {
 }
 
 // GetRequests returns the requests.
-func (s *Statistics) GetRequests() []Request {
+func (s *Statistics) GetRequests(ctx context.Context) []Request {
+	ctx, span := tracer.Start(ctx, "Statistics.GetRequests")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	return s.Requests
 }
 
 // GetRequestsByIpAddress returns the requests by IP address.
-func (s *Statistics) GetRequestsByIpAddress(ipAddress string) []Request {
+func (s *Statistics) GetRequestsByIpAddress(ctx context.Context, ipAddress string) []Request {
+	ctx, span := tracer.Start(ctx, "Statistics.GetRequestsByIpAddress")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var requests []Request
@@ -38,7 +48,10 @@ func (s *Statistics) GetRequestsByIpAddress(ipAddress string) []Request {
 }
 
 // GetRequestsByTimeRange returns the requests by time range.
-func (s *Statistics) GetRequestsByTimeRange(start, end time.Time) []Request {
+func (s *Statistics) GetRequestsByTimeRange(ctx context.Context, start, end time.Time) []Request {
+	ctx, span := tracer.Start(ctx, "Statistics.GetRequestsByTimeRange")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var requests []Request
@@ -51,7 +64,10 @@ func (s *Statistics) GetRequestsByTimeRange(start, end time.Time) []Request {
 }
 
 // GetRequestsByUserAgent returns the requests by user agent.
-func (s *Statistics) GetRequestsByUserAgent(userAgent string) []Request {
+func (s *Statistics) GetRequestsByUserAgent(ctx context.Context, userAgent string) []Request {
+	ctx, span := tracer.Start(ctx, "Statistics.GetRequestsByUserAgent")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var requests []Request
@@ -64,7 +80,10 @@ func (s *Statistics) GetRequestsByUserAgent(userAgent string) []Request {
 }
 
 // GetRequestsGroupedByIpAddress returns the requests grouped by IP address.
-func (s *Statistics) GetRequestsGroupedByIpAddress() map[string][]Request {
+func (s *Statistics) GetRequestsGroupedByIpAddress(ctx context.Context) map[string][]Request {
+	ctx, span := tracer.Start(ctx, "Statistics.GetRequestsGroupedByIpAddress")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	grouped := make(map[string][]Request)
@@ -75,7 +94,10 @@ func (s *Statistics) GetRequestsGroupedByIpAddress() map[string][]Request {
 }
 
 // GetRequestsGroupedByUserAgent returns the requests grouped by user agent.
-func (s *Statistics) GetRequestsGroupedByUserAgent() map[string][]Request {
+func (s *Statistics) GetRequestsGroupedByUserAgent(ctx context.Context) map[string][]Request {
+	ctx, span := tracer.Start(ctx, "Statistics.GetRequestsGroupedByUserAgent")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	grouped := make(map[string][]Request)
@@ -86,7 +108,10 @@ func (s *Statistics) GetRequestsGroupedByUserAgent() map[string][]Request {
 }
 
 // GetTotalDataSizeServed returns the data size served.
-func (s *Statistics) GetTotalDataSizeServed() int {
+func (s *Statistics) GetTotalDataSizeServed(ctx context.Context) int {
+	ctx, span := tracer.Start(ctx, "Statistics.GetTotalDataSizeServed")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var size int
@@ -97,7 +122,10 @@ func (s *Statistics) GetTotalDataSizeServed() int {
 }
 
 // GetTotalDataSizeServedByTimeRange returns the data size served by time range.
-func (s *Statistics) GetTotalDataSizeServedByTimeRange(start, end time.Time) int {
+func (s *Statistics) GetTotalDataSizeServedByTimeRange(ctx context.Context, start, end time.Time) int {
+	ctx, span := tracer.Start(ctx, "Statistics.GetTotalDataSizeServedByTimeRange")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var size int
@@ -110,15 +138,21 @@ func (s *Statistics) GetTotalDataSizeServedByTimeRange(start, end time.Time) int
 }
 
 // GetTotalRequests returns the total requests.
-func (s *Statistics) GetTotalRequests() int {
+func (s *Statistics) GetTotalRequests(ctx context.Context) int {
+	ctx, span := tracer.Start(ctx, "Statistics.GetTotalRequests")
+	defer span.End()
+
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	return len(s.Requests)
 }
 
 // GetTotalRobotsTxtViolators returns the total robots.txt violators.
-func (s *Statistics) GetTotalRobotsTxtViolators() int {
-	requests := s.GetRequestsGroupedByUserAgent()
+func (s *Statistics) GetTotalRobotsTxtViolators(ctx context.Context) int {
+	ctx, span := tracer.Start(ctx, "Statistics.GetTotalRobotsTxtViolators")
+	defer span.End()
+
+	requests := s.GetRequestsGroupedByUserAgent(ctx)
 	violators := map[string]struct{}{}
 	for identifier, requests := range requests {
 		robotsTxtCounter := 0
@@ -135,7 +169,10 @@ func (s *Statistics) GetTotalRobotsTxtViolators() int {
 }
 
 // UpdatePrompts updates the prompts.
-func (s *Statistics) UpdatePrompts(prompts map[string]int) {
+func (s *Statistics) UpdatePrompts(ctx context.Context, prompts map[string]int) {
+	ctx, span := tracer.Start(ctx, "Statistics.UpdatePrompts")
+	defer span.End()
+	
 	s.PromptsLock.Lock()
 	defer s.PromptsLock.Unlock()
 	delta := 0

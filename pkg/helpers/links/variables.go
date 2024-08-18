@@ -1,6 +1,7 @@
 package links
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -11,13 +12,16 @@ import (
 )
 
 // generateVariables generates a random number of variables.
-func generateVariables(variablesCount int, linkHasVariablesProbability float64) string {
+func generateVariables(ctx context.Context, variablesCount int, linkHasVariablesProbability float64) string {
+	ctx, span := tracer.Start(ctx, "generateVariables")
+	defer span.End()
+
 	variables := []string{}
 	variablesValue := []string{}
 	varcount := rand.Intn(variablesCount) + 1
 	for i := 0; i < varcount; i++ {
-		variables = append(variables, getVariableNameString())
-		variablesValue = append(variablesValue, getVariableValueString())
+		variables = append(variables, getVariableNameString(ctx))
+		variablesValue = append(variablesValue, getVariableValueString(ctx))
 	}
 
 	variablesString := ""
@@ -34,107 +38,113 @@ func generateVariables(variablesCount int, linkHasVariablesProbability float64) 
 }
 
 // getVariableNameString returns a random variable name string.
-func getVariableNameString() string {
+func getVariableNameString(ctx context.Context) string {
+	ctx, span := tracer.Start(ctx, "getVariableNameString")
+	defer span.End()
+
 	typeRand := rand.Intn(types.VariableNamesCount) + 1
 	switch types.VariableNames(typeRand) {
 	case types.SingleCharacterVariable:
 		charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		return string(charset[rand.Intn(len(charset))])
 	case types.VerbVariable:
-		return functions.PickRandomStringFromSlice(&dictionaries.Verbs)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)
 	case types.NounVariable:
-		return functions.PickRandomStringFromSlice(&dictionaries.Nouns)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns)
 	case types.TwoNounVariable:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.ThreeNounVariable:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.TwoNounDashedVariable:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "-")
 	case types.ThreeNounDashedVariable:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "-")
 	case types.VerbNounCombinationVariable:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Verbs),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.NounVerbCombinationVariable:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			strings.ToUpper(functions.PickRandomStringFromSlice(&dictionaries.Verbs)),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			strings.ToUpper(functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)),
 		}, "")
 	case types.MonthVariable:
-		return functions.PickRandomStringFromSlice(&dictionaries.Months)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Months)
 	case types.DayVariable:
-		return functions.PickRandomStringFromSlice(&dictionaries.Weekdays)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Weekdays)
 	default:
 		return "default"
 	}
 }
 
 // getVariableValueString returns a random variable value string.
-func getVariableValueString() string {
+func getVariableValueString(ctx context.Context) string {
+	ctx, span := tracer.Start(ctx, "getVariableValueString")
+	defer span.End()
+
 	typeRand := rand.Intn(types.VariableValuesCount) + 1
 	switch types.VariableValues(typeRand) {
 	case types.VerbValue:
-		return functions.PickRandomStringFromSlice(&dictionaries.Verbs)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)
 	case types.NounValue:
-		return functions.PickRandomStringFromSlice(&dictionaries.Nouns)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns)
 	case types.TwoNounValue:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.ThreeNounValue:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.TwoNounDashedValue:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "-")
 	case types.ThreeNounDashedValue:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "-")
 	case types.VerbNounCombinationValue:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Verbs),
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		}, "")
 	case types.NounVerbCombinationValue:
 		return strings.Join([]string{
-			functions.PickRandomStringFromSlice(&dictionaries.Nouns),
-			strings.ToUpper(functions.PickRandomStringFromSlice(&dictionaries.Verbs)),
+			functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
+			strings.ToUpper(functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)),
 		}, "")
 	case types.DateValue:
-		return functions.PickRandomDate()
+		return functions.PickRandomDate(ctx)
 	case types.YearValue:
-		return functions.PickRandomYear()
+		return functions.PickRandomYear(ctx)
 	case types.MonthValue:
-		return functions.PickRandomStringFromSlice(&dictionaries.Months)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Months)
 	case types.DayValue:
-		return functions.PickRandomStringFromSlice(&dictionaries.Weekdays)
+		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Weekdays)
 	case types.Base64Value:
-		return functions.RandomBase64String()
+		return functions.RandomBase64String(ctx)
 	default:
 		return "default"
 	}

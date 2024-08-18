@@ -188,6 +188,7 @@ func Run(c *cli.Context) error {
 	}
 
 	hal := hallucinator.NewHallucinator(
+		ctx,
 		c.Duration("generate-interval"),
 		c.Int("hallucination-cache-size"),
 		c.Int("hallucination-prompt-word-count"),
@@ -220,7 +221,9 @@ func Run(c *cli.Context) error {
 	})
 
 	gr.Add(func() error {
-		ws := webserver.NewWebServer(c.String("address"),
+		ws := webserver.NewWebServer(
+			ctx,
+			c.String("address"),
 			c.Int("port"),
 			hal,
 			st,
@@ -232,7 +235,7 @@ func Run(c *cli.Context) error {
 		select {
 		case <-ctx.Done():
 			return nil
-		case syncer <- ws.Serve():
+		case syncer <- ws.Serve(ctx):
 			return <-syncer
 		}
 	}, func(_ error) {
@@ -241,14 +244,16 @@ func Run(c *cli.Context) error {
 	})
 
 	gr.Add(func() error {
-		ss := statisticsserver.NewStatisticsServer(c.String("address"),
+		ss := statisticsserver.NewStatisticsServer(
+			ctx,
+			c.String("address"),
 			c.Int("statistics-port"),
 			st,
 		)
 		select {
 		case <-ctx.Done():
 			return nil
-		case syncer <- ss.Serve():
+		case syncer <- ss.Serve(ctx):
 			return <-syncer
 		}
 	}, func(_ error) {

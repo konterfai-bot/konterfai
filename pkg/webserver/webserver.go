@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -34,7 +35,10 @@ type WebServerCacheItem struct {
 var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/webserver")
 
 // NewWebServer creates a new WebServer instance.
-func NewWebServer(host string, port int, hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseUrl url.URL, HttpOkProbability, Uncertainty float64, errorCacheSize int) *WebServer {
+func NewWebServer(ctx context.Context, host string, port int, hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseUrl url.URL, HttpOkProbability, Uncertainty float64, errorCacheSize int) *WebServer {
+	ctx, span := tracer.Start(ctx, "NewWebServer")
+	defer span.End()
+
 	return &WebServer{
 		Host:                  host,
 		Port:                  port,
@@ -49,7 +53,10 @@ func NewWebServer(host string, port int, hallucinator *hallucinator.Hallucinator
 }
 
 // Serve starts the web server.
-func (ws *WebServer) Serve() error {
+func (ws *WebServer) Serve(ctx context.Context) error {
+	ctx, span := tracer.Start(ctx, "WebServer.Serve")
+	defer span.End()
+
 	server := http.NewServeMux()
 	server.HandleFunc("/robots.txt", ws.handleRobotsTxt)
 
