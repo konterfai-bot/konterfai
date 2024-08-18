@@ -2,9 +2,10 @@ package statistics
 
 import (
 	"context"
-	"go.opentelemetry.io/otel"
 	"sync"
 	"time"
+
+	"go.opentelemetry.io/otel"
 )
 
 // Statistics is the structure for the Statistics.

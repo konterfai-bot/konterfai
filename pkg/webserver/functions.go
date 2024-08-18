@@ -1,12 +1,14 @@
 package webserver
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"time"
+
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // getRandomHttpResonseCode returns a random http response code.
@@ -20,6 +22,14 @@ func getRandomHttpResonseCode(okProbability float64) int {
 
 // handleHallucination handles the hallucination request.
 func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "WebServer.handleHallucination")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("http.method", r.Method),
+		attribute.String("http.url", r.URL.String()),
+	)
+	r = r.WithContext(ctx)
+
 	hallucination := ws.Hallucinator.PopRandomHallucination()
 	go func() {
 		ws.Statistics.AppendRequest(statistics.Request{

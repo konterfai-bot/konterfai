@@ -1,12 +1,14 @@
 package statisticsserver
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"fmt"
 	"html/template"
 	"math"
 	"net/http"
 	"strings"
+
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type Data struct {
@@ -16,7 +18,15 @@ type Data struct {
 }
 
 // handleRoot is the handler for the root path.
-func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, _ *http.Request) {
+func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "StatisticsServer.handleRoot")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("http.method", r.Method),
+		attribute.String("http.url", r.URL.String()),
+	)
+	r = r.WithContext(ctx)
+
 	tpl, err := template.New("t").Parse(ss.htmlTemplates["index.gohtml"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

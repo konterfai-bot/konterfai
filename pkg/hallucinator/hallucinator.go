@@ -3,7 +3,6 @@ package hallucinator
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -15,6 +14,7 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
 	"codeberg.org/konterfai/konterfai/pkg/renderer"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"go.opentelemetry.io/otel"
 )
 
 // Hallucinator is the structure for the Hallucinator.
@@ -100,6 +100,9 @@ func NewHallucinator(interval time.Duration,
 
 // Start starts the Hallucinator.
 func (h *Hallucinator) Start(ctx context.Context) error {
+	ctx, span := tracer.Start(ctx, "Hallucinator.Start")
+	defer span.End()
+
 	promptNeedsUpdate := false
 	for {
 		if h.GetHallucinationCount() < h.hallucinationCacheSize {

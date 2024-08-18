@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel"
 	"net/url"
 	"os"
 	"strings"
@@ -15,6 +14,7 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/webserver"
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
+	"go.opentelemetry.io/otel"
 )
 
 // Initialize is the entry point for initializing the konterfAI cli command.
@@ -174,11 +174,7 @@ func Run(c *cli.Context) error {
 	}()
 	defer cancel()
 
-	// TODO: this value will be used for passing the traceprovider to the different threads
-	_ = GetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
-
-	ctx, span := tracer.Start(ctx, "Run")
-	defer span.End()
+	SetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
 
 	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)
@@ -187,7 +183,6 @@ func Run(c *cli.Context) error {
 
 	hcUrl, err := url.Parse(c.String("hallucinator-url"))
 	if err != nil {
-		span.RecordError(err)
 		fmt.Println("could not parse hallucinator-url")
 		return err
 	}
@@ -220,7 +215,6 @@ func Run(c *cli.Context) error {
 			return <-syncer
 		}
 	}, func(_ error) {
-		span.AddEvent("shutting down hallucinator")
 		fmt.Println("shutting down hallucinator")
 		cancel()
 	})
@@ -242,7 +236,6 @@ func Run(c *cli.Context) error {
 			return <-syncer
 		}
 	}, func(_ error) {
-		span.AddEvent("shutting down webserver")
 		fmt.Println("shutting down webserver")
 		cancel()
 	})
@@ -259,7 +252,6 @@ func Run(c *cli.Context) error {
 			return <-syncer
 		}
 	}, func(_ error) {
-		span.AddEvent("shutting down statistics server")
 		fmt.Println("shutting down statistics server")
 		cancel()
 	})

@@ -3,55 +3,63 @@ package command
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv/v1.26.0"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-// GetTraceProvider returns a new trace provider with the given endpoint and service name.
-func GetTraceProvider(ctx context.Context, endpoint, serviceName string) *trace.TracerProvider {
+// SetTraceProvider returns a new trace provider with the given endpoint and service name.
+func SetTraceProvider(ctx context.Context, endpoint, serviceName string) {
 	if endpoint == "" {
 		fmt.Println("tracing is disabled")
-		return trace.NewTracerProvider(
+		otel.SetTracerProvider(trace.NewTracerProvider(
 			trace.WithSampler(trace.NeverSample()),
-		)
+		))
+		return
 	}
-	exporter, err := otlptrace.New(
-		ctx,
-		otlptracehttp.NewClient(
-			otlptracehttp.WithEndpoint(endpoint),
-			otlptracehttp.WithHeaders(map[string]string{
-				"Content-Type": "application/json",
-			}),
-			otlptracehttp.WithInsecure(),
-		),
+
+	conn, err := grpc.NewClient(endpoint,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
+
+	if err != nil {
+		fmt.Printf("failed to create grpc connection: %v\n", err)
+		return
+	}
+
+	exporter, err := otlptracegrpc.New(
+		context.Background(),
+		otlptracegrpc.WithGRPCConn(conn),
 	)
 
 	if err != nil {
 		fmt.Printf("failed to create trace exporter: %v\n", err)
-		return nil
+		return
+	}
+
+	resources, err := resource.New(
+		ctx,
+		resource.WithAttributes(
+			attribute.String("service.name", serviceName),
+			attribute.String("library.language", "go"),
+		),
+	)
+
+	if err != nil {
+		fmt.Printf("failed to create resource: %v\n", err)
+		return
 	}
 
 	tp := trace.NewTracerProvider(
 		trace.WithSampler(trace.AlwaysSample()),
-		trace.WithBatcher(
-			exporter,
-			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
-			trace.WithBatchTimeout(trace.DefaultScheduleDelay*time.Millisecond),
-			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
-		),
-		trace.WithResource(
-			resource.NewWithAttributes(
-				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(serviceName),
-			),
-		),
+		trace.WithBatcher(exporter),
+		trace.WithResource(resources),
 	)
 	otel.SetTracerProvider(tp)
-	return tp
 }

@@ -9,10 +9,20 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/robots"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // handleRobotsTxt handles the /robots.txt request.
 func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "WebServer.handleRobotsTxt")
+	defer span.End()
+	r = r.WithContext(ctx)
+
+	span.SetAttributes(
+		attribute.String("http.method", r.Method),
+		attribute.String("http.url", r.URL.String()),
+	)
+
 	responseData := robots.RobotsTxt(r)
 	go func() {
 		ws.Statistics.AppendRequest(statistics.Request{
@@ -31,6 +41,14 @@ func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 
 // handleRoot handles the root request.
 func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "WebServer.handleRoot")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("http.method", r.Method),
+		attribute.String("http.url", r.URL.String()),
+	)
+	r = r.WithContext(ctx)
+
 	httpCode := ws.getErrorFromCache(r.URL)
 	if httpCode < 1 {
 		if r.URL.Path == "/" || r.URL.Path == ws.HttpBaseUrl.Path || r.URL.Path == "" {

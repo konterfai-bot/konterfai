@@ -1,7 +1,6 @@
 package webserver
 
 import (
-	"go.opentelemetry.io/otel"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -9,6 +8,7 @@ import (
 
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
+	"go.opentelemetry.io/otel"
 )
 
 // WebServer is the structure for the WebServer.

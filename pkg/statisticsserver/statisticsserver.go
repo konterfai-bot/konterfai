@@ -3,13 +3,13 @@ package statisticsserver
 import (
 	"embed"
 	"fmt"
-	"go.opentelemetry.io/otel"
 	"net/http"
 	"os"
 	"strconv"
 
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel"
 )
 
 //go:embed assets

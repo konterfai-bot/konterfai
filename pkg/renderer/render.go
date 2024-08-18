@@ -3,12 +3,13 @@ package renderer
 import (
 	"embed"
 	"fmt"
-	"go.opentelemetry.io/otel"
 	"html/template"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
+
+	"go.opentelemetry.io/otel"
 )
 
 //go:embed assets
