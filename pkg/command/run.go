@@ -21,7 +21,7 @@ func Run(c *cli.Context) error {
 	}()
 	defer cancel()
 
-	SetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
+	setTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
 
 	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)

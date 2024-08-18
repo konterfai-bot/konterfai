@@ -34,13 +34,13 @@ func Initialize() error {
 			},
 			&cli.StringFlag{
 				Name:        "hallucinator-url",
-				Usage:       "The FQDN of the hallicinator, e.g. http://localhost:8080",
+				Usage:       "The FQDN konterfAI uses. Must match the settings of your reverse proxy (if konterfAI is not running stand-alone).",
 				Value:       "http://localhost:8080",
 				DefaultText: "http://localhost:8080",
 			},
 			&cli.DurationFlag{
 				Name:        "generate-interval",
-				Usage:       "The interval in seconds to generate a new hallucination",
+				Usage:       "The interval in seconds to wait before attempting to generate a new hallucination, when the cache is full.",
 				Value:       5 * time.Second,
 				DefaultText: "5",
 			},
@@ -53,14 +53,15 @@ func Initialize() error {
 				DefaultText: "10",
 			},
 			&cli.IntFlag{
-				Name:        "hallucination-prompt-word-count",
-				Usage:       "The number of words to use for hallucination prompts",
+				Name: "hallucination-prompt-word-count",
+				Usage: "The number of words (nouns, verbs, ..) to use for hallucination prompts." +
+					" More words means a higher probabpility for the result to become a vivid hallucination (like a feaver-dream).",
 				Value:       5,
 				DefaultText: "5",
 			},
 			&cli.IntFlag{
 				Name:        "hallucination-word-count",
-				Usage:       "The number of words to use for hallucinations.",
+				Usage:       " The number of words that is expected from the resulting hallucination (length of the generated article).",
 				Value:       500,
 				DefaultText: "500",
 			},
@@ -97,32 +98,33 @@ func Initialize() error {
 			},
 			&cli.StringFlag{
 				Name:        "ollama-address",
-				Usage:       "The address of the ollama service",
+				Usage:       "The address of the ollama service.",
 				Value:       "http://localhost:11434",
 				DefaultText: "http://localhost:11434",
 			},
 			&cli.StringFlag{
-				Name:        "ollama-model",
-				Usage:       "The model to use for hallucinations",
+				Name: "ollama-model",
+				Usage: "The model to use for hallucinations. Must be an active model in the ollama instance." +
+					" The smaller the model, the faster the hallucination generation will be and the less CPU-/GPU-time will be used.",
 				Value:       "qwen2:0.5b",
 				DefaultText: "qwen2:0.5b",
 			},
 			&cli.DurationFlag{
 				Name:        "ollama-request-timeout",
-				Usage:       "The timeout for the ollama service",
+				Usage:       "The timeout for the ollama service.",
 				Value:       60 * time.Second,
 				DefaultText: "60s",
 			},
 			&cli.Float64Flag{
 				Name: "ai-temperature",
-				Usage: "The temperature for the AI. Use a high number for more randomness" +
+				Usage: "The temperature for the AI. Use a high number for more randomness." +
 					" and a low number for more coherence.",
 				Value:       30.0,
 				DefaultText: "30.0",
 			},
 			&cli.IntFlag{
 				Name:        "ai-seed",
-				Usage:       "The seed for the AI",
+				Usage:       "The seed value to use for the AI.",
 				Value:       0,
 				DefaultText: "0",
 			},
@@ -133,19 +135,22 @@ func Initialize() error {
 				DefaultText: "0.95",
 			},
 			&cli.IntFlag{
-				Name:        "webserver-error-cache-size",
-				Usage:       "The number of error codes to cache.",
+				Name: "webserver-error-cache-size",
+				Usage: "The number of error responses to cache (as long as an url is cached there," +
+					" the request to that url would return the same error code if requested multiple times.",
 				Value:       1000,
 				DefaultText: "1000",
 			},
 			&cli.Float64Flag{
 				Name:  "random-uncertainty",
-				Usage: "The uncertainty for the random generator. Use a high number for more randomness",
+				Usage: "The uncertainty for the random generator (0.1 = 10%). Use a high number for more randomness.",
 				Value: 0.1,
 			},
 			&cli.StringFlag{
-				Name:  "tracing-endpoint",
-				Usage: "The endpoint for the tracing server (open telemetry). If empty, tracing is disabled.",
+				Name: "tracing-endpoint",
+				Usage: "The endpoint for the tracing server (open telemetry, e.g. Jaeger)." +
+					"If empty, tracing is disabled." +
+					"Example value for Jaeger: --tracing-endpoint=localhost:4317",
 				Value: "",
 			},
 		},
