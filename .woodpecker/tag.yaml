@@ -6,7 +6,7 @@ steps:
   test:
     image: golang:1.22
     commands:
-      - go test -v ./...
+      - make test
 
   all-arch-build:
     image: golang:1.22

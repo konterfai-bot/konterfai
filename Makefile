@@ -14,6 +14,13 @@ build:
 	@go build -o bin/$(APP_NAME) cmd/$(APP_NAME)/main.go
 	@echo "Done."
 
+
+.PHONY: test
+test:
+	@echo "Testing..."
+	@go test -v ./...
+	@echo "Done."
+
 .PHONY: clean
 clean:
 	@rm -rf bin
