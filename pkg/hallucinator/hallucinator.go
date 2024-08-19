@@ -114,34 +114,34 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			if err != nil {
 				functions.SleepWithContext(ctx, h.Interval)
 				fmt.Println(fmt.Errorf("could not generate hallucination (%v)", err))
-			} else {
-				if h.isValidResult(ctx, hal.Text) {
-					h.appendHallucination(ctx, hal)
+				continue
+			}
+			if h.isValidResult(ctx, hal.Text) {
+				h.appendHallucination(ctx, hal)
 
-					//Update Prometheus metrics
-					statistics.PromptsGeneratedTotal.Inc()
-				} else {
-					fmt.Println("invalid hallucination, skipping...")
-				}
+				//Update Prometheus metrics
+				statistics.PromptsGeneratedTotal.Inc()
+			} else {
+				fmt.Println("invalid hallucination, skipping...")
 			}
-		} else {
-			fmt.Println("hallucinations cache is full, waiting for next interval...")
-			if promptNeedsUpdate {
-				go func() {
-					prompts := map[string]int{}
-					h.hallucinationLock.Lock()
-					for idx := range h.GetHallucinationCount(ctx) {
-						h.hallucinationCountLock.Lock()
-						prompts[h.hallucinations[idx].Prompt] = h.hallucinations[idx].RequestCount
-						h.hallucinationCountLock.Unlock()
-					}
-					h.hallucinationLock.Unlock()
-					h.statistics.UpdatePrompts(ctx, prompts)
-				}()
-				promptNeedsUpdate = false
-			}
-			functions.SleepWithContext(ctx, h.Interval)
+			continue
 		}
+		fmt.Println("hallucinations cache is full, waiting for next interval...")
+		if promptNeedsUpdate {
+			go func() {
+				prompts := map[string]int{}
+				h.hallucinationLock.Lock()
+				for idx := range h.GetHallucinationCount(ctx) {
+					h.hallucinationCountLock.Lock()
+					prompts[h.hallucinations[idx].Prompt] = h.hallucinations[idx].RequestCount
+					h.hallucinationCountLock.Unlock()
+				}
+				h.hallucinationLock.Unlock()
+				h.statistics.UpdatePrompts(ctx, prompts)
+			}()
+			promptNeedsUpdate = false
+		}
+		functions.SleepWithContext(ctx, h.Interval)
 	}
 }
 

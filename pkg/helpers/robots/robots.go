@@ -2,12 +2,12 @@ package robots
 
 import (
 	"fmt"
-	"go.opentelemetry.io/otel/attribute"
 	"math/rand"
 	"net/http"
 	"slices"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/helpers/robots")

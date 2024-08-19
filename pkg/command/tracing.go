@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// SetTraceProvider returns a new trace provider with the given endpoint and service name.
-func SetTraceProvider(ctx context.Context, endpoint, serviceName string) {
+// setTraceProvider returns a new trace provider with the given endpoint and service name.
+func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 	if endpoint == "" {
 		fmt.Println("tracing is disabled")
 		otel.SetTracerProvider(trace.NewTracerProvider(

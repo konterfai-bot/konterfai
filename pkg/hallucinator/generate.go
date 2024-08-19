@@ -50,15 +50,15 @@ func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination
 	prompt := h.generatePrompt(ctx)
 	fmt.Printf("generating hallucination with prompt: \"%s\"\n", prompt)
 
-	requestBody := OllamaJsonRequest{
+	requestBody := ollamaJsonRequest{
 		Model: h.ollamaModel,
-		Messages: []OllamaMessage{
+		Messages: []ollamaMessage{
 			{
 				Role:    "user",
 				Content: prompt,
 			},
 		},
-		Options: OllamaOptions{
+		Options: ollamaOptions{
 			Temperature: h.aiTemperature,
 			Seed:        h.aiSeed,
 		},
@@ -89,7 +89,7 @@ func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination
 	responses := strings.Split(string(resBody), "\n")
 	payload := []string{}
 	for _, message := range responses {
-		m := OllamaResponse{}
+		m := ollamaResponse{}
 		err := json.Unmarshal([]byte(message), &m)
 		if err != nil {
 			continue

@@ -3,12 +3,12 @@ package links
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel"
 	"net/url"
 	"strings"
 
 	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
+	"go.opentelemetry.io/otel"
 )
 
 var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/helpers/links")

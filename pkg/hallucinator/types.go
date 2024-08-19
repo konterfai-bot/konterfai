@@ -7,31 +7,31 @@ type Hallucination struct {
 	RequestCount int
 }
 
-// OllamaJsonRequest is the request structure for the Ollama API.
-type OllamaJsonRequest struct {
+// ollamaJsonRequest is the request structure for the Ollama API.
+type ollamaJsonRequest struct {
 	Model    string          `json:"model"`
-	Messages []OllamaMessage `json:"messages"`
+	Messages []ollamaMessage `json:"messages"`
 	Stream   bool            `json:"stream"`
-	Options  OllamaOptions   `json:"options"`
+	Options  ollamaOptions   `json:"options"`
 }
 
-// OllamaMessage is the message structure for the Ollama API.
-type OllamaMessage struct {
+// ollamaMessage is the message structure for the Ollama API.
+type ollamaMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
-// OllamaOptions is the options structure for the Ollama API.
-type OllamaOptions struct {
+// ollamaOptions is the options structure for the Ollama API.
+type ollamaOptions struct {
 	Temperature float64 `json:"temperature"`
 	Seed        int     `json:"seed"`
 }
 
-// OllamaResponse is the response structure for the Ollama API.
-type OllamaResponse struct {
+// ollamaResponse is the response structure for the Ollama API.
+type ollamaResponse struct {
 	Model           string        `json:"model"`
 	CreatedAt       string        `json:"created_at"`
-	Message         OllamaMessage `json:"message"`
+	Message         ollamaMessage `json:"message"`
 	Done            bool          `json:"done"`
 	DoneReason      string        `json:"done_reason"`
 	TotalDuration   int           `json:"total_duration"`

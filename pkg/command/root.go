@@ -14,7 +14,6 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/webserver"
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
-	"go.opentelemetry.io/otel"
 )
 
 // Initialize is the entry point for initializing the konterfAI cli command.
@@ -165,8 +164,6 @@ func Initialize() error {
 	return app.Run(os.Args)
 }
 
-var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/command")
-
 // Run is the entry point for running konterfAI.
 func Run(c *cli.Context) error {
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
@@ -174,7 +171,7 @@ func Run(c *cli.Context) error {
 	}()
 	defer cancel()
 
-	SetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
+	setTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
 
 	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)
