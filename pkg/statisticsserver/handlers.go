@@ -110,7 +110,7 @@ func analyseStatistics(ctx context.Context, requestData map[string][]statistics.
 
 // convertByteSizeToSIUnits converts the byte size to SI units.
 func convertByteSizeToSIUnits(ctx context.Context, bytes int) string {
-	ctx, span := tracer.Start(ctx, "StatisticsServer.convertByteSizeToSIUnits")
+	_, span := tracer.Start(ctx, "StatisticsServer.convertByteSizeToSIUnits")
 	defer span.End()
 
 	byteToFloat64 := float64(bytes)

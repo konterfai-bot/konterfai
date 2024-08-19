@@ -52,7 +52,7 @@ type RandomTopic struct {
 }
 
 func NewRenderer(ctx context.Context, headLineLinks []string) *Renderer {
-	ctx, span := tracer.Start(ctx, "NewRenderer")
+	_, span := tracer.Start(ctx, "NewRenderer")
 	defer span.End()
 
 	htmlTemplates := []string{}
@@ -102,7 +102,7 @@ func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (s
 
 // getRandomTemplate returns a random template.
 func (r *Renderer) getRandomTemplate(ctx context.Context) string {
-	ctx, span := tracer.Start(ctx, "Renderer.getRandomTemplate")
+	_, span := tracer.Start(ctx, "Renderer.getRandomTemplate")
 	defer span.End()
 
 	return r.htmlTemplates[rand.Intn(len(r.htmlTemplates))]

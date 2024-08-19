@@ -2,6 +2,7 @@ package statistics
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -63,15 +64,14 @@ func (s *Statistics) recordStatistics(ctx context.Context) {
 	ctx, span := tracer.Start(ctx, "Statistics.recordStatistics")
 	defer span.End()
 
+	isProcessing := sync.Mutex{}
 	go func() {
-		isProcessing := false
 		for {
 			select {
 			case <-s.Context.Done():
 				return
 			case <-time.After(5 * time.Second):
-				if !isProcessing {
-					isProcessing = true
+				if isProcessing.TryLock() {
 					RobotsTxtViolatorsTotal.Set(float64(s.GetTotalRobotsTxtViolators(ctx)))
 
 					// TODO: needs optimization, as it is not efficient to calculate the total size and requests every 5 seconds
@@ -92,7 +92,7 @@ func (s *Statistics) recordStatistics(ctx context.Context) {
 						IpTraffic.WithLabelValues(ip).Set(float64(size))
 						IpRequests.WithLabelValues(ip).Set(float64(len(requests)))
 					}
-					isProcessing = false
+					isProcessing.Unlock()
 				}
 			}
 		}

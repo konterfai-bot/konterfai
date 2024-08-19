@@ -14,7 +14,7 @@ import (
 
 // getRandomHttpResonseCode returns a random http response code.
 func getRandomHttpResonseCode(ctx context.Context, okProbability float64) int {
-	ctx, span := tracer.Start(ctx, "WebServer.getRandomHttpResonseCode")
+	_, span := tracer.Start(ctx, "WebServer.getRandomHttpResonseCode")
 	defer span.End()
 
 	if rand.Float64() < okProbability {
@@ -54,7 +54,7 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 
 // getErrorFromCache returns the error code from the cache.
 func (ws *WebServer) getErrorFromCache(ctx context.Context, requestUrl *url.URL) int {
-	ctx, span := tracer.Start(ctx, "WebServer.getErrorFromCache")
+	_, span := tracer.Start(ctx, "WebServer.getErrorFromCache")
 	defer span.End()
 
 	ws.HttpResponseCacheLock.Lock()
@@ -69,7 +69,7 @@ func (ws *WebServer) getErrorFromCache(ctx context.Context, requestUrl *url.URL)
 
 // putErrorToCache puts the error code to the cache.
 func (ws *WebServer) putErrorToCache(ctx context.Context, requestUrl *url.URL, errorCode int) {
-	ctx, span := tracer.Start(ctx, "WebServer.putErrorToCache")
+	_, span := tracer.Start(ctx, "WebServer.putErrorToCache")
 	defer span.End()
 
 	ws.HttpResponseCacheLock.Lock()

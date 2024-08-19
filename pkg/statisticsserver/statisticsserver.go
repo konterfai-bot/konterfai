@@ -29,7 +29,7 @@ type StatisticsServer struct {
 
 // NewStatisticsServer creates a new StatisticsServer instance.
 func NewStatisticsServer(ctx context.Context, host string, port int, statistics *statistics.Statistics) *StatisticsServer {
-	ctx, span := tracer.Start(ctx, "NewStatisticsServer")
+	_, span := tracer.Start(ctx, "NewStatisticsServer")
 	defer span.End()
 
 	htmlTemplates := map[string]string{}
@@ -59,7 +59,7 @@ func NewStatisticsServer(ctx context.Context, host string, port int, statistics 
 
 // Serve starts the statistics server.
 func (ss *StatisticsServer) Serve(ctx context.Context) error {
-	ctx, span := tracer.Start(ctx, "StatisticsServer.Serve")
+	_, span := tracer.Start(ctx, "StatisticsServer.Serve")
 	defer span.End()
 
 	server := http.NewServeMux()

@@ -14,7 +14,7 @@ var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/helpers/functions
 
 // PickRandomDate picks a random date.
 func PickRandomDate(ctx context.Context) string {
-	ctx, span := tracer.Start(ctx, "PickRandomDate")
+	_, span := tracer.Start(ctx, "PickRandomDate")
 	defer span.End()
 
 	year := rand.Intn(2100-1900) + 1900
@@ -25,7 +25,7 @@ func PickRandomDate(ctx context.Context) string {
 
 // PickRandomStringFromSlice picks a random element from the given slice.
 func PickRandomStringFromSlice(ctx context.Context, slice *[]string) string {
-	ctx, span := tracer.Start(ctx, "PickRandomStringFromSlice")
+	_, span := tracer.Start(ctx, "PickRandomStringFromSlice")
 	defer span.End()
 
 	if len(*slice) == 0 {
@@ -37,7 +37,7 @@ func PickRandomStringFromSlice(ctx context.Context, slice *[]string) string {
 
 // PickRandomSliceFromSlice picks a random slice from the given slice.
 func PickRandomSliceFromSlice(ctx context.Context, slice *[][]string) []string {
-	ctx, span := tracer.Start(ctx, "PickRandomSliceFromSlice")
+	_, span := tracer.Start(ctx, "PickRandomSliceFromSlice")
 	defer span.End()
 
 	if len(*slice) == 0 {
@@ -49,7 +49,7 @@ func PickRandomSliceFromSlice(ctx context.Context, slice *[][]string) []string {
 
 // PickRandomYear picks a random year.
 func PickRandomYear(ctx context.Context) string {
-	ctx, span := tracer.Start(ctx, "PickRandomYear")
+	_, span := tracer.Start(ctx, "PickRandomYear")
 	defer span.End()
 
 	year, _, _ := time.Now().Date()
@@ -58,7 +58,7 @@ func PickRandomYear(ctx context.Context) string {
 
 // RandomBase64String returns a random base64 string.
 func RandomBase64String(ctx context.Context) string {
-	ctx, span := tracer.Start(ctx, "RandomBase64String")
+	_, span := tracer.Start(ctx, "RandomBase64String")
 	defer span.End()
 
 	length := rand.Intn(500-100) + 100
@@ -71,7 +71,7 @@ func RandomBase64String(ctx context.Context) string {
 
 // RecalculateProbabilityWithUncertainity recalculates the probability with the given uncertainty.
 func RecalculateProbabilityWithUncertainity(ctx context.Context, baseProbability float64, uncertainty float64) float64 {
-	ctx, span := tracer.Start(ctx, "RecalculateProbabilityWithUncertainity")
+	_, span := tracer.Start(ctx, "RecalculateProbabilityWithUncertainity")
 	defer span.End()
 
 	prefix := rand.Intn(100)
@@ -84,7 +84,7 @@ func RecalculateProbabilityWithUncertainity(ctx context.Context, baseProbability
 // SleepWithContext sleeps for the given duration or until the context is done.
 func SleepWithContext(ctx context.Context, duration time.Duration) {
 	// No need to trace this function as it has a fixed runtime.
-	
+
 	t := time.NewTimer(duration)
 	select {
 	case <-ctx.Done():

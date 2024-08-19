@@ -36,7 +36,7 @@ var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/webserver")
 
 // NewWebServer creates a new WebServer instance.
 func NewWebServer(ctx context.Context, host string, port int, hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseUrl url.URL, HttpOkProbability, Uncertainty float64, errorCacheSize int) *WebServer {
-	ctx, span := tracer.Start(ctx, "NewWebServer")
+	_, span := tracer.Start(ctx, "NewWebServer")
 	defer span.End()
 
 	return &WebServer{
@@ -54,7 +54,7 @@ func NewWebServer(ctx context.Context, host string, port int, hallucinator *hall
 
 // Serve starts the web server.
 func (ws *WebServer) Serve(ctx context.Context) error {
-	ctx, span := tracer.Start(ctx, "WebServer.Serve")
+	_, span := tracer.Start(ctx, "WebServer.Serve")
 	defer span.End()
 
 	server := http.NewServeMux()

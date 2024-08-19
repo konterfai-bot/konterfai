@@ -14,7 +14,7 @@ import (
 
 // GetHallucinationCount returns the current hallucination count.
 func (h *Hallucinator) GetHallucinationCount(ctx context.Context) int {
-	ctx, span := tracer.Start(ctx, "Hallucinator.GetHallucinationCount")
+	_, span := tracer.Start(ctx, "Hallucinator.GetHallucinationCount")
 	defer span.End()
 
 	h.hallucinationCountLock.Lock()
@@ -186,7 +186,7 @@ func (h *Hallucinator) cleanHallucinations(ctx context.Context) {
 func (h *Hallucinator) setHallucinationCount(ctx context.Context) {
 	// This function does not have a lock on the hallucinations list. It is expected that the caller has locked the list.
 	// This happens in AppendHallucination and CleanHallucinations.
-	ctx, span := tracer.Start(ctx, "Hallucinator.setHallucinationCount")
+	_, span := tracer.Start(ctx, "Hallucinator.setHallucinationCount")
 	defer span.End()
 
 	h.hallucinationCountLock.Lock()
