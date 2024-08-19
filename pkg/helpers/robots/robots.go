@@ -24,7 +24,7 @@ func RobotsTxt(r *http.Request) []byte {
 	defer span.End()
 
 	r = r.WithContext(ctx)
-	
+
 	// This list has been inspired by https://hellocoding.de/blog/seo/ki-ausschliessen-von-webseite
 	// and https://www.cyberciti.biz/web-developer/block-openai-bard-bing-ai-crawler-bots-using-robots-txt-file/
 	// We print that out to tell the ai crawlers to not index this site.
