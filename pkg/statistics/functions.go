@@ -95,6 +95,9 @@ func (s *Statistics) GetRequestsByTimeRange(ctx context.Context, start, end time
 		if r.Timestamp.After(start) && r.Timestamp.Before(end) {
 			requests = append(requests, r)
 		}
+		if r.Timestamp.Equal(start) || r.Timestamp.Equal(end) {
+			requests = append(requests, r)
+		}
 	}
 	return requests
 }
@@ -231,6 +234,9 @@ func (s *Statistics) GetTotalDataSizeServedByTimeRange(ctx context.Context, star
 	var size int
 	for _, r := range s.Requests {
 		if r.Timestamp.After(start) && r.Timestamp.Before(end) {
+			size += r.Size
+		}
+		if r.Timestamp.Equal(start) || r.Timestamp.Equal(end) {
 			size += r.Size
 		}
 	}
