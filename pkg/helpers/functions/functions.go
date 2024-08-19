@@ -20,7 +20,7 @@ func PickRandomDate(ctx context.Context) string {
 	year := rand.Intn(2100-1900) + 1900
 	month := rand.Intn(12) + 1
 	day := rand.Intn(28) + 1
-	return fmt.Sprintf("%d-%d-%d", year, month, day)
+	return fmt.Sprintf("%0.4d-%0.2d-%0.2d", year, month, day)
 }
 
 // PickRandomStringFromSlice picks a random element from the given slice.
