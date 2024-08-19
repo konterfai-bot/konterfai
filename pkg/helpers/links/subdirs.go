@@ -16,6 +16,10 @@ func generateSubDirectories(ctx context.Context, subdirectories int) string {
 	ctx, span := tracer.Start(ctx, "generateSubDirectories")
 	defer span.End()
 
+	if subdirectories < 1 {
+		return ""
+	}
+
 	sd := []string{}
 	subcount := rand.Intn(subdirectories) + 1
 	for i := 0; i < subcount; i++ {

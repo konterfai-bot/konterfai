@@ -16,6 +16,10 @@ func generateVariables(ctx context.Context, variablesCount int, linkHasVariables
 	ctx, span := tracer.Start(ctx, "generateVariables")
 	defer span.End()
 
+	if variablesCount < 1 {
+		return ""
+	}
+
 	variables := []string{}
 	variablesValue := []string{}
 	varcount := rand.Intn(variablesCount) + 1
