@@ -3,6 +3,11 @@ when:
   event: [ pull_request ]
 
 steps:
+  test:
+    image: golang:1.22
+    commands:
+      - go test -v ./...
+
   all-arch-build:
     image: golang:1.22
     commands:
