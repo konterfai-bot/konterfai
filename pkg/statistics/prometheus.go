@@ -74,24 +74,16 @@ func (s *Statistics) recordStatistics(ctx context.Context) {
 				if isProcessing.TryLock() {
 					RobotsTxtViolatorsTotal.Set(float64(s.GetTotalRobotsTxtViolators(ctx)))
 
-					// TODO: needs optimization, as it is not efficient to calculate the total size and requests every 5 seconds
-					for agent, requests := range s.GetRequestsGroupedByUserAgent(ctx) {
-						size := 0
-						for _, req := range requests {
-							size += req.Size
-						}
-						AgentTraffic.WithLabelValues(agent).Set(float64(size))
-						AgentRequests.WithLabelValues(agent).Set(float64(len(requests)))
+					for _, agent := range s.GetAgents(ctx) {
+						AgentTraffic.WithLabelValues(agent).Set(float64(s.GetTotalDataSizeServedByAgent(ctx, agent)))
+						AgentRequests.WithLabelValues(agent).Set(float64(s.GetTotalRequestsByAgent(ctx, agent)))
 					}
 
-					for ip, requests := range s.GetRequestsGroupedByIpAddress(ctx) {
-						size := 0
-						for _, req := range requests {
-							size += req.Size
-						}
-						IpTraffic.WithLabelValues(ip).Set(float64(size))
-						IpRequests.WithLabelValues(ip).Set(float64(len(requests)))
+					for _, ip := range s.GetIpAddresses(ctx) {
+						IpTraffic.WithLabelValues(ip).Set(float64(s.GetTotalDataSizeServedByIpAddress(ctx, ip)))
+						IpRequests.WithLabelValues(ip).Set(float64(s.GetTotalRequestsByIpAddress(ctx, ip)))
 					}
+
 					isProcessing.Unlock()
 				}
 			}
