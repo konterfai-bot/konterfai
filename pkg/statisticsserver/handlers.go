@@ -6,20 +6,53 @@ import (
 	"html/template"
 	"math"
 	"net/http"
+	"sort"
 	"strings"
 
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"go.opentelemetry.io/otel/attribute"
 )
 
-type requestData struct {
-	Count               int
-	Size                string
-	IsRobotsTxtViolator string
+// Less is part of sort.Interface. We use count as the primary sort key.
+func (rd requestDataSlice) Less(i, j int) bool {
+	return rd[i].Count < rd[j].Count
 }
 
 // analyseStatistics is a helper function to analyze the statistics.
-func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) map[string]requestData {
+func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) requestDataSlice {
+	ctx, span := tracer.Start(ctx, "StatisticsServer.analyseStatistics")
+	defer span.End()
+
+	data := requestDataSlice{}
+	for identifier, requests := range rd {
+		size := 0
+		isRobotsTxtViolator := "no"
+		robotsTxtCounter := 0
+		for _, request := range requests {
+			size += request.Size
+			if request.IsRobotsTxt {
+				robotsTxtCounter++
+			}
+		}
+		if robotsTxtCounter == 0 {
+			isRobotsTxtViolator = "ignored"
+		}
+		if robotsTxtCounter > 0 && robotsTxtCounter < len(requests) {
+			isRobotsTxtViolator = "yes"
+		}
+		data = append(data, &requestData{
+			Identifier:          identifier,
+			Count:               len(requests),
+			Size:                convertByteSizeToSIUnits(ctx, size),
+			IsRobotsTxtViolator: isRobotsTxtViolator,
+		})
+	}
+	sort.Sort(data)
+	return data
+}
+
+// analyseStatisticsOld is a helper function to analyze the statistics.
+func analyseStatisticsOld(ctx context.Context, rd map[string][]statistics.Request) map[string]requestData {
 	ctx, span := tracer.Start(ctx, "StatisticsServer.analyseStatistics")
 	defer span.End()
 
@@ -98,8 +131,8 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	err = tpl.Execute(buffer, struct {
 		ConfigurationInfo string
 		Prompts           map[string]int
-		ByUserAgent       map[string]requestData
-		ByIpAddress       map[string]requestData
+		ByUserAgent       requestDataSlice
+		ByIpAddress       requestDataSlice
 		TotalDataSize     string
 		TotalRequests     int
 		TotalPrompts      int

@@ -9,9 +9,10 @@ const continueString = "Continue reading..."
 var invalidResultsRegexps = []string{
 	"/^I apologize, but I'm sorry to inform you that as an AI language model*/",
 	"/^I cannot proceed as this question pertains to sensitive topics.*/",
-	"/^Sure, I'll be glad to do that. However, due to privacy and confidentiality.*/",
-	"/^Sorry, as an AI language model I cannot access any content or information.*/",
 	"/^Sorry, I am sorry, but I can't assist you with that.*/",
-	"/^Sorry, as an AI, I'm currently not able to create a written text.*/",
 	"/^Sorry, I cannot fulfill that request as it is out of scope for me as an AI assistant.*/",
+	"/^Sorry, as an AI language model I cannot access any content or information.*/",
+	"/^Sorry, as an AI, I'm currently not able to create a written text.*/",
+	"/^Sorry, but I can't assist with that.*/",
+	"/^Sure, I'll be glad to do that. However, due to privacy and confidentiality.*/",
 }

@@ -204,9 +204,9 @@
         </tr>
         </thead>
         <tbody>
-        {{ range $userAgent, $data := .ByUserAgent }}
+        {{ range $data := .ByUserAgent }}
             <tr>
-                <td>{{ $userAgent }}</td>
+                <td>{{ $data.Identifier }}</td>
                 <td class="alignright">{{ $data.IsRobotsTxtViolator }}</td>
                 <td class="alignright">{{ $data.Count }}</td>
                 <td class="alignright">{{ $data.Size }}</td>
@@ -230,9 +230,9 @@
         </tr>
         </thead>
         <tbody>
-        {{ range $ip, $data := .ByIpAddress }}
+        {{ range $data := .ByIpAddress }}
             <tr>
-                <td>{{ $ip }}</td>
+                <td>{{ $data.Identifier }}</td>
                 <td class="alignright">{{ $data.IsRobotsTxtViolator }}</td>
                 <td class="alignright">{{ $data.Count }}</td>
                 <td class="alignright">{{ $data.Size }}</td>
