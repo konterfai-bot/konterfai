@@ -51,37 +51,6 @@ func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) 
 	return data
 }
 
-// analyseStatisticsOld is a helper function to analyze the statistics.
-func analyseStatisticsOld(ctx context.Context, rd map[string][]statistics.Request) map[string]requestData {
-	ctx, span := tracer.Start(ctx, "StatisticsServer.analyseStatistics")
-	defer span.End()
-
-	data := map[string]requestData{}
-	for identifier, requests := range rd {
-		size := 0
-		isRobotsTxtViolator := "no"
-		robotsTxtCounter := 0
-		for _, request := range requests {
-			size += request.Size
-			if request.IsRobotsTxt {
-				robotsTxtCounter++
-			}
-		}
-		if robotsTxtCounter == 0 {
-			isRobotsTxtViolator = "ignored"
-		}
-		if robotsTxtCounter > 0 && robotsTxtCounter < len(requests) {
-			isRobotsTxtViolator = "yes"
-		}
-		data[identifier] = requestData{
-			Count:               len(requests),
-			Size:                convertByteSizeToSIUnits(ctx, size),
-			IsRobotsTxtViolator: isRobotsTxtViolator,
-		}
-	}
-	return data
-}
-
 // convertByteSizeToSIUnits converts the byte size to SI units.
 func convertByteSizeToSIUnits(ctx context.Context, bytes int) string {
 	_, span := tracer.Start(ctx, "StatisticsServer.convertByteSizeToSIUnits")
@@ -115,10 +84,9 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	buffer := &strings.Builder{}
-	// TODO: sort by count
+
 	byUserAgent := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByUserAgent(ctx))
 
-	// TODO: sort by count
 	byIpAddress := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByIpAddress(ctx))
 
 	totalDataSize := convertByteSizeToSIUnits(ctx, ss.Statistics.GetTotalDataSizeServed(ctx))
