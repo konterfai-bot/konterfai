@@ -13,17 +13,12 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 )
 
-// Less is part of sort.Interface. We use count as the primary sort key.
-func (rd requestDataSlice) Less(i, j int) bool {
-	return rd[i].Count < rd[j].Count
-}
-
 // analyseStatistics is a helper function to analyze the statistics.
-func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) requestDataSlice {
+func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) RequestDataSlice {
 	ctx, span := tracer.Start(ctx, "StatisticsServer.analyseStatistics")
 	defer span.End()
 
-	data := requestDataSlice{}
+	data := RequestDataSlice{}
 	for identifier, requests := range rd {
 		size := 0
 		isRobotsTxtViolator := "no"
@@ -40,7 +35,7 @@ func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) 
 		if robotsTxtCounter > 0 && robotsTxtCounter < len(requests) {
 			isRobotsTxtViolator = "yes"
 		}
-		data = append(data, &requestData{
+		data = append(data, &RequestData{
 			Identifier:          identifier,
 			Count:               len(requests),
 			Size:                convertByteSizeToSIUnits(ctx, size),
@@ -99,8 +94,8 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	err = tpl.Execute(buffer, struct {
 		ConfigurationInfo string
 		Prompts           map[string]int
-		ByUserAgent       requestDataSlice
-		ByIpAddress       requestDataSlice
+		ByUserAgent       RequestDataSlice
+		ByIpAddress       RequestDataSlice
 		TotalDataSize     string
 		TotalRequests     int
 		TotalPrompts      int

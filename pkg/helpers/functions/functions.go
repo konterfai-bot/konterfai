@@ -70,11 +70,19 @@ func RandomBase64String(ctx context.Context) string {
 }
 
 // RecalculateProbabilityWithUncertainity recalculates the probability with the given uncertainty.
-func RecalculateProbabilityWithUncertainity(ctx context.Context, baseProbability float64, uncertainty float64) float64 {
+func RecalculateProbabilityWithUncertainity(ctx context.Context, baseProbability float64, uncertainty float64, definePrefix int) float64 {
 	_, span := tracer.Start(ctx, "RecalculateProbabilityWithUncertainity")
 	defer span.End()
 
-	prefix := rand.Intn(100)
+	var prefix int
+	// if definePrefix is 0, then the probability will be calculated with the baseProbability
+	// this is mostly for testing & coverage purposes, in production definePrefix should be set to 0
+	// When you set the definePrefix, even numbers will decrease the probability and odd numbers will increase the probability
+	if definePrefix == 0 {
+		prefix = rand.Intn(100)
+	} else {
+		prefix = definePrefix
+	}
 	if prefix%2 == 0 {
 		return baseProbability - rand.Float64()*uncertainty
 	}

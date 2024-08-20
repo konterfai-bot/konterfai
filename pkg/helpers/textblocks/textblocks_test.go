@@ -12,7 +12,7 @@ import (
 
 func TestTextblocks(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Functions Suite")
+	RunSpecs(t, "Textblocks Suite")
 }
 
 var _ = Describe("Textblocks", func() {
@@ -48,6 +48,16 @@ var _ = Describe("Textblocks", func() {
 
 		It("should match the expected format", func() {
 			Expect(textblocks.RandomNewsPaperName(ctx)).To(MatchRegexp(`.* .*`))
+		})
+	})
+
+	Context("RandomTopic", func() {
+		It("should return a random topic", func() {
+			Expect(textblocks.RandomTopic(ctx)).NotTo(BeEmpty())
+		})
+
+		It("should match the expected format", func() {
+			Expect(textblocks.RandomTopic(ctx)).To(MatchRegexp(`.* .* .*`))
 		})
 	})
 })

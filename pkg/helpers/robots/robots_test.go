@@ -12,7 +12,7 @@ import (
 
 func TestRobots(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Functions Suite")
+	RunSpecs(t, "Robots Suite")
 }
 
 var _ = Describe("Robots", func() {

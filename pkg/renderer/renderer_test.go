@@ -12,7 +12,7 @@ import (
 
 func TestRenderer(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Functions Suite")
+	RunSpecs(t, "Renderer Suite")
 }
 
 var _ = Describe("Renderer", func() {
@@ -48,6 +48,29 @@ var _ = Describe("Renderer", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(renderedTemplate).NotTo(BeEmpty())
 			Expect(renderedTemplate).NotTo(BeNil())
+		})
+
+		It("should render a random template if headlineLinks are provided from the renderer", func() {
+			rd.HeadlineLinks = []string{}
+			r = renderer.NewRenderer(ctx, []string{"headLineLink0", "headLineLink1", "headLineLink2", "headLineLink3", "headLineLink4", "headLineLink5", "headLineLink6", "headLineLink7", "headLineLink8", "headLineLink9"})
+			renderedTemplate, err := r.RenderInRandomTemplate(ctx, rd)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(renderedTemplate).NotTo(BeEmpty())
+			Expect(renderedTemplate).NotTo(BeNil())
+		})
+
+		It("should not render if headlineLinks is empty", func() {
+			rd.HeadlineLinks = []string{}
+			renderedTemplate, err := r.RenderInRandomTemplate(ctx, rd)
+			Expect(err).To(HaveOccurred())
+			Expect(renderedTemplate).To(Equal(""))
+		})
+
+		It("should not render if headlineLinks is nil", func() {
+			rd.HeadlineLinks = nil
+			renderedTemplate, err := r.RenderInRandomTemplate(ctx, rd)
+			Expect(err).To(HaveOccurred())
+			Expect(renderedTemplate).To(Equal(""))
 		})
 	})
 })

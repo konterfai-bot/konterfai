@@ -2,7 +2,7 @@ package types
 
 type PathTypes int
 
-const PathTypesCount = 12
+const PathTypesCount = 13
 const (
 	_ PathTypes = iota
 	UUIDPath
@@ -21,7 +21,7 @@ const (
 
 type VariableNames int
 
-const VariableNamesCount = 11
+const VariableNamesCount = 12
 const (
 	_ VariableNames = iota
 	SingleCharacterVariable
@@ -39,7 +39,7 @@ const (
 
 type VariableValues int
 
-const VariableValuesCount = 10
+const VariableValuesCount = 14
 const (
 	_ = iota
 	VerbValue

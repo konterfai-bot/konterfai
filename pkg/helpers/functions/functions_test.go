@@ -4,6 +4,7 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"context"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -107,8 +108,46 @@ var _ = Describe("Functions", func() {
 		It("should recalculate the probability with the given uncertainty", func() {
 			baseProbability := 0.5
 			uncertainty := 0.1
-			recalculatedProbability := functions.RecalculateProbabilityWithUncertainity(ctx, baseProbability, uncertainty)
+			recalculatedProbability := functions.RecalculateProbabilityWithUncertainity(ctx, baseProbability, uncertainty, 0)
 			Expect(recalculatedProbability).To(BeNumerically("~", baseProbability, uncertainty))
+		})
+
+		It("should return the base probability if the uncertainty is 0", func() {
+			baseProbability := 0.5
+			recalculatedProbability := functions.RecalculateProbabilityWithUncertainity(ctx, baseProbability, 0, 0)
+			Expect(recalculatedProbability).To(Equal(baseProbability))
+		})
+
+		It("should return a value lower than the base probability if the definePrefix is negative", func() {
+			baseProbability := 0.5
+			recalculatedProbability := functions.RecalculateProbabilityWithUncertainity(ctx, baseProbability, 0.1, 10)
+			Expect(recalculatedProbability).To(BeNumerically("<", baseProbability))
+		})
+
+		It("should return a value higher than the base probability if the definePrefix is positive", func() {
+			baseProbability := 0.5
+			recalculatedProbability := functions.RecalculateProbabilityWithUncertainity(ctx, baseProbability, 0.1, 5)
+			Expect(recalculatedProbability).To(BeNumerically(">", baseProbability))
+		})
+	})
+
+	Context("SleepWithContext", func() {
+		It("should sleep for the given duration", func() {
+			start := time.Now()
+			duration := 100 * time.Millisecond
+			ctx, cancel := context.WithTimeout(ctx, duration)
+			defer cancel()
+			functions.SleepWithContext(ctx, duration)
+			Expect(time.Since(start)).To(BeNumerically("~", duration, 10*time.Millisecond))
+		})
+
+		It("should return immediately if the context is done", func() {
+			start := time.Now()
+			duration := 100 * time.Millisecond
+			ctx, cancel := context.WithTimeout(ctx, 0)
+			defer cancel()
+			functions.SleepWithContext(ctx, duration)
+			Expect(time.Since(start)).To(BeNumerically("<", duration))
 		})
 	})
 })

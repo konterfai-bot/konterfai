@@ -59,7 +59,8 @@ func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 			httpCode = http.StatusOK
 		} else {
 			// We generate a random response code.
-			httpCode = getRandomHttpResonseCode(ctx, functions.RecalculateProbabilityWithUncertainity(ctx, ws.HttpOkProbability, ws.Uncertainty))
+			httpCode = getRandomHttpResonseCode(ctx,
+				functions.RecalculateProbabilityWithUncertainity(ctx, ws.HttpOkProbability, ws.Uncertainty, 0))
 			if r.URL.Path != "/" &&
 				r.URL.Path != ws.HttpBaseUrl.Path &&
 				r.URL.Path != "" &&

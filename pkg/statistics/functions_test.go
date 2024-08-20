@@ -5,14 +5,8 @@ import (
 	"context"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"testing"
 	"time"
 )
-
-func TestFunctions(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Functions Suite")
-}
 
 var _ = Describe("Functions", func() {
 	var ctx context.Context
@@ -301,6 +295,45 @@ var _ = Describe("Functions", func() {
 				r.Timestamp = r.Timestamp.Add(-1000 * time.Second)
 				Expect(s.GetTotalDataSizeServedByTimeRange(ctx, r.Timestamp.Add(-100*time.Second), r.Timestamp.Add(100*time.Second))).To(Equal(3 * r.Size))
 			})
+
+			It("should return the total data size served by time range when start and end are equal", func() {
+				s.AppendRequest(ctx, r)
+				Expect(s.GetTotalDataSizeServedByTimeRange(ctx, r.Timestamp, r.Timestamp)).To(Equal(r.Size))
+				r.Timestamp = r.Timestamp.Add(10 * time.Second)
+				s.AppendRequest(ctx, r)
+				Expect(s.GetTotalDataSizeServedByTimeRange(ctx, r.Timestamp, r.Timestamp)).To(Equal(r.Size))
+			})
+		})
+	})
+
+	Context("GetTotalRequestsByAgent", func() {
+		It("should return the total requests by agent", func() {
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByAgent(ctx, r.UserAgent)).To(Equal(1))
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByAgent(ctx, r.UserAgent)).To(Equal(2))
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByAgent(ctx, r.UserAgent)).To(Equal(3))
+			r.UserAgent = "Mozilla/4.0"
+			s.AppendRequest(ctx, r)
+			r.UserAgent = "Mozilla/5.0"
+			Expect(s.GetTotalRequestsByAgent(ctx, r.UserAgent)).To(Equal(3))
+		})
+	})
+
+	Context("GetTotalRequestsByIpAddress", func() {
+		It("should return the total requests by IP address", func() {
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(1))
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(2))
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(3))
+			r.IpAddress = "172.0.0.1"
+			s.AppendRequest(ctx, r)
+			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(1))
+			r.IpAddress = "127.0.0.1"
+			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(3))
 		})
 	})
 

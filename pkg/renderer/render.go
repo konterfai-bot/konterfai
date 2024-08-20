@@ -88,8 +88,12 @@ func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (s
 		return "", err
 	}
 	if rd.HeadlineLinks == nil || len(rd.HeadlineLinks) < 10 {
+		if r.headlineLinks == nil || len(r.headlineLinks) < 10 {
+			return "", fmt.Errorf("headlineLinks is nil or has less than 10 elements, is empty or unset")
+		}
 		rd.HeadlineLinks = r.headlineLinks
 	}
+
 	year, _, _ := time.Now().Date()
 	rd.CurrentYear = fmt.Sprintf("%d", year)
 	buffer := &strings.Builder{}

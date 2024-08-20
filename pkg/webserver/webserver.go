@@ -24,6 +24,7 @@ type WebServer struct {
 	HttpResponseCacheSize int
 	HttpResponseCacheLock sync.Mutex
 	HttpBaseUrl           url.URL
+	ServeMux              *http.ServeMux
 }
 
 // WebServerCacheItem is the structure for the WebServer cache item.
