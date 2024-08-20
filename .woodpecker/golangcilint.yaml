@@ -1,0 +1,11 @@
+---
+when:
+  # disabled for now, should be pull_request
+  event: [ manual ]
+
+steps:
+  - name: golangci-lint
+    image: golang:1.22
+    commands:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.60.2
+      - golangci-lint run

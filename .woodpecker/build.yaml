@@ -1,24 +1,19 @@
+---
 when:
-  branch: main
-  event: [ pull_request ]
+  - event: [ push, pull_request ]
+    branch: main
+  - event: tag
+    ref: refs/tags/v*
 
 steps:
-  test:
-    image: golang:1.22
-    commands:
-      - make coverage-ci
-
-  coverage:
-    image: woodpeckerci/plugin-codecov
-    settings:
-      files:
-        - coverage.out
-      token:
-        from_secret: codecov_token
-
-  all-arch-build:
+  - name: all-arch-build
     image: golang:1.22
     commands:
       - make all-arch-build
       - echo 'Build artifacts:'
       - ls bin/
+
+depends_on:
+  # golangci-lint is disabled for now
+  #- golangci-lint
+  - coverage

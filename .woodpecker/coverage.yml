@@ -1,0 +1,23 @@
+---
+when:
+  - event: [ pull_request ]
+  - event: [ push ]
+    branch: main
+  - event: tag
+    ref: refs/tags/v*
+
+steps:
+  - name: test
+    image: golang:1.22
+    commands:
+      - make coverage-ci
+
+  - name: coverage
+    image: woodpeckerci/plugin-codecov
+    settings:
+      files:
+        - coverage.out
+      token:
+        from_secret: codecov_token
+    depends_on:
+      - test

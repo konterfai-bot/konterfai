@@ -1,21 +1,10 @@
+---
 when:
-  event: tag
-  ref: refs/tags/v*
+  - event: tag
+    ref: refs/tags/v*
 
 steps:
-  test:
-    image: golang:1.22
-    commands:
-      - make test
-
-  all-arch-build:
-    image: golang:1.22
-    commands:
-      - make all-arch-build
-      - echo 'Build artifacts:'
-      - ls bin/
-
-  dry-run:
+  - name: tag-docker-dry-run
     image: woodpeckerci/plugin-docker-buildx
     settings:
       dockerfile: Dockerfile
@@ -24,7 +13,7 @@ steps:
       repo: konterfai/konterfai
       auto_tag: true
 
-  publish:
+  - name: tag-docker-publish
     image: woodpeckerci/plugin-docker-buildx
     settings:
       platforms: linux/amd64,linux/arm64,linux/arm/v7
@@ -39,3 +28,7 @@ steps:
           username: konterfai
           password:
             from_secret: quay_token
+
+depends_on:
+  - coverage
+  - all-arch-build
