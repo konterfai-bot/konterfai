@@ -6,7 +6,7 @@ steps:
   test:
     image: golang:1.22
     commands:
-      - make coverage
+      - make coverage-ci
 
   coverage:
     image: woodpeckerci/plugin-codecov

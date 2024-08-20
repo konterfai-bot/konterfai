@@ -1,6 +1,7 @@
 APP_NAME = "konterfai"
 OLLAMA_MODEL ?= "qwen2:0.5b"
 DOCKER_TAG ?= "dev"
+BROWSER ?= "firefox"
 
 .PHONY: all
 all: build
@@ -14,7 +15,6 @@ build:
 	@go build -o bin/$(APP_NAME) cmd/$(APP_NAME)/main.go
 	@echo "Done."
 
-
 .PHONY: test
 test:
 	@echo "Testing..."
@@ -23,6 +23,14 @@ test:
 
 .PHONY: coverage
 coverage:
+	@echo "Coverage..."
+	@go test -v ./... -coverprofile=coverage.out
+	@go tool cover -html=coverage.out -o coverage.html
+	@$(BROWSER) coverage.html
+	@echo "Done."
+
+.PHONY: coverage-ci
+coverage-ci:
 	@echo "Coverage..."
 	@go test -v ./... -coverprofile=coverage.out
 	@go tool cover -html=coverage.out -o coverage.html
