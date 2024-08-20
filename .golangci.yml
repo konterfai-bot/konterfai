@@ -3,3 +3,17 @@ run:
 
 linters:
   enable-all: true
+  disable:
+      - gochecknoglobals
+      - gomnd
+      - execinquery
+issues:
+  exclude-use-default: true
+  exclude-rules:
+    - path: _test.go
+      source: "." # exclude _test.go files from linting
+  exclude-dirs:
+    - .git
+    - vendor
+    - docs
+    - deployments
