@@ -6,7 +6,15 @@ steps:
   test:
     image: golang:1.22
     commands:
-      - make test
+      - make coverage
+
+  coverage:
+    image: woodpeckerci/plugin-codecov
+    settings:
+      files:
+        - coverage.out
+      token:
+        from_secret: codecov_token
 
   all-arch-build:
     image: golang:1.22

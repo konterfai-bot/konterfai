@@ -3,6 +3,19 @@ when:
   event: [ push ]
 
 steps:
+  test:
+    image: golang:1.22
+    commands:
+      - make coverage
+
+  coverage:
+    image: woodpeckerci/plugin-codecov
+    settings:
+      files:
+        - coverage.out
+      token:
+        from_secret: codecov_token
+
   dry-run:
     image: woodpeckerci/plugin-docker-buildx
     settings:
