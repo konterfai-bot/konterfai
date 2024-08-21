@@ -1,10 +1,11 @@
 package functions_test
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"context"
 	"testing"
 	"time"
+
+	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

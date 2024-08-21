@@ -21,19 +21,20 @@ func generateSubDirectories(ctx context.Context, subdirectories int) string {
 	}
 
 	sd := []string{}
-	subcount := rand.Intn(subdirectories) + 1
-	for i := 0; i < subcount; i++ {
+	subcount := rand.Intn(subdirectories) + 1 //nolint:gosec
+	for range subcount {
 		sd = append(sd, getSubDirectoryString(ctx))
 	}
+
 	return strings.Join(sd, "/")
 }
 
 // getSubDirectoryString returns a random subdirectory string.
-func getSubDirectoryString(ctx context.Context) string {
+func getSubDirectoryString(ctx context.Context) string { //nolint:cyclop
 	ctx, span := tracer.Start(ctx, "getSubDirectoryString")
 	defer span.End()
 
-	typeRand := rand.Intn(types.PathTypesCount) + 1
+	typeRand := rand.Intn(types.PathTypesCount) + 1 //nolint:gosec
 	switch types.PathTypes(typeRand) {
 	case types.UUIDPath:
 		return uuid.NewString()
@@ -77,6 +78,6 @@ func getSubDirectoryString(ctx context.Context) string {
 	case types.DayPath:
 		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Weekdays)
 	default:
-		return "default"
+		return fallbackDefaultWord
 	}
 }

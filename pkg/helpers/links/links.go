@@ -13,8 +13,10 @@ import (
 
 var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/helpers/links")
 
-// RandomLink generates a random link based on the given base URL, the number of random subdirectories and the number of random variables.
-func RandomLink(ctx context.Context, baseUrl url.URL, subdirectories, variablesCount int, linkHasVariablesProbability float64) string {
+// RandomLink generates a random link based on given base URL, the number of random subdirectories and random variables.
+func RandomLink(ctx context.Context, baseURL url.URL, subdirectories,
+	variablesCount int, linkHasVariablesProbability float64,
+) string {
 	ctx, span := tracer.Start(ctx, "RandomLink")
 	defer span.End()
 
@@ -23,13 +25,14 @@ func RandomLink(ctx context.Context, baseUrl url.URL, subdirectories, variablesC
 	variables := generateVariables(ctx, variablesCount, linkHasVariablesProbability)
 
 	if variables != "" {
-		return fmt.Sprintf("%s://%s/%s?%s", baseUrl.Scheme, baseUrl.Host, subDirectoryPath, variables)
+		return fmt.Sprintf("%s://%s/%s?%s", baseURL.Scheme, baseURL.Host, subDirectoryPath, variables)
 	}
-	return fmt.Sprintf("%s://%s/%s", baseUrl.Scheme, baseUrl.Host, subDirectoryPath)
+
+	return fmt.Sprintf("%s://%s/%s", baseURL.Scheme, baseURL.Host, subDirectoryPath)
 }
 
 // RandomSimpleLink generates a random link based on the given base URL.
-func RandomSimpleLink(ctx context.Context, baseUrl url.URL) string {
+func RandomSimpleLink(ctx context.Context, baseURL url.URL) string {
 	ctx, span := tracer.Start(ctx, "RandomSimpleLink")
 	defer span.End()
 
@@ -37,5 +40,6 @@ func RandomSimpleLink(ctx context.Context, baseUrl url.URL) string {
 		functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 		functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns),
 	}, "-"))
-	return fmt.Sprintf("%s://%s/%s", baseUrl.Scheme, baseUrl.Host, name)
+
+	return fmt.Sprintf("%s://%s/%s", baseURL.Scheme, baseURL.Host, name)
 }

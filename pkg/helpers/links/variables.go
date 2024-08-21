@@ -22,15 +22,15 @@ func generateVariables(ctx context.Context, variablesCount int, linkHasVariables
 
 	variables := []string{}
 	variablesValue := []string{}
-	varcount := rand.Intn(variablesCount) + 1
-	for i := 0; i < varcount; i++ {
+	varcount := rand.Intn(variablesCount) + 1 //nolint:gosec
+	for range varcount {
 		variables = append(variables, getVariableNameString(ctx))
 		variablesValue = append(variablesValue, getVariableValueString(ctx))
 	}
 
 	variablesString := ""
-	if rand.Float64() < linkHasVariablesProbability {
-		for i := 0; i < len(variables); i++ {
+	if rand.Float64() < linkHasVariablesProbability { //nolint:gosec
+		for i := range len(variables) {
 			if variablesString != "" {
 				variablesString = fmt.Sprintf("%s&%s=%s", variablesString, variables[i], variablesValue[i])
 			} else {
@@ -38,19 +38,21 @@ func generateVariables(ctx context.Context, variablesCount int, linkHasVariables
 			}
 		}
 	}
+
 	return variablesString
 }
 
 // getVariableNameString returns a random variable name string.
-func getVariableNameString(ctx context.Context) string {
+func getVariableNameString(ctx context.Context) string { //nolint:cyclop
 	ctx, span := tracer.Start(ctx, "getVariableNameString")
 	defer span.End()
 
-	typeRand := rand.Intn(types.VariableNamesCount) + 1
+	typeRand := rand.Intn(types.VariableNamesCount) + 1 //nolint:gosec
 	switch types.VariableNames(typeRand) {
 	case types.SingleCharacterVariable:
 		charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		return string(charset[rand.Intn(len(charset))])
+
+		return string(charset[rand.Intn(len(charset))]) //nolint:gosec
 	case types.VerbVariable:
 		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)
 	case types.NounVariable:
@@ -92,16 +94,16 @@ func getVariableNameString(ctx context.Context) string {
 	case types.DayVariable:
 		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Weekdays)
 	default:
-		return "default"
+		return fallbackDefaultWord
 	}
 }
 
 // getVariableValueString returns a random variable value string.
-func getVariableValueString(ctx context.Context) string {
+func getVariableValueString(ctx context.Context) string { //nolint:cyclop
 	ctx, span := tracer.Start(ctx, "getVariableValueString")
 	defer span.End()
 
-	typeRand := rand.Intn(types.VariableValuesCount) + 1
+	typeRand := rand.Intn(types.VariableValuesCount) + 1 //nolint:gosec
 	switch types.VariableValues(typeRand) {
 	case types.VerbValue:
 		return functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs)
@@ -150,6 +152,6 @@ func getVariableValueString(ctx context.Context) string {
 	case types.Base64Value:
 		return functions.RandomBase64String(ctx)
 	default:
-		return "default"
+		return fallbackDefaultWord
 	}
 }
