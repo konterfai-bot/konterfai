@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime"
 	"strings"
 
 	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
@@ -28,7 +29,7 @@ func (h *Hallucinator) generateFollowUpLink(ctx context.Context, continueText st
 	return fmt.Sprintf("<br/><br/><a href=\"%s\">%s</a>",
 		links.RandomLink(
 			ctx,
-			h.hallucinatorUrl,
+			h.hallucinatorURL,
 			h.hallucinatorLinkMaxSubdirectories,
 			h.hallucinatorLinkMaxVariables,
 			h.hallucinatorLinkHasVariablesProbability,
@@ -41,73 +42,74 @@ func (h *Hallucinator) generateFollowUpLink(ctx context.Context, continueText st
 func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination, error) {
 	ctx, span := tracer.Start(ctx, "Hallucinator.generateHallucination")
 	defer span.End()
-	requestUrl, err := url.JoinPath(h.ollamaAddress, "/api/chat")
+	requestURL, err := url.JoinPath(h.ollamaAddress, "/api/chat")
 	if err != nil {
-		fmt.Println("could not join url path")
-		os.Exit(1)
+		fmt.Printf("could not join url path (%v)", err)
+		defer os.Exit(1)
+		runtime.Goexit()
 	}
-
 	prompt := h.generatePrompt(ctx)
 	fmt.Printf("generating hallucination with prompt: \"%s\"\n", prompt)
-
-	requestBody := ollamaJsonRequest{
-		Model: h.ollamaModel,
-		Messages: []ollamaMessage{
-			{
-				Role:    "user",
-				Content: prompt,
-			},
-		},
-		Options: ollamaOptions{
-			Temperature: h.aiTemperature,
-			Seed:        h.aiSeed,
-		},
+	requestBody := ollamaJSONRequest{
+		Model: h.ollamaModel, Messages: []ollamaMessage{{Role: "user", Content: prompt}},
+		Options: ollamaOptions{Temperature: h.aiTemperature, Seed: h.aiSeed},
 	}
-
-	requestBodyJson, err := json.Marshal(requestBody)
+	requestBodyJSON, err := json.Marshal(requestBody)
 	if err != nil {
 		fmt.Println("could not marshal request body")
-		os.Exit(1)
+		defer os.Exit(1)
+		runtime.Goexit()
 	}
-
-	res, err := h.httpClient.Post(requestUrl, "application/json", bytes.NewReader(requestBodyJson))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestURL, bytes.NewReader(requestBodyJSON))
 	if err != nil {
-		fmt.Println(fmt.Errorf("could not get hallucination from ollama (%v)", err))
+		fmt.Printf("could not create request (%v)\n", err)
+
 		return Hallucination{}, err
 	}
+	res, err := h.httpClient.Do(req)
+	if err != nil {
+		fmt.Printf("could not get hallucination from ollama (%v)\n", err)
 
+		return Hallucination{}, err
+	}
 	if res.StatusCode != http.StatusOK {
 		fmt.Println("ollama did not return 200 OK")
+
 		return Hallucination{}, errors.New("ollama did not return 200 OK")
 	}
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("could not read response body")
+
 		return Hallucination{}, err
 	}
-	responses := strings.Split(string(resBody), "\n")
-	payload := []string{}
+	pl := concatOllamaMessages(resBody)
+	if err := res.Body.Close(); err != nil {
+		fmt.Printf("could not close response body (%v)\n", err)
+	}
+
+	return Hallucination{Text: pl, Prompt: prompt, RequestCount: h.hallucinationRequestCount}, nil
+}
+
+// concatOllamaMessages concatenates Ollama messages.
+func concatOllamaMessages(responseBody []byte) string {
+	responses := strings.Split(string(responseBody), "\n")
+	var payload []string
 	for _, message := range responses {
 		m := ollamaResponse{}
-		err := json.Unmarshal([]byte(message), &m)
-		if err != nil {
+		if err := json.Unmarshal([]byte(message), &m); err != nil {
 			continue
 		}
-		msg := strings.Trim(m.Message.Content, " ")
-		if msg != "" && msg != "\n" {
+		if msg := strings.Trim(m.Message.Content, " "); msg != "" && msg != "\n" {
 			payload = append(payload, msg)
 		}
 		if m.Done {
 			break
 		}
 	}
-	pl := strings.Join(payload, " ")
-	return Hallucination{
-		Text:         pl,
-		Prompt:       prompt,
-		RequestCount: h.hallucinationRequestCount,
-	}, nil
+
+	return strings.Join(payload, " ")
 }
 
 // generatePrompt generates a prompt for the Hallucinator.
@@ -115,8 +117,8 @@ func (h *Hallucinator) generatePrompt(ctx context.Context) string {
 	ctx, span := tracer.Start(ctx, "Hallucinator.generatePrompt")
 	defer span.End()
 	words := ""
-	for i := 0; i < h.promptWordCount; i++ {
-		rnd := rand.Intn(100) % 3
+	for range h.promptWordCount {
+		rnd := rand.Intn(100) % 3 //nolint: gosec
 		switch rnd {
 		case 0:
 			words += functions.PickRandomStringFromSlice(ctx, &dictionaries.Verbs) + " "
@@ -128,6 +130,7 @@ func (h *Hallucinator) generatePrompt(ctx context.Context) string {
 			words += functions.PickRandomStringFromSlice(ctx, &dictionaries.Nouns) + " "
 		}
 	}
+
 	return fmt.Sprintf(functions.PickRandomStringFromSlice(ctx, &dictionaries.Prompts),
 		functions.PickRandomStringFromSlice(ctx, &dictionaries.ArticleTypes),
 		words,
@@ -137,20 +140,21 @@ func (h *Hallucinator) generatePrompt(ctx context.Context) string {
 }
 
 // generateRandomTopicLinks generates random topic links.
-func (h *Hallucinator) generateRandomTopicLinks(ctx context.Context, count int) []renderer.RandomTopic {
+func (h *Hallucinator) generateRandomTopicLinks(ctx context.Context) []renderer.RandomTopic {
 	ctx, span := tracer.Start(ctx, "Hallucinator.generateRandomTopicLinks")
 	defer span.End()
-	var topics []renderer.RandomTopic
-	for i := 0; i < count; i++ {
+	topics := make([]renderer.RandomTopic, 0, 10)
+	for range 10 {
 		topics = append(topics, renderer.RandomTopic{
 			Topic: textblocks.RandomTopic(ctx),
 			Link: links.RandomLink(ctx,
-				h.hallucinatorUrl,
+				h.hallucinatorURL,
 				h.hallucinatorLinkMaxSubdirectories,
 				h.hallucinatorLinkMaxVariables,
 				h.hallucinatorLinkHasVariablesProbability,
 			),
 		})
 	}
+
 	return topics
 }

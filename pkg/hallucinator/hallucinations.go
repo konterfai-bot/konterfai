@@ -19,6 +19,7 @@ func (h *Hallucinator) GetHallucinationCount(ctx context.Context) int {
 
 	h.hallucinationCountLock.Lock()
 	defer h.hallucinationCountLock.Unlock()
+
 	return h.hallucinationCount
 }
 
@@ -51,8 +52,8 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 				NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
 				Headline:     dream404String,
 				Content:      dreamString,
-				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, backToStartString)),
-				RandomTopics: h.generateRandomTopicLinks(ctx, 10),
+				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, backToStartString)), //nolint: gosec
+				RandomTopics: h.generateRandomTopicLinks(ctx),
 				Year:         functions.PickRandomYear(ctx),
 				MetaData: renderer.MetaData{
 					Description: dreamString,
@@ -64,6 +65,7 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 		if err != nil {
 			return fmt.Sprintf("Could not render template, error: %v", err)
 		}
+
 		return hallucination
 	}
 	currentHallucination := h.hallucinations[0].Text
@@ -78,9 +80,9 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 		renderer.RenderData{
 			NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
 			Headline:     textblocks.RandomHeadline(ctx),
-			Content:      template.HTML(h.clutterTextWithRandomHref(ctx, h.hallucinations[0].Text)),
-			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, continueString)),
-			RandomTopics: h.generateRandomTopicLinks(ctx, 10),
+			Content:      template.HTML(h.clutterTextWithRandomHref(ctx, h.hallucinations[0].Text)), //nolint: gosec
+			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, continueString)),                //nolint: gosec
+			RandomTopics: h.generateRandomTopicLinks(ctx),
 			Year:         functions.PickRandomYear(ctx),
 			MetaData: renderer.MetaData{
 				Description: metaDescription,
@@ -92,6 +94,7 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 	if err != nil {
 		return fmt.Sprintf("Could not render template, error: %v", err)
 	}
+
 	return hallucination
 }
 
@@ -106,8 +109,8 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 				NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
 				Headline:     dream404String,
 				Content:      dreamString,
-				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, backToStartString)),
-				RandomTopics: h.generateRandomTopicLinks(ctx, 10),
+				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, backToStartString)), //nolint: gosec
+				RandomTopics: h.generateRandomTopicLinks(ctx),
 				Year:         functions.PickRandomYear(ctx),
 				MetaData: renderer.MetaData{
 					Description: dreamString,
@@ -119,9 +122,10 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 		if err != nil {
 			return fmt.Sprintf("Could not render template, error: %v", err)
 		}
+
 		return hallucination
 	}
-	randomIndex := rand.Intn(h.GetHallucinationCount(ctx))
+	randomIndex := rand.Intn(h.GetHallucinationCount(ctx)) //nolint: gosec
 	h.DecreaseHallucinationRequestCount(ctx, randomIndex)
 	currentHallucination := h.hallucinations[randomIndex].Text
 	var metaDescription string
@@ -134,9 +138,9 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 		renderer.RenderData{
 			NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
 			Headline:     textblocks.RandomHeadline(ctx),
-			Content:      template.HTML(h.clutterTextWithRandomHref(ctx, currentHallucination)),
-			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, continueString)),
-			RandomTopics: h.generateRandomTopicLinks(ctx, 10),
+			Content:      template.HTML(h.clutterTextWithRandomHref(ctx, currentHallucination)), //nolint: gosec
+			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, continueString)),            //nolint: gosec
+			RandomTopics: h.generateRandomTopicLinks(ctx),
 			Year:         functions.PickRandomYear(ctx),
 			MetaData: renderer.MetaData{
 				Description: metaDescription,
@@ -148,6 +152,7 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 	if err != nil {
 		return fmt.Sprintf("Could not render template, error: %v", err)
 	}
+
 	return hallucination
 }
 

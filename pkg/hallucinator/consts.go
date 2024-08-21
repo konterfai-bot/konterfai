@@ -1,9 +1,11 @@
 package hallucinator
 
-const dreamString = "We are sorry, but the requested article could be not found!"
-const dream404String = "Error 404: Article not found."
-const backToStartString = "Back to start."
-const continueString = "Continue reading..."
+const (
+	backToStartString = "Back to start."
+	continueString    = "Continue reading..."
+	dream404String    = "Error 404: Article not found."
+	dreamString       = "We are sorry, but the requested article could be not found!"
+)
 
 // invalidResultsRegexps is a list of regular expressions that are used to filter out invalid results.
 var invalidResultsRegexps = []string{

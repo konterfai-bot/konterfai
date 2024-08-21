@@ -31,7 +31,7 @@ type Hallucinator struct {
 	hallucinatorLinkMaxSubdirectories       int
 	hallucinatorLinkHasVariablesProbability float64
 	hallucinatorLinkMaxVariables            int
-	hallucinatorUrl                         url.URL
+	hallucinatorURL                         url.URL
 	ollamaAddress                           string
 	ollamaModel                             string
 	aiTemperature                           float64
@@ -55,7 +55,7 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 	hallucinatorLinkMaxSubdirectories int,
 	hallucinatorLinkHasVariablesProbability float64,
 	hallucinatorLinkMaxVariables int,
-	hallucinatorUrl url.URL,
+	hallucinatorURL url.URL,
 	ollamaAddress string,
 	ollamaModel string,
 	ollamaRequestTimeOut time.Duration,
@@ -69,12 +69,13 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 	headLineLinks := [10]string{}
 	for i := 0; i < len(headLineLinks); i++ {
 		headLineLinks[i] = links.RandomLink(ctx,
-			hallucinatorUrl,
+			hallucinatorURL,
 			hallucinatorLinkMaxSubdirectories,
 			hallucinatorLinkMaxVariables,
 			hallucinatorLinkHasVariablesProbability,
 		)
 	}
+
 	return &Hallucinator{
 		Interval:                                interval,
 		hallucinations:                          []Hallucination{},
@@ -86,7 +87,7 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 		hallucinatorLinkMaxSubdirectories:       hallucinatorLinkMaxSubdirectories,
 		hallucinatorLinkHasVariablesProbability: hallucinatorLinkHasVariablesProbability,
 		hallucinatorLinkMaxVariables:            hallucinatorLinkMaxVariables,
-		hallucinatorUrl:                         hallucinatorUrl,
+		hallucinatorURL:                         hallucinatorURL,
 		ollamaAddress:                           ollamaAddress,
 		ollamaModel:                             ollamaModel,
 		aiTemperature:                           aiTemperature,
@@ -104,26 +105,28 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 // Start starts the Hallucinator.
 func (h *Hallucinator) Start(ctx context.Context) error {
 	// No need to trace this function as it is the entry point and an endless loop.
-
 	promptNeedsUpdate := false
 	for {
 		if h.GetHallucinationCount(ctx) < h.hallucinationCacheSize {
 			promptNeedsUpdate = true
-			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n", len(h.hallucinations)+1, h.hallucinationCacheSize)
+			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n",
+				len(h.hallucinations)+1, h.hallucinationCacheSize)
 			hal, err := h.generateHallucination(ctx)
 			if err != nil {
 				functions.SleepWithContext(ctx, h.Interval)
-				fmt.Println(fmt.Errorf("could not generate hallucination (%v)", err))
+				fmt.Printf("could not generate hallucination (%v)\n", err)
+
 				continue
 			}
 			if h.isValidResult(ctx, hal.Text) {
 				h.appendHallucination(ctx, hal)
 
-				//Update Prometheus metrics
+				// Update Prometheus metrics
 				statistics.PromptsGeneratedTotal.Inc()
 			} else {
 				fmt.Println("invalid hallucination, skipping...")
 			}
+
 			continue
 		}
 		fmt.Println("hallucinations cache is full, waiting for next interval...")
@@ -157,11 +160,11 @@ func (h *Hallucinator) clutterTextWithRandomHref(ctx context.Context, text strin
 		if len(generated) >= percentile {
 			break
 		}
-		i := rand.Intn(len(textSlice))
+		i := rand.Intn(len(textSlice)) //nolint: gosec
 		if !generated[i] {
 			textSlice[i] = fmt.Sprintf("<a href=\"%s\">%s</a>",
 				links.RandomLink(ctx,
-					h.hallucinatorUrl,
+					h.hallucinatorURL,
 					h.hallucinatorLinkMaxSubdirectories,
 					h.hallucinatorLinkMaxVariables,
 					h.hallucinatorLinkHasVariablesProbability,
@@ -169,5 +172,6 @@ func (h *Hallucinator) clutterTextWithRandomHref(ctx context.Context, text strin
 			generated[i] = true
 		}
 	}
+
 	return strings.Join(textSlice, " ")
 }
