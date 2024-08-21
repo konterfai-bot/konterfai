@@ -1,7 +1,7 @@
 ---
 when:
   # disabled for now, should be pull_request
-  event: [ manual ]
+  event: [ pull_request ]
 
 steps:
   - name: golangci-lint

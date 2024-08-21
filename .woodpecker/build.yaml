@@ -14,6 +14,5 @@ steps:
       - ls bin/
 
 depends_on:
-  # golangci-lint is disabled for now
-  #- golangci-lint
+  - golangci-lint
   - coverage
