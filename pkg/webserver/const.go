@@ -2,8 +2,8 @@ package webserver
 
 import "net/http"
 
-// ValidHttpStatusCodes is a list of valid status codes for the web server.
-var ValidHttpStatusCodes = []int{
+// ValidHTTPStatusCodes is a list of valid status codes for the web server.
+var ValidHTTPStatusCodes = []int{
 	http.StatusForbidden,
 	http.StatusPreconditionFailed,
 	http.StatusInternalServerError,

@@ -42,27 +42,23 @@ func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleRoot handles the root request.
-func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) {
+func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) { //nolint:cyclop
 	ctx, span := tracer.Start(r.Context(), "WebServer.handleRoot")
 	defer span.End()
-	span.SetAttributes(
-		attribute.String("http.method", r.Method),
-		attribute.String("http.url", r.URL.String()),
-		attribute.String("http.user-agent", r.UserAgent()),
-		attribute.String("http.remote-addr", r.RemoteAddr),
-	)
+	span.SetAttributes(attribute.String("http.method", r.Method), attribute.String("http.url", r.URL.String()),
+		attribute.String("http.user-agent", r.UserAgent()), attribute.String("http.remote-addr", r.RemoteAddr))
 	r = r.WithContext(ctx)
 
 	httpCode := ws.getErrorFromCache(ctx, r.URL)
 	if httpCode < 1 {
-		if r.URL.Path == "/" || r.URL.Path == ws.HttpBaseUrl.Path || r.URL.Path == "" {
+		if r.URL.Path == "/" || r.URL.Path == ws.HTTPBaseURL.Path || r.URL.Path == "" {
 			httpCode = http.StatusOK
 		} else {
 			// We generate a random response code.
-			httpCode = getRandomHttpResonseCode(ctx,
-				functions.RecalculateProbabilityWithUncertainity(ctx, ws.HttpOkProbability, ws.Uncertainty, 0))
+			httpCode = getRandomHTTPResonseCode(ctx,
+				functions.RecalculateProbabilityWithUncertainity(ctx, ws.HTTPOkProbability, ws.Uncertainty, 0))
 			if r.URL.Path != "/" &&
-				r.URL.Path != ws.HttpBaseUrl.Path &&
+				r.URL.Path != ws.HTTPBaseURL.Path &&
 				r.URL.Path != "" &&
 				// we do not want to store 200 OK responses
 				httpCode != http.StatusOK &&
@@ -76,16 +72,17 @@ func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 	if httpCode != http.StatusOK {
 		if httpCode == http.StatusMovedPermanently {
-			http.Redirect(w, r, links.RandomSimpleLink(ctx, ws.HttpBaseUrl), httpCode)
+			http.Redirect(w, r, links.RandomSimpleLink(ctx, ws.HTTPBaseURL), httpCode)
+
 			return
 		}
 		// We write the response code to the response.
 		w.WriteHeader(httpCode)
-		// We write the response code to the response.
 		_, err := w.Write([]byte(http.StatusText(httpCode)))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+
 		return
 	}
 	ws.handleHallucination(w, r)

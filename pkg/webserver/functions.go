@@ -12,16 +12,17 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 )
 
-// getRandomHttpResonseCode returns a random http response code.
-func getRandomHttpResonseCode(ctx context.Context, okProbability float64) int {
-	_, span := tracer.Start(ctx, "WebServer.getRandomHttpResonseCode")
+// getRandomHTTPResonseCode returns a random http response code.
+func getRandomHTTPResonseCode(ctx context.Context, okProbability float64) int {
+	_, span := tracer.Start(ctx, "WebServer.getRandomHTTPResonseCode")
 	defer span.End()
 
-	if rand.Float64() < okProbability {
+	if rand.Float64() < okProbability { //nolint:gosec
 		return http.StatusOK
 	}
 	seed := time.Now().UTC().UnixNano()
-	return ValidHttpStatusCodes[rand.New(rand.NewSource(seed)).Intn(len(ValidHttpStatusCodes))]
+
+	return ValidHTTPStatusCodes[rand.New(rand.NewSource(seed)).Intn(len(ValidHTTPStatusCodes))] //nolint:gosec
 }
 
 // handleHallucination handles the hallucination request.
@@ -53,29 +54,31 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 }
 
 // getErrorFromCache returns the error code from the cache.
-func (ws *WebServer) getErrorFromCache(ctx context.Context, requestUrl *url.URL) int {
+func (ws *WebServer) getErrorFromCache(ctx context.Context, requestURL *url.URL) int {
 	_, span := tracer.Start(ctx, "WebServer.getErrorFromCache")
 	defer span.End()
 
-	ws.HttpResponseCacheLock.Lock()
-	defer ws.HttpResponseCacheLock.Unlock()
-	for _, item := range ws.HttpResponseCache {
-		if item.Url == fmt.Sprintf("%s%s", ws.HttpBaseUrl.String(), requestUrl.Path) {
+	ws.HTTPResponseCacheLock.Lock()
+	defer ws.HTTPResponseCacheLock.Unlock()
+	for _, item := range ws.HTTPResponseCache {
+		if item.URL == fmt.Sprintf("%s%s", ws.HTTPBaseURL.String(), requestURL.Path) {
 			return item.Code
 		}
 	}
+
 	return 0
 }
 
 // putErrorToCache puts the error code to the cache.
-func (ws *WebServer) putErrorToCache(ctx context.Context, requestUrl *url.URL, errorCode int) {
+func (ws *WebServer) putErrorToCache(ctx context.Context, requestURL *url.URL, errorCode int) {
 	_, span := tracer.Start(ctx, "WebServer.putErrorToCache")
 	defer span.End()
 
-	ws.HttpResponseCacheLock.Lock()
-	defer ws.HttpResponseCacheLock.Unlock()
-	if len(ws.HttpResponseCache) >= ws.HttpResponseCacheSize {
-		ws.HttpResponseCache = append(ws.HttpResponseCache[:0], ws.HttpResponseCache[1:]...)
+	ws.HTTPResponseCacheLock.Lock()
+	defer ws.HTTPResponseCacheLock.Unlock()
+	if len(ws.HTTPResponseCache) >= ws.HTTPResponseCacheSize {
+		ws.HTTPResponseCache = append(ws.HTTPResponseCache[:0], ws.HTTPResponseCache[1:]...)
 	}
-	ws.HttpResponseCache = append(ws.HttpResponseCache, WebServerCacheItem{Url: fmt.Sprintf("%s%s", ws.HttpBaseUrl.String(), requestUrl.String()), Code: errorCode})
+	ws.HTTPResponseCache = append(ws.HTTPResponseCache, ErrorCacheItem{URL: fmt.Sprintf("%s%s",
+		ws.HTTPBaseURL.String(), requestURL.String()), Code: errorCode})
 }
