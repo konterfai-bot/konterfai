@@ -5,9 +5,18 @@ linters:
   enable-all: true
   disable:
       - execinquery
+      - exhaustruct
       - exportloopref
       - gochecknoglobals
       - gomnd
+      - mnd # this is more a nuisance than a help
+      - varnamelen
+      # linters that need to be verified if they are useful
+      - err113
+      - gci
+      - wsl
+      - forbidigo # this must be reenabled it forbids fmt.Println atm, but we need a proper logger to work with this
+      - wrapcheck # this must be reenabled at the moment error-handling is not consistent
 issues:
   exclude-use-default: true
   exclude-rules:
@@ -18,3 +27,24 @@ issues:
     - vendor
     - docs
     - deployments
+
+linters-settings:
+  depguard:
+    rules:
+      main:
+        files:
+          - $all
+          - "!$test"
+        allow:
+          - $gostd
+          - codeberg.org/konterfai/konterfai
+          - github.com/google
+          - github.com/oklog/run
+          - github.com/prometheus
+          - github.com/urfave/cli
+      test:
+        files:
+          - "$test"
+        allow:
+          - $gostd
+          - codeberg.org/konterfai/konterfai
