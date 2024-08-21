@@ -13,7 +13,7 @@ func (s *Statistics) AppendRequest(ctx context.Context, r Request) {
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
-	r.IpAddress = strings.Split(r.IpAddress, ":")[0]
+	r.IPAddress = strings.Split(r.IPAddress, ":")[0]
 	s.Requests = append(s.Requests, r)
 
 	// Update Prometheus metrics
@@ -32,28 +32,30 @@ func (s *Statistics) GetAgents(ctx context.Context) []string {
 	for _, r := range s.Requests {
 		agents[r.UserAgent] = struct{}{}
 	}
-	var agentsList []string
+	agentsList := make([]string, 0, len(agents))
 	for agent := range agents {
 		agentsList = append(agentsList, agent)
 	}
+
 	return agentsList
 }
 
-// GetIpAddresses returns the IP addresses.
-func (s *Statistics) GetIpAddresses(ctx context.Context) []string {
-	_, span := tracer.Start(ctx, "Statistics.GetIpAddresses")
+// GetIPAddresses returns the IP addresses.
+func (s *Statistics) GetIPAddresses(ctx context.Context) []string {
+	_, span := tracer.Start(ctx, "Statistics.GetIPAddresses")
 	defer span.End()
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	ips := map[string]struct{}{}
 	for _, r := range s.Requests {
-		ips[r.IpAddress] = struct{}{}
+		ips[r.IPAddress] = struct{}{}
 	}
-	var ipsList []string
+	ipsList := make([]string, 0, len(ips))
 	for ip := range ips {
 		ipsList = append(ipsList, ip)
 	}
+
 	return ipsList
 }
 
@@ -64,22 +66,24 @@ func (s *Statistics) GetRequests(ctx context.Context) []Request {
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
+
 	return s.Requests
 }
 
-// GetRequestsByIpAddress returns the requests by IP address.
-func (s *Statistics) GetRequestsByIpAddress(ctx context.Context, ipAddress string) []Request {
-	_, span := tracer.Start(ctx, "Statistics.GetRequestsByIpAddress")
+// GetRequestsByIPAddress returns the requests by IP address.
+func (s *Statistics) GetRequestsByIPAddress(ctx context.Context, ipAddress string) []Request {
+	_, span := tracer.Start(ctx, "Statistics.GetRequestsByIPAddress")
 	defer span.End()
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var requests []Request
 	for _, r := range s.Requests {
-		if r.IpAddress == ipAddress {
+		if r.IPAddress == ipAddress {
 			requests = append(requests, r)
 		}
 	}
+
 	return requests
 }
 
@@ -99,6 +103,7 @@ func (s *Statistics) GetRequestsByTimeRange(ctx context.Context, start, end time
 			requests = append(requests, r)
 		}
 	}
+
 	return requests
 }
 
@@ -115,20 +120,22 @@ func (s *Statistics) GetRequestsByUserAgent(ctx context.Context, userAgent strin
 			requests = append(requests, r)
 		}
 	}
+
 	return requests
 }
 
-// GetRequestsGroupedByIpAddress returns the requests grouped by IP address.
-func (s *Statistics) GetRequestsGroupedByIpAddress(ctx context.Context) map[string][]Request {
-	_, span := tracer.Start(ctx, "Statistics.GetRequestsGroupedByIpAddress")
+// GetRequestsGroupedByIPAddress returns the requests grouped by IP address.
+func (s *Statistics) GetRequestsGroupedByIPAddress(ctx context.Context) map[string][]Request {
+	_, span := tracer.Start(ctx, "Statistics.GetRequestsGroupedByIPAddress")
 	defer span.End()
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	grouped := make(map[string][]Request)
 	for _, r := range s.Requests {
-		grouped[r.IpAddress] = append(grouped[r.IpAddress], r)
+		grouped[r.IPAddress] = append(grouped[r.IPAddress], r)
 	}
+
 	return grouped
 }
 
@@ -143,6 +150,7 @@ func (s *Statistics) GetRequestsGroupedByUserAgent(ctx context.Context) map[stri
 	for _, r := range s.Requests {
 		grouped[r.UserAgent] = append(grouped[r.UserAgent], r)
 	}
+
 	return grouped
 }
 
@@ -157,6 +165,7 @@ func (s *Statistics) GetTotalDataSizeServed(ctx context.Context) int {
 	for _, r := range s.Requests {
 		size += r.Size
 	}
+
 	return size
 }
 
@@ -173,22 +182,24 @@ func (s *Statistics) GetTotalDataSizeServedByAgent(ctx context.Context, agent st
 			size += r.Size
 		}
 	}
+
 	return size
 }
 
-// GetTotalDataSizeServedByIpAddress returns the data size served by IP address.
-func (s *Statistics) GetTotalDataSizeServedByIpAddress(ctx context.Context, ipAddress string) int {
-	_, span := tracer.Start(ctx, "Statistics.GetTotalDataSizeServedByIpAddress")
+// GetTotalDataSizeServedByIPAddress returns the data size served by IP address.
+func (s *Statistics) GetTotalDataSizeServedByIPAddress(ctx context.Context, ipAddress string) int {
+	_, span := tracer.Start(ctx, "Statistics.GetTotalDataSizeServedByIPAddress")
 	defer span.End()
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var size int
 	for _, r := range s.Requests {
-		if r.IpAddress == ipAddress {
+		if r.IPAddress == ipAddress {
 			size += r.Size
 		}
 	}
+
 	return size
 }
 
@@ -205,22 +216,24 @@ func (s *Statistics) GetTotalRequestsByAgent(ctx context.Context, agent string) 
 			count++
 		}
 	}
+
 	return count
 }
 
-// GetTotalRequestsByIpAddress returns the total requests by IP address.
-func (s *Statistics) GetTotalRequestsByIpAddress(ctx context.Context, ipAddress string) int {
-	_, span := tracer.Start(ctx, "Statistics.GetTotalRequestsByIpAddress")
+// GetTotalRequestsByIPAddress returns the total requests by IP address.
+func (s *Statistics) GetTotalRequestsByIPAddress(ctx context.Context, ipAddress string) int {
+	_, span := tracer.Start(ctx, "Statistics.GetTotalRequestsByIPAddress")
 	defer span.End()
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
 	var count int
 	for _, r := range s.Requests {
-		if r.IpAddress == ipAddress {
+		if r.IPAddress == ipAddress {
 			count++
 		}
 	}
+
 	return count
 }
 
@@ -240,6 +253,7 @@ func (s *Statistics) GetTotalDataSizeServedByTimeRange(ctx context.Context, star
 			size += r.Size
 		}
 	}
+
 	return size
 }
 
@@ -250,6 +264,7 @@ func (s *Statistics) GetTotalRequests(ctx context.Context) int {
 
 	s.StatisticsLock.Lock()
 	defer s.StatisticsLock.Unlock()
+
 	return len(s.Requests)
 }
 
@@ -271,6 +286,7 @@ func (s *Statistics) GetTotalRobotsTxtViolators(ctx context.Context) int {
 			violators[identifier] = struct{}{}
 		}
 	}
+
 	return len(violators)
 }
 

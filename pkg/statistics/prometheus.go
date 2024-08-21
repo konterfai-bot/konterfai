@@ -24,13 +24,13 @@ var (
 
 	// DataFedTotal is the total amount of data fed.
 	DataFedTotal = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "konterfai_data_fed_total_bytes",
+		Name: "konterfai_data_fed_bytes_total",
 		Help: "The total amount of data fed in bytes.",
 	})
 
 	// RobotsTxtViolatorsTotal is the total number of violators of robots.txt.
 	RobotsTxtViolatorsTotal = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "konterfai_robots_txt_violators_total",
+		Name: "konterfai_robots_txt_violators",
 		Help: "The total number of violators of robots.txt.",
 	})
 
@@ -42,19 +42,19 @@ var (
 
 	// AgentRequests is the requests per user agent.
 	AgentRequests = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "konterfai_agent_requests_total",
+		Name: "konterfai_agent_requests",
 		Help: "The requests per user agent.",
 	}, []string{"user_agent"})
 
-	// IpTraffic is the traffic per IP address.
-	IpTraffic = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	// IPTraffic is the traffic per IP address.
+	IPTraffic = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "konterfai_ip_traffic_bytes",
 		Help: "The traffic per IP address in bytes.",
 	}, []string{"ip_address"})
 
-	// IpRequests is the requests per IP address.
-	IpRequests = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "konterfai_ip_requests_total",
+	// IPRequests is the requests per IP address.
+	IPRequests = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "konterfai_ip_requests",
 		Help: "The requests per IP address.",
 	}, []string{"ip_address"})
 )
@@ -68,7 +68,7 @@ func (s *Statistics) recordStatistics(ctx context.Context) {
 	go func() {
 		for {
 			select {
-			case <-s.Context.Done():
+			case <-ctx.Done():
 				return
 			case <-time.After(5 * time.Second):
 				if isProcessing.TryLock() {
@@ -79,9 +79,9 @@ func (s *Statistics) recordStatistics(ctx context.Context) {
 						AgentRequests.WithLabelValues(agent).Set(float64(s.GetTotalRequestsByAgent(ctx, agent)))
 					}
 
-					for _, ip := range s.GetIpAddresses(ctx) {
-						IpTraffic.WithLabelValues(ip).Set(float64(s.GetTotalDataSizeServedByIpAddress(ctx, ip)))
-						IpRequests.WithLabelValues(ip).Set(float64(s.GetTotalRequestsByIpAddress(ctx, ip)))
+					for _, ip := range s.GetIPAddresses(ctx) {
+						IPTraffic.WithLabelValues(ip).Set(float64(s.GetTotalDataSizeServedByIPAddress(ctx, ip)))
+						IPRequests.WithLabelValues(ip).Set(float64(s.GetTotalRequestsByIPAddress(ctx, ip)))
 					}
 
 					isProcessing.Unlock()

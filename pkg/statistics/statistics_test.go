@@ -1,8 +1,9 @@
 package statistics_test
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"context"
+
+	"codeberg.org/konterfai/konterfai/pkg/statistics"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

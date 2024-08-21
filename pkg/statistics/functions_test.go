@@ -17,8 +17,7 @@ var _ = Describe("Functions", func() {
 		ctx = context.Background()
 		s = &statistics.Statistics{}
 		r = statistics.Request{
-			Context:   ctx,
-			IpAddress: "127.0.0.1",
+			IPAddress: "127.0.0.1",
 			UserAgent: "Mozilla/5.0",
 			Size:      1024,
 		}
@@ -29,9 +28,8 @@ var _ = Describe("Functions", func() {
 			s.AppendRequest(ctx, r)
 			cmp := s.GetRequests(ctx)[0]
 			Expect(cmp.UserAgent).To(Equal(r.UserAgent))
-			Expect(cmp.IpAddress).To(Equal(r.IpAddress))
+			Expect(cmp.IPAddress).To(Equal(r.IPAddress))
 			Expect(cmp.Size).To(Equal(r.Size))
-			Expect(cmp.Context).To(Equal(r.Context))
 		})
 
 		It("should contain two requests", func() {
@@ -64,25 +62,25 @@ var _ = Describe("Functions", func() {
 		})
 	})
 
-	Context("GetIpAddresses", func() {
+	Context("GetIPAddresses", func() {
 		It("should return one IP address", func() {
 			s.AppendRequest(ctx, r)
-			ips := s.GetIpAddresses(ctx)
-			Expect(ips).To(ContainElement(r.IpAddress))
+			ips := s.GetIPAddresses(ctx)
+			Expect(ips).To(ContainElement(r.IPAddress))
 		})
 
 		It("should return one IP address when two requests with the same IP address are appended", func() {
 			s.AppendRequest(ctx, r)
 			s.AppendRequest(ctx, r)
-			ips := s.GetIpAddresses(ctx)
+			ips := s.GetIPAddresses(ctx)
 			Expect(len(ips)).To(Equal(1))
 		})
 
 		It("should return two IP addresses", func() {
 			s.AppendRequest(ctx, r)
-			r.IpAddress = "172.0.0.1"
+			r.IPAddress = "172.0.0.1"
 			s.AppendRequest(ctx, r)
-			ips := s.GetIpAddresses(ctx)
+			ips := s.GetIPAddresses(ctx)
 			Expect(len(ips)).To(Equal(2))
 		})
 	})
@@ -102,29 +100,29 @@ var _ = Describe("Functions", func() {
 		})
 	})
 
-	Context("GetRequestsByIpAddress", func() {
+	Context("GetRequestsByIPAddress", func() {
 		It("should return one request", func() {
 			s.AppendRequest(ctx, r)
-			requests := s.GetRequestsByIpAddress(ctx, r.IpAddress)
+			requests := s.GetRequestsByIPAddress(ctx, r.IPAddress)
 			Expect(len(requests)).To(Equal(1))
 		})
 
 		It("should return two requests", func() {
 			s.AppendRequest(ctx, r)
 			s.AppendRequest(ctx, r)
-			requests := s.GetRequestsByIpAddress(ctx, r.IpAddress)
+			requests := s.GetRequestsByIPAddress(ctx, r.IPAddress)
 			Expect(len(requests)).To(Equal(2))
 		})
 
 		It("should return zero requests", func() {
-			requests := s.GetRequestsByIpAddress(ctx, r.IpAddress)
+			requests := s.GetRequestsByIPAddress(ctx, r.IPAddress)
 			Expect(len(requests)).To(Equal(0))
 		})
 
 		It("should return two requests with the same IP address", func() {
 			s.AppendRequest(ctx, r)
 			s.AppendRequest(ctx, r)
-			requests := s.GetRequestsByIpAddress(ctx, r.IpAddress)
+			requests := s.GetRequestsByIPAddress(ctx, r.IPAddress)
 			Expect(len(requests)).To(Equal(2))
 		})
 	})
@@ -185,30 +183,30 @@ var _ = Describe("Functions", func() {
 		})
 	})
 
-	Context("GetRequestsGroupedByIpAddress", func() {
+	Context("GetRequestsGroupedByIPAddress", func() {
 		It("should return one request", func() {
 			s.AppendRequest(ctx, r)
-			requests := s.GetRequestsGroupedByIpAddress(ctx)
-			Expect(len(requests[r.IpAddress])).To(Equal(1))
+			requests := s.GetRequestsGroupedByIPAddress(ctx)
+			Expect(len(requests[r.IPAddress])).To(Equal(1))
 		})
 
 		It("should return two requests", func() {
 			s.AppendRequest(ctx, r)
 			s.AppendRequest(ctx, r)
-			requests := s.GetRequestsGroupedByIpAddress(ctx)
-			Expect(len(requests[r.IpAddress])).To(Equal(2))
+			requests := s.GetRequestsGroupedByIPAddress(ctx)
+			Expect(len(requests[r.IPAddress])).To(Equal(2))
 		})
 
 		It("should return zero requests", func() {
-			requests := s.GetRequestsGroupedByIpAddress(ctx)
+			requests := s.GetRequestsGroupedByIPAddress(ctx)
 			Expect(len(requests)).To(Equal(0))
 		})
 
 		It("should return two requests with the same IP address", func() {
 			s.AppendRequest(ctx, r)
 			s.AppendRequest(ctx, r)
-			requests := s.GetRequestsGroupedByIpAddress(ctx)
-			Expect(len(requests[r.IpAddress])).To(Equal(2))
+			requests := s.GetRequestsGroupedByIPAddress(ctx)
+			Expect(len(requests[r.IPAddress])).To(Equal(2))
 		})
 	})
 
@@ -266,18 +264,18 @@ var _ = Describe("Functions", func() {
 		})
 	})
 
-	Context("GetTotalDataSizeServedByIpAddress", func() {
+	Context("GetTotalDataSizeServedByIPAddress", func() {
 		It("should return the total data size served by IP address", func() {
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalDataSizeServedByIpAddress(ctx, r.IpAddress)).To(Equal(r.Size))
+			Expect(s.GetTotalDataSizeServedByIPAddress(ctx, r.IPAddress)).To(Equal(r.Size))
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalDataSizeServedByIpAddress(ctx, r.IpAddress)).To(Equal(2 * r.Size))
+			Expect(s.GetTotalDataSizeServedByIPAddress(ctx, r.IPAddress)).To(Equal(2 * r.Size))
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalDataSizeServedByIpAddress(ctx, r.IpAddress)).To(Equal(3 * r.Size))
-			r.IpAddress = "172.0.0.1"
+			Expect(s.GetTotalDataSizeServedByIPAddress(ctx, r.IPAddress)).To(Equal(3 * r.Size))
+			r.IPAddress = "172.0.0.1"
 			s.AppendRequest(ctx, r)
-			r.IpAddress = "127.0.0.1"
-			Expect(s.GetTotalDataSizeServedByIpAddress(ctx, r.IpAddress)).To(Equal(3 * r.Size))
+			r.IPAddress = "127.0.0.1"
+			Expect(s.GetTotalDataSizeServedByIPAddress(ctx, r.IPAddress)).To(Equal(3 * r.Size))
 		})
 
 		Context("GetTotalDataSizeServedByTimeRange", func() {
@@ -321,19 +319,19 @@ var _ = Describe("Functions", func() {
 		})
 	})
 
-	Context("GetTotalRequestsByIpAddress", func() {
+	Context("GetTotalRequestsByIPAddress", func() {
 		It("should return the total requests by IP address", func() {
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(1))
+			Expect(s.GetTotalRequestsByIPAddress(ctx, r.IPAddress)).To(Equal(1))
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(2))
+			Expect(s.GetTotalRequestsByIPAddress(ctx, r.IPAddress)).To(Equal(2))
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(3))
-			r.IpAddress = "172.0.0.1"
+			Expect(s.GetTotalRequestsByIPAddress(ctx, r.IPAddress)).To(Equal(3))
+			r.IPAddress = "172.0.0.1"
 			s.AppendRequest(ctx, r)
-			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(1))
-			r.IpAddress = "127.0.0.1"
-			Expect(s.GetTotalRequestsByIpAddress(ctx, r.IpAddress)).To(Equal(3))
+			Expect(s.GetTotalRequestsByIPAddress(ctx, r.IPAddress)).To(Equal(1))
+			r.IPAddress = "127.0.0.1"
+			Expect(s.GetTotalRequestsByIPAddress(ctx, r.IPAddress)).To(Equal(3))
 		})
 	})
 

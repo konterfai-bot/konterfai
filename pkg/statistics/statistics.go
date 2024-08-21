@@ -10,7 +10,6 @@ import (
 
 // Statistics is the structure for the Statistics.
 type Statistics struct {
-	Context           context.Context
 	Requests          []Request
 	StatisticsLock    sync.Mutex
 	ConfigurationInfo string
@@ -21,9 +20,8 @@ type Statistics struct {
 
 // Request is the structure for the Request.
 type Request struct {
-	Context     context.Context
 	UserAgent   string    `yaml:"userAgent"`
-	IpAddress   string    `yaml:"ipAddress"`
+	IPAddress   string    `yaml:"ipAddress"`
 	Timestamp   time.Time `yaml:"timestamp"`
 	IsRobotsTxt bool      `yaml:"isRobotsTxt"`
 	Size        int       `yaml:"size"`
@@ -37,10 +35,10 @@ func NewStatistics(ctx context.Context, configurationInfo string) *Statistics {
 	defer span.End()
 
 	st := &Statistics{
-		Context:           ctx,
 		Requests:          []Request{},
 		ConfigurationInfo: configurationInfo,
 	}
 	st.recordStatistics(ctx)
+
 	return st
 }

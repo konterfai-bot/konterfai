@@ -85,7 +85,7 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 
 	byUserAgent := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByUserAgent(ctx))
 
-	byIPAddress := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByIpAddress(ctx))
+	byIPAddress := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByIPAddress(ctx))
 
 	totalDataSize := convertByteSizeToSIUnits(ctx, ss.Statistics.GetTotalDataSizeServed(ctx))
 

@@ -28,7 +28,7 @@ func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 	responseData := robots.RobotsTxt(r)
 	go func() {
 		ws.Statistics.AppendRequest(ctx, statistics.Request{
-			IpAddress:   r.RemoteAddr,
+			IPAddress:   r.RemoteAddr,
 			Timestamp:   time.Now(),
 			UserAgent:   r.Header.Get("User-Agent"),
 			IsRobotsTxt: true,

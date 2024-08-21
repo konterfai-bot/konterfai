@@ -39,7 +39,7 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 	hallucination := ws.Hallucinator.PopRandomHallucination(ctx)
 	go func() {
 		ws.Statistics.AppendRequest(ctx, statistics.Request{
-			IpAddress:   r.RemoteAddr,
+			IPAddress:   r.RemoteAddr,
 			Timestamp:   time.Now(),
 			UserAgent:   r.Header.Get("User-Agent"),
 			IsRobotsTxt: false,
