@@ -1,7 +1,8 @@
 package dictionaries
 
 // Months is a list of months in English, German and French.
-var Months = []string{"January",
+var Months = []string{
+	"January",
 	"February",
 	"March",
 	"April",
@@ -40,7 +41,8 @@ var Months = []string{"January",
 }
 
 // Weekdays is a list of weekdays in English, German and French.
-var Weekdays = []string{"Sunday",
+var Weekdays = []string{
+	"Sunday",
 	"Monday",
 	"Tuesday",
 	"Wednesday",

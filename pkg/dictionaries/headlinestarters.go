@@ -1,6 +1,6 @@
 package dictionaries
 
-// HeadlineStarters is a list of Headline starters
+// HeadlineStarters is a list of Headline starters.
 var HeadlineStarters = []string{
 	"Breaking",
 	"Exclusive",
