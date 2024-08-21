@@ -7,6 +7,8 @@ import (
 	"html/template"
 	"math/rand"
 	"os"
+	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -58,24 +60,24 @@ func NewRenderer(ctx context.Context, headLineLinks []string) *Renderer {
 	htmlTemplates := []string{}
 	templates, err := assets.ReadDir("assets")
 	if err != nil {
-		fmt.Println(fmt.Errorf("could not read assets directory (%v)", err))
-		os.Exit(1)
+		fmt.Printf("could not read assets directory (%v)\n", err)
+		defer os.Exit(1)
+		runtime.Goexit()
 	}
 	for _, file := range templates {
 		if file.IsDir() {
 			continue
 		}
-		f, err := assets.ReadFile(fmt.Sprintf("assets/%s", file.Name()))
+		f, err := assets.ReadFile("assets/" + file.Name())
 		if err != nil {
-			fmt.Println(fmt.Errorf("could not read asset file (%v)", err))
-			os.Exit(1)
+			fmt.Printf("could not read asset file (%v)\n", err)
+			defer os.Exit(1)
+			runtime.Goexit()
 		}
 		htmlTemplates = append(htmlTemplates, string(f))
 	}
-	return &Renderer{
-		htmlTemplates: htmlTemplates,
-		headlineLinks: headLineLinks,
-	}
+
+	return &Renderer{htmlTemplates: htmlTemplates, headlineLinks: headLineLinks}
 }
 
 // RenderInRandomTemplate renders the given text in a random template using go templates.
@@ -95,12 +97,13 @@ func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (s
 	}
 
 	year, _, _ := time.Now().Date()
-	rd.CurrentYear = fmt.Sprintf("%d", year)
+	rd.CurrentYear = strconv.Itoa(year)
 	buffer := &strings.Builder{}
 	err = tpl.Execute(buffer, rd)
 	if err != nil {
 		return "", err
 	}
+
 	return buffer.String(), nil
 }
 
@@ -109,5 +112,5 @@ func (r *Renderer) getRandomTemplate(ctx context.Context) string {
 	_, span := tracer.Start(ctx, "Renderer.getRandomTemplate")
 	defer span.End()
 
-	return r.htmlTemplates[rand.Intn(len(r.htmlTemplates))]
+	return r.htmlTemplates[rand.Intn(len(r.htmlTemplates))] //nolint:gosec
 }
