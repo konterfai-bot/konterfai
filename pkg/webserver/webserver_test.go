@@ -2,10 +2,11 @@ package webserver_test
 
 import (
 	"context"
-	"github.com/oklog/run"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/oklog/run"
 
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"

@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
+	"time"
 
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -28,31 +30,34 @@ type StatisticsServer struct {
 }
 
 // NewStatisticsServer creates a new StatisticsServer instance.
-func NewStatisticsServer(ctx context.Context, host string, port int, statistics *statistics.Statistics) *StatisticsServer {
+func NewStatisticsServer(ctx context.Context, host string, port int, st *statistics.Statistics) *StatisticsServer {
 	_, span := tracer.Start(ctx, "NewStatisticsServer")
 	defer span.End()
 
 	htmlTemplates := map[string]string{}
 	templates, err := assets.ReadDir("assets")
 	if err != nil {
-		fmt.Println(fmt.Errorf("could not read assets directory (%v)", err))
-		os.Exit(1)
+		fmt.Printf("could not read assets directory (%v)\n", err)
+		defer os.Exit(1)
+		runtime.Goexit()
 	}
 	for _, file := range templates {
 		if file.IsDir() {
 			continue
 		}
-		f, err := assets.ReadFile(fmt.Sprintf("assets/%s", file.Name()))
+		f, err := assets.ReadFile("assets/" + file.Name())
 		if err != nil {
-			fmt.Println(fmt.Errorf("could not read asset file (%v)", err))
-			os.Exit(1)
+			fmt.Printf("could not read asset file (%v)\n", err)
+			defer os.Exit(1)
+			runtime.Goexit()
 		}
 		htmlTemplates[file.Name()] = string(f)
 	}
+
 	return &StatisticsServer{
 		Host:          host,
 		Port:          port,
-		Statistics:    statistics,
+		Statistics:    st,
 		htmlTemplates: htmlTemplates,
 	}
 }
@@ -62,12 +67,17 @@ func (ss *StatisticsServer) Serve(ctx context.Context) error {
 	_, span := tracer.Start(ctx, "StatisticsServer.Serve")
 	defer span.End()
 
-	server := http.NewServeMux()
-	server.Handle("/metrics", promhttp.Handler())
-	server.HandleFunc("/", ss.handleRoot)
-	err := http.ListenAndServe(ss.Host+":"+strconv.Itoa(ss.Port), server)
-	if err != nil {
+	serverMux := http.NewServeMux()
+	serverMux.Handle("/metrics", promhttp.Handler())
+	serverMux.HandleFunc("/", ss.handleRoot)
+	server := &http.Server{
+		Addr:              ss.Host + ":" + strconv.Itoa(ss.Port),
+		Handler:           serverMux,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	if err := server.ListenAndServe(); err != nil {
 		return err
 	}
+
 	return nil
 }

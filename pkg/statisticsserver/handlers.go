@@ -43,6 +43,7 @@ func analyseStatistics(ctx context.Context, rd map[string][]statistics.Request) 
 		})
 	}
 	sort.Sort(data)
+
 	return data
 }
 
@@ -58,6 +59,7 @@ func convertByteSizeToSIUnits(ctx context.Context, bytes int) string {
 		}
 		byteToFloat64 /= 1024.0
 	}
+
 	return fmt.Sprintf("%.1fYiB", byteToFloat64)
 }
 
@@ -71,18 +73,19 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 		attribute.String("http.user-agent", r.UserAgent()),
 		attribute.String("http.remote-addr", r.RemoteAddr),
 	)
-	r = r.WithContext(ctx)
+	_ = r.WithContext(ctx)
 
 	tpl, err := template.New("t").Parse(ss.htmlTemplates["index.gohtml"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		return
 	}
 	buffer := &strings.Builder{}
 
 	byUserAgent := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByUserAgent(ctx))
 
-	byIpAddress := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByIpAddress(ctx))
+	byIPAddress := analyseStatistics(ctx, ss.Statistics.GetRequestsGroupedByIpAddress(ctx))
 
 	totalDataSize := convertByteSizeToSIUnits(ctx, ss.Statistics.GetTotalDataSizeServed(ctx))
 
@@ -95,7 +98,7 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 		ConfigurationInfo string
 		Prompts           map[string]int
 		ByUserAgent       RequestDataSlice
-		ByIpAddress       RequestDataSlice
+		ByIPAddress       RequestDataSlice
 		TotalDataSize     string
 		TotalRequests     int
 		TotalPrompts      int
@@ -103,18 +106,20 @@ func (ss *StatisticsServer) handleRoot(w http.ResponseWriter, r *http.Request) {
 		ConfigurationInfo: ss.Statistics.ConfigurationInfo,
 		Prompts:           ss.Statistics.Prompts,
 		ByUserAgent:       byUserAgent,
-		ByIpAddress:       byIpAddress,
+		ByIPAddress:       byIPAddress,
 		TotalDataSize:     totalDataSize,
 		TotalRequests:     totalRequests,
 		TotalPrompts:      ss.Statistics.PromptsCount,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		return
 	}
 	_, err = w.Write([]byte(buffer.String()))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		return
 	}
 }

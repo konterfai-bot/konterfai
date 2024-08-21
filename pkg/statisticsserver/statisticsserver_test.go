@@ -2,8 +2,9 @@ package statisticsserver_test
 
 import (
 	"context"
-	"github.com/oklog/run"
 	"time"
+
+	"github.com/oklog/run"
 
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"

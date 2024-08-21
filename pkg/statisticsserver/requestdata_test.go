@@ -1,8 +1,9 @@
 package statisticsserver_test
 
 import (
-	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"
 	"sort"
+
+	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
