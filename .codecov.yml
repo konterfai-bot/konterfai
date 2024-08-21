@@ -1,0 +1,25 @@
+coverage:
+  round: down
+  precision: 5
+
+codecov:
+  branch: main
+  max_report_age: off
+  ci:
+    - woodpecker
+
+ignore:
+  - "**.yml"
+  - "**/assets/**"
+  - ".woodpecker/**"
+  - "Dockerfile"
+  - "LICENSE"
+  - "Makefile"
+  - "README.md"
+  - "cmd/**"
+  - "deployments/**"
+  - "docs/**"
+  - "entrypoint.sh"
+  - "go.mod"
+  - "go.sum"
+  - "vendor/**"
