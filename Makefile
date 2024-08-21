@@ -36,6 +36,12 @@ coverage-ci:
 	@go tool cover -html=coverage.out -o coverage.html
 	@echo "Done."
 
+.PHONY: golangci-lint
+golangci-lint:
+	@echo "Linting..."
+	@golangci-lint run
+	@echo "Done."
+
 .PHONY: clean
 clean:
 	@rm -rf bin
