@@ -4,9 +4,10 @@ run:
 linters:
   enable-all: true
   disable:
+      - execinquery
+      - exportloopref
       - gochecknoglobals
       - gomnd
-      - execinquery
 issues:
   exclude-use-default: true
   exclude-rules:
