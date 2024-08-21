@@ -3,6 +3,7 @@ package renderer
 import (
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"html/template"
 	"math/rand"
@@ -91,7 +92,7 @@ func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (s
 	}
 	if rd.HeadlineLinks == nil || len(rd.HeadlineLinks) < 10 {
 		if r.headlineLinks == nil || len(r.headlineLinks) < 10 {
-			return "", fmt.Errorf("headlineLinks is nil or has less than 10 elements, is empty or unset")
+			return "", errors.New("headlineLinks is nil or has less than 10 elements, is empty or unset")
 		}
 		rd.HeadlineLinks = r.headlineLinks
 	}

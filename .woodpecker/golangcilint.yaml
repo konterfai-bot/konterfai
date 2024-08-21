@@ -1,8 +1,8 @@
 ---
 when:
   # disabled for now, should be pull_request
-  event: [ pull_request ]
-
+  - event: [ pull_request ]
+    branch: main
 steps:
   - name: golangci-lint
     image: golang:1.22

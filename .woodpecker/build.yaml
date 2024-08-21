@@ -12,7 +12,3 @@ steps:
       - make all-arch-build
       - echo 'Build artifacts:'
       - ls bin/
-
-depends_on:
-  - golangci-lint
-  - coverage
