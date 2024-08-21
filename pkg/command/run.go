@@ -3,10 +3,11 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/oklog/run"
-	"github.com/urfave/cli/v2"
 	"net/url"
 	"strings"
+
+	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
 
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
@@ -15,45 +16,28 @@ import (
 )
 
 // Run is the entry point for running konterfAI.
-func Run(c *cli.Context) error {
+func Run(c *cli.Context) error { //nolint: funlen
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
 		return context.WithCancel(c.Context)
 	}()
 	defer cancel()
-
 	setTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
-
 	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)
-
 	st := statistics.NewStatistics(ctx, generateHeader(c, false))
-
-	hcUrl, err := url.Parse(c.String("hallucinator-url"))
+	hcURL, err := url.Parse(c.String("hallucinator-url"))
 	if err != nil {
 		fmt.Println("could not parse hallucinator-url")
+
 		return err
 	}
-
-	hal := hallucinator.NewHallucinator(
-		ctx,
-		c.Duration("generate-interval"),
-		c.Int("hallucination-cache-size"),
-		c.Int("hallucination-prompt-word-count"),
-		c.Int("hallucination-request-count"),
-		c.Int("hallucination-word-count"),
-		c.Int("hallucinator-link-percentage"),
-		c.Int("hallucinator-link-max-subdirectory-depth"),
-		c.Float64("hallucinator-link-has-variables-probability"),
-		c.Int("hallucinator-link-max-variables"),
-		*hcUrl,
-		c.String("ollama-address"),
-		c.String("ollama-model"),
-		c.Duration("ollama-request-timeout"),
-		c.Float64("ai-temperature"),
-		c.Int("ai-seed"),
-		st,
-	)
-
+	hal := hallucinator.NewHallucinator(ctx, c.Duration("generate-interval"),
+		c.Int("hallucination-cache-size"), c.Int("hallucination-prompt-word-count"),
+		c.Int("hallucination-request-count"), c.Int("hallucination-word-count"),
+		c.Int("hallucinator-link-percentage"), c.Int("hallucinator-link-max-subdirectory-depth"),
+		c.Float64("hallucinator-link-has-variables-probability"), c.Int("hallucinator-link-max-variables"),
+		*hcURL, c.String("ollama-address"), c.String("ollama-model"),
+		c.Duration("ollama-request-timeout"), c.Float64("ai-temperature"), c.Int("ai-seed"), st)
 	gr := run.Group{}
 	gr.Add(func() error {
 		select {
@@ -66,19 +50,10 @@ func Run(c *cli.Context) error {
 		fmt.Println("shutting down hallucinator")
 		cancel()
 	})
-
 	gr.Add(func() error {
-		ws := webserver.NewWebServer(
-			ctx,
-			c.String("address"),
-			c.Int("port"),
-			hal,
-			st,
-			*hcUrl,
-			c.Float64("webserver-200-probability"),
-			c.Float64("random-uncertainty"),
-			c.Int("webserver-error-cache-size"),
-		)
+		ws := webserver.NewWebServer(ctx, c.String("address"), c.Int("port"), hal, st, *hcURL,
+			c.Float64("webserver-200-probability"), c.Float64("random-uncertainty"),
+			c.Int("webserver-error-cache-size"))
 		select {
 		case <-ctx.Done():
 			return nil
@@ -89,14 +64,8 @@ func Run(c *cli.Context) error {
 		fmt.Println("shutting down webserver")
 		cancel()
 	})
-
 	gr.Add(func() error {
-		ss := statisticsserver.NewStatisticsServer(
-			ctx,
-			c.String("address"),
-			c.Int("statistics-port"),
-			st,
-		)
+		ss := statisticsserver.NewStatisticsServer(ctx, c.String("address"), c.Int("statistics-port"), st)
 		select {
 		case <-ctx.Done():
 			return nil
@@ -150,5 +119,6 @@ func generateHeader(c *cli.Context, withHeadline bool) string {
 	},
 		"",
 	)
+
 	return header
 }

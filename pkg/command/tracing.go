@@ -20,25 +20,26 @@ func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 		otel.SetTracerProvider(trace.NewTracerProvider(
 			trace.WithSampler(trace.NeverSample()),
 		))
+
 		return
 	}
 
 	conn, err := grpc.NewClient(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
-
 	if err != nil {
 		fmt.Printf("failed to create grpc connection: %v\n", err)
+
 		return
 	}
 
 	exporter, err := otlptracegrpc.New(
-		context.Background(),
+		ctx,
 		otlptracegrpc.WithGRPCConn(conn),
 	)
-
 	if err != nil {
 		fmt.Printf("failed to create trace exporter: %v\n", err)
+
 		return
 	}
 
@@ -49,9 +50,9 @@ func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 			attribute.String("library.language", "go"),
 		),
 	)
-
 	if err != nil {
 		fmt.Printf("failed to create resource: %v\n", err)
+
 		return
 	}
 

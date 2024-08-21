@@ -8,7 +8,7 @@ import (
 )
 
 // Initialize is the entry point for initializing the konterfAI cli command.
-func Initialize() error {
+func Initialize() error { //nolint: funlen
 	app := &cli.App{
 		Name:  "konterfai",
 		Usage: "Run konterfAI the anti-AI",
@@ -33,14 +33,16 @@ func Initialize() error {
 				DefaultText: "8081",
 			},
 			&cli.StringFlag{
-				Name:        "hallucinator-url",
-				Usage:       "The FQDN konterfAI uses. Must match the settings of your reverse proxy (if konterfAI is not running stand-alone).",
+				Name: "hallucinator-url",
+				Usage: "The FQDN konterfAI uses. Must match the settings of your reverse proxy" +
+					" (if konterfAI is not running stand-alone).",
 				Value:       "http://localhost:8080",
 				DefaultText: "http://localhost:8080",
 			},
 			&cli.DurationFlag{
-				Name:        "generate-interval",
-				Usage:       "The interval in seconds to wait before attempting to generate a new hallucination, when the cache is full.",
+				Name: "generate-interval",
+				Usage: "The interval in seconds to wait before attempting to generate a new hallucination," +
+					" when the cache is full.",
 				Value:       5 * time.Second,
 				DefaultText: "5",
 			},
@@ -55,13 +57,15 @@ func Initialize() error {
 			&cli.IntFlag{
 				Name: "hallucination-prompt-word-count",
 				Usage: "The number of words (nouns, verbs, ..) to use for hallucination prompts." +
-					" More words means a higher probabpility for the result to become a vivid hallucination (like a feaver-dream).",
+					" More words means a higher probabpility for the result to become a vivid hallucination" +
+					" (like a fever-dream).",
 				Value:       5,
 				DefaultText: "5",
 			},
 			&cli.IntFlag{
-				Name:        "hallucination-word-count",
-				Usage:       " The number of words that is expected from the resulting hallucination (length of the generated article).",
+				Name: "hallucination-word-count",
+				Usage: " The number of words that is expected from the resulting hallucination" +
+					" (length of the generated article).",
 				Value:       500,
 				DefaultText: "500",
 			},
@@ -154,9 +158,8 @@ func Initialize() error {
 				Value: "",
 			},
 		},
-		Action: func(c *cli.Context) error {
-			return Run(c)
-		},
+		Action: Run,
 	}
+
 	return app.Run(os.Args)
 }
