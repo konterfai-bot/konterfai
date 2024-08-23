@@ -45,18 +45,18 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 
 	h.hallucinationLock.Lock()
 	defer h.hallucinationLock.Unlock()
-	h.cleanHallucinations(ctx)
+	h.CleanHallucinations(ctx)
 	if h.GetHallucinationCount(ctx) < 1 {
 		hallucination, err := h.renderer.RenderInRandomTemplate(ctx,
 			renderer.RenderData{
 				NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
-				Headline:     dream404String,
-				Content:      dreamString,
-				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, backToStartString)), //nolint: gosec
+				Headline:     Dream404String,
+				Content:      DreamString,
+				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, BackToStartString)), //nolint: gosec
 				RandomTopics: h.generateRandomTopicLinks(ctx),
 				Year:         functions.PickRandomYear(ctx),
 				MetaData: renderer.MetaData{
-					Description: dreamString,
+					Description: DreamString,
 					Keywords:    textblocks.RandomKeywords(ctx, 10),
 					Charset:     functions.PickRandomStringFromSlice(ctx, &dictionaries.Charsets),
 				},
@@ -81,7 +81,7 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 			NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
 			Headline:     textblocks.RandomHeadline(ctx),
 			Content:      template.HTML(h.clutterTextWithRandomHref(ctx, h.hallucinations[0].Text)), //nolint: gosec
-			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, continueString)),                //nolint: gosec
+			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, ContinueString)),                //nolint: gosec
 			RandomTopics: h.generateRandomTopicLinks(ctx),
 			Year:         functions.PickRandomYear(ctx),
 			MetaData: renderer.MetaData{
@@ -102,18 +102,17 @@ func (h *Hallucinator) PopHallucination(ctx context.Context) string {
 func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 	h.hallucinationLock.Lock()
 	defer h.hallucinationLock.Unlock()
-	h.cleanHallucinations(ctx)
 	if h.GetHallucinationCount(ctx) < 1 {
 		hallucination, err := h.renderer.RenderInRandomTemplate(ctx,
 			renderer.RenderData{
 				NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
-				Headline:     dream404String,
-				Content:      dreamString,
-				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, backToStartString)), //nolint: gosec
+				Headline:     Dream404String,
+				Content:      DreamString,
+				FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, BackToStartString)), //nolint: gosec
 				RandomTopics: h.generateRandomTopicLinks(ctx),
 				Year:         functions.PickRandomYear(ctx),
 				MetaData: renderer.MetaData{
-					Description: dreamString,
+					Description: DreamString,
 					Keywords:    textblocks.RandomKeywords(ctx, 10),
 					Charset:     functions.PickRandomStringFromSlice(ctx, &dictionaries.Charsets),
 				},
@@ -139,7 +138,7 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 			NewsAnchor:   textblocks.RandomNewsPaperName(ctx),
 			Headline:     textblocks.RandomHeadline(ctx),
 			Content:      template.HTML(h.clutterTextWithRandomHref(ctx, currentHallucination)), //nolint: gosec
-			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, continueString)),            //nolint: gosec
+			FollowUpLink: template.HTML(h.generateFollowUpLink(ctx, ContinueString)),            //nolint: gosec
 			RandomTopics: h.generateRandomTopicLinks(ctx),
 			Year:         functions.PickRandomYear(ctx),
 			MetaData: renderer.MetaData{
@@ -152,13 +151,16 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 	if err != nil {
 		return fmt.Sprintf("Could not render template, error: %v", err)
 	}
+	go func() {
+		h.CleanHallucinations(ctx)
+	}()
 
 	return hallucination
 }
 
-// appendHallucination appends a hallucination to the list of hallucinations.
-func (h *Hallucinator) appendHallucination(ctx context.Context, hallucination Hallucination) {
-	ctx, span := tracer.Start(ctx, "Hallucinator.appendHallucination")
+// AppendHallucination appends a hallucination to the list of hallucinations.
+func (h *Hallucinator) AppendHallucination(ctx context.Context, hallucination Hallucination) {
+	ctx, span := tracer.Start(ctx, "Hallucinator.AppendHallucination")
 	defer span.End()
 
 	h.hallucinationLock.Lock()
@@ -167,11 +169,11 @@ func (h *Hallucinator) appendHallucination(ctx context.Context, hallucination Ha
 	h.setHallucinationCount(ctx)
 }
 
-// cleanHallucinations cleans the list of hallucinations and removes hallucinations with requestCount 0.
-func (h *Hallucinator) cleanHallucinations(ctx context.Context) {
+// CleanHallucinations cleans the list of hallucinations and removes hallucinations with requestCount 0.
+func (h *Hallucinator) CleanHallucinations(ctx context.Context) {
 	// This function does not have a lock on the hallucinations list. It is expected that the caller has locked the list.
 	// This happens in PopHallucination and PopRandomHallucination.
-	ctx, span := tracer.Start(ctx, "Hallucinator.cleanHallucinations")
+	ctx, span := tracer.Start(ctx, "Hallucinator.CleanHallucinations")
 	defer span.End()
 
 	if h.GetHallucinationCount(ctx) < 1 {

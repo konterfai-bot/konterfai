@@ -119,7 +119,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 				continue
 			}
 			if h.isValidResult(ctx, hal.Text) {
-				h.appendHallucination(ctx, hal)
+				h.AppendHallucination(ctx, hal)
 
 				// Update Prometheus metrics
 				statistics.PromptsGeneratedTotal.Inc()
