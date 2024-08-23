@@ -77,34 +77,46 @@ func (h *Hallucinator) GenerateHallucination(ctx context.Context) (Hallucination
 
 		return Hallucination{}, errors.New("ollama did not return 200 OK")
 	}
-	if res.Body == nil {
+
+	pl, err := h.validateBody(res.Body)
+	if err != nil {
+		return Hallucination{}, err
+	}
+
+	if err := res.Body.Close(); err != nil {
+		fmt.Printf("could not close response body (%v)\n", err)
+	}
+
+	return Hallucination{Text: pl, Prompt: prompt, RequestCount: h.hallucinationRequestCount}, nil
+}
+
+// isValidResult checks if the hallucination is valid.
+func (h *Hallucinator) validateBody(body io.ReadCloser) (string, error) {
+	if body == nil {
 		fmt.Println("ollama did not return a body")
 
-		return Hallucination{}, errors.New("ollama did not return a body")
+		return "", errors.New("ollama did not return a body")
 	}
-	resBody, err := io.ReadAll(res.Body)
+	resBody, err := io.ReadAll(body)
 	if err != nil {
 		fmt.Println("could not read response body")
 
-		return Hallucination{}, err
+		return "", err
 	}
 	if len(resBody) == 0 {
 		fmt.Println("ollama did not return a body")
 
-		return Hallucination{}, errors.New("ollama did return an empty body")
+		return "", errors.New("ollama did return an empty body")
 	}
 
 	pl, err := concatOllamaMessages(resBody)
 	if err != nil {
 		fmt.Printf("could not concatenate ollama messages (%v)\n", err)
 
-		return Hallucination{}, err
-	}
-	if err := res.Body.Close(); err != nil {
-		fmt.Printf("could not close response body (%v)\n", err)
+		return "", err
 	}
 
-	return Hallucination{Text: pl, Prompt: prompt, RequestCount: h.hallucinationRequestCount}, nil
+	return pl, nil
 }
 
 // concatOllamaMessages concatenates Ollama messages.
