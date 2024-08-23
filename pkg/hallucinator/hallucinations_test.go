@@ -19,6 +19,7 @@ var _ = Describe("Hallucinator", func() {
 		h      *hallucinator.Hallucinator
 		st     *statistics.Statistics
 	)
+
 	BeforeEach(func() {
 		ctx, cancel = func() (context.Context, context.CancelFunc) {
 			return context.WithCancel(context.Background())
@@ -139,6 +140,10 @@ var _ = Describe("Hallucinator", func() {
 			h.CleanHallucinations(ctx)
 			c := h.GetHallucinationCount(ctx)
 			Expect(c).To(BeNumerically("<", 10))
+		})
+
+		It("does not fail when decreasing the hallucination count and the id is < 0", func() {
+			h.DecreaseHallucinationRequestCount(ctx, -1)
 		})
 	})
 })

@@ -17,6 +17,11 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+// httpClient is an interface for the http.Client.
+type httpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Hallucinator is the structure for the Hallucinator.
 type Hallucinator struct {
 	Interval                                time.Duration
@@ -38,7 +43,7 @@ type Hallucinator struct {
 	aiSeed                                  int
 	promptWordCount                         int
 
-	httpClient *http.Client
+	HTTPClient httpClient
 	renderer   *renderer.Renderer
 	statistics *statistics.Statistics
 }
@@ -94,7 +99,7 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 		aiSeed:                                  aiSeed,
 		promptWordCount:                         hallucinatorPromptWordCount,
 
-		httpClient: &http.Client{
+		HTTPClient: &http.Client{
 			Timeout: ollamaRequestTimeOut,
 		},
 		renderer:   renderer.NewRenderer(ctx, headLineLinks[:]),
@@ -111,7 +116,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			promptNeedsUpdate = true
 			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n",
 				len(h.hallucinations)+1, h.hallucinationCacheSize)
-			hal, err := h.generateHallucination(ctx)
+			hal, err := h.GenerateHallucination(ctx)
 			if err != nil {
 				functions.SleepWithContext(ctx, h.Interval)
 				fmt.Printf("could not generate hallucination (%v)\n", err)

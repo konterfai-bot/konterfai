@@ -38,9 +38,9 @@ func (h *Hallucinator) generateFollowUpLink(ctx context.Context, continueText st
 	)
 }
 
-// generateHallucination generates a hallucination from the Ollama API.
-func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination, error) {
-	ctx, span := tracer.Start(ctx, "Hallucinator.generateHallucination")
+// GenerateHallucination generates a hallucination from the Ollama API.
+func (h *Hallucinator) GenerateHallucination(ctx context.Context) (Hallucination, error) {
+	ctx, span := tracer.Start(ctx, "Hallucinator.GenerateHallucination")
 	defer span.End()
 	requestURL, err := url.JoinPath(h.ollamaAddress, "/api/chat")
 	if err != nil {
@@ -51,7 +51,7 @@ func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination
 	prompt := h.generatePrompt(ctx)
 	fmt.Printf("generating hallucination with prompt: \"%s\"\n", prompt)
 	requestBody := ollamaJSONRequest{
-		Model: h.ollamaModel, Messages: []ollamaMessage{{Role: "user", Content: prompt}},
+		Model: h.ollamaModel, Messages: []OllamaMessage{{Role: "user", Content: prompt}},
 		Options: ollamaOptions{Temperature: h.aiTemperature, Seed: h.aiSeed},
 	}
 	requestBodyJSON, err := json.Marshal(requestBody)
@@ -66,7 +66,7 @@ func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination
 
 		return Hallucination{}, err
 	}
-	res, err := h.httpClient.Do(req)
+	res, err := h.HTTPClient.Do(req)
 	if err != nil {
 		fmt.Printf("could not get hallucination from ollama (%v)\n", err)
 
@@ -77,14 +77,29 @@ func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination
 
 		return Hallucination{}, errors.New("ollama did not return 200 OK")
 	}
+	if res.Body == nil {
+		fmt.Println("ollama did not return a body")
 
+		return Hallucination{}, errors.New("ollama did not return a body")
+	}
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("could not read response body")
 
 		return Hallucination{}, err
 	}
-	pl := concatOllamaMessages(resBody)
+	if len(resBody) == 0 {
+		fmt.Println("ollama did not return a body")
+
+		return Hallucination{}, errors.New("ollama did return an empty body")
+	}
+
+	pl, err := concatOllamaMessages(resBody)
+	if err != nil {
+		fmt.Printf("could not concatenate ollama messages (%v)\n", err)
+
+		return Hallucination{}, err
+	}
 	if err := res.Body.Close(); err != nil {
 		fmt.Printf("could not close response body (%v)\n", err)
 	}
@@ -93,13 +108,13 @@ func (h *Hallucinator) generateHallucination(ctx context.Context) (Hallucination
 }
 
 // concatOllamaMessages concatenates Ollama messages.
-func concatOllamaMessages(responseBody []byte) string {
+func concatOllamaMessages(responseBody []byte) (string, error) {
 	responses := strings.Split(string(responseBody), "\n")
 	var payload []string
 	for _, message := range responses {
-		m := ollamaResponse{}
+		m := OllamaResponse{}
 		if err := json.Unmarshal([]byte(message), &m); err != nil {
-			continue
+			return "", err
 		}
 		if msg := strings.Trim(m.Message.Content, " "); msg != "" && msg != "\n" {
 			payload = append(payload, msg)
@@ -109,7 +124,7 @@ func concatOllamaMessages(responseBody []byte) string {
 		}
 	}
 
-	return strings.Join(payload, " ")
+	return strings.Join(payload, " "), nil
 }
 
 // generatePrompt generates a prompt for the Hallucinator.

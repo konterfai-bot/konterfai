@@ -10,13 +10,13 @@ type Hallucination struct {
 // ollamaJSONRequest is the request structure for the Ollama API.
 type ollamaJSONRequest struct {
 	Model    string          `json:"model"`
-	Messages []ollamaMessage `json:"messages"`
+	Messages []OllamaMessage `json:"messages"`
 	Stream   bool            `json:"stream"`
 	Options  ollamaOptions   `json:"options"`
 }
 
-// ollamaMessage is the message structure for the Ollama API.
-type ollamaMessage struct {
+// OllamaMessage is the message structure for the Ollama API.
+type OllamaMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
@@ -27,11 +27,11 @@ type ollamaOptions struct {
 	Seed        int     `json:"seed"`
 }
 
-// ollamaResponse is the response structure for the Ollama API.
-type ollamaResponse struct {
+// OllamaResponse is the response structure for the Ollama API.
+type OllamaResponse struct {
 	Model           string        `json:"model"`
 	CreatedAt       string        `json:"created_at"` //nolint: tagliatelle
-	Message         ollamaMessage `json:"message"`
+	Message         OllamaMessage `json:"message"`
 	Done            bool          `json:"done"`
 	DoneReason      string        `json:"done_reason"`       //nolint: tagliatelle
 	TotalDuration   int           `json:"total_duration"`    //nolint: tagliatelle
