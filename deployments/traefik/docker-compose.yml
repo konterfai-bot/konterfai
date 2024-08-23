@@ -49,6 +49,7 @@ services:
     labels:
       - "traefik.enable=false"
     deploy:
+      # if you do not have a ollama capable GPU, you can remove the resources section
       resources:
         reservations:
           devices:
@@ -77,11 +78,13 @@ services:
       - "traefik.http.middlewares.useragent-intercept.headers.customrequestheaders.X-Intercepted-UserAgent: intercepted"
       - "traefik.http.routers.konterfai.middlewares=useragent-intercept"
       - "traefik.http.services.konterfai.loadbalancer.server.port=8080"
+      - "traefik.http.routers.konterfai.service=konterfai"
 
-      # You probably want to add some kinde of authentication here, like auth-basic or your openid provider
+      # You probably want to add some kind of authentication here, like auth-basic or your openid provider
       # unless you are running this in an internal network.
       - "traefik.http.routers.konterfai-statistics.rule=Host(`statistics.konterfai.localhost`)"
-      - "traefik.http.routers.konterfai-statistics.loadbalancer.server.port=8081"
+      - "traefik.http.services.konterfai-statistics.loadbalancer.server.port=8081"
+      - "traefik.http.routers.konterfai-statistics.service=konterfai-statistics"
 
       - "traefik.constraint-label=traefik-public"
     depends_on:
@@ -143,4 +146,3 @@ volumes:
 
 networks:
   konterfai-net:
-    external: true
