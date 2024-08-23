@@ -151,9 +151,7 @@ func (h *Hallucinator) PopRandomHallucination(ctx context.Context) string {
 	if err != nil {
 		return fmt.Sprintf("Could not render template, error: %v", err)
 	}
-	go func() {
-		h.CleanHallucinations(ctx)
-	}()
+	h.CleanHallucinations(ctx)
 
 	return hallucination
 }
