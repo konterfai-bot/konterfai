@@ -2,6 +2,7 @@ APP_NAME = "konterfai"
 OLLAMA_MODEL ?= "qwen2:0.5b"
 DOCKER_TAG ?= "dev"
 BROWSER ?= "firefox"
+GOLANGCILINT_TIMEOUT ?=240s
 
 .PHONY: all
 all: build
@@ -39,7 +40,7 @@ coverage-ci:
 .PHONY: golangci-lint
 golangci-lint:
 	@echo "Linting..."
-	@golangci-lint run
+	@golangci-lint run --timeout=$(GOLANGCILINT_TIMEOUT)
 	@echo "Done."
 
 .PHONY: clean
