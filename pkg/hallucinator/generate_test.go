@@ -147,4 +147,29 @@ var _ = Describe("Generate", func() {
 		Expect(err).To(HaveOccurred())
 		Expect(hal).To(Equal(hallucinator.Hallucination{}))
 	})
+
+	It("should return an error if the hallucination matches a regexp", func() {
+		mockHttpClient := new(MockHttpClient)
+		mockHttpClient.On("Do", mock.Anything).Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"message": {"content": "Sorry, but I can't assist with that,foobar"}}`)),
+		}, nil)
+		h.HTTPClient = mockHttpClient
+		hal, err := h.GenerateHallucination(ctx)
+		Expect(err).To(HaveOccurred())
+		Expect(hal).To(Equal(hallucinator.Hallucination{}))
+	})
+
+	It("should return an error if the hallucination response is malformed", func() {
+		mockHttpClient := new(MockHttpClient)
+		mockHttpClient.On("Do", mock.Anything).Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"message": {"content": "This content is valid"`)),
+		}, nil)
+		h.HTTPClient = mockHttpClient
+		hal, err := h.GenerateHallucination(ctx)
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("unexpected end of JSON input"))
+		Expect(hal).To(Equal(hallucinator.Hallucination{}))
+	})
 })

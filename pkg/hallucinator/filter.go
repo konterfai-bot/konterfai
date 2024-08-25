@@ -10,9 +10,9 @@ func (h *Hallucinator) isValidResult(ctx context.Context, txt string) bool {
 	_, span := tracer.Start(ctx, "Hallucinator.isValidResult")
 	defer span.End()
 
-	for _, re := range InvalidResultsRegexps {
+	for _, re := range invalidResultsRegexps {
 		r := regexp.MustCompile(re)
-		if r.MatchString(txt) {
+		if r.MatchString("(?i)" + txt) {
 			return false
 		}
 	}
