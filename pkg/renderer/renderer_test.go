@@ -72,5 +72,19 @@ var _ = Describe("Renderer", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(renderedTemplate).To(Equal(""))
 		})
+
+		It("should throw an error if the template is not found", func() {
+			r.SetTemplates([]string{})
+			renderedTemplate, err := r.RenderInRandomTemplate(ctx, rd)
+			Expect(err).To(HaveOccurred())
+			Expect(renderedTemplate).To(Equal(""))
+		})
+
+		It("should throw an error if the template contains invalid fields", func() {
+			r.SetTemplates([]string{"{{.InvalidField}}"})
+			renderedTemplate, err := r.RenderInRandomTemplate(ctx, rd)
+			Expect(err).To(HaveOccurred())
+			Expect(renderedTemplate).To(Equal(""))
+		})
 	})
 })

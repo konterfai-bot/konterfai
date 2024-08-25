@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -23,8 +24,9 @@ var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/renderer")
 
 // Renderer is the structure for the Renderer.
 type Renderer struct {
-	htmlTemplates []string
-	headlineLinks []string
+	htmlTemplates     []string
+	htmlTemplatesLock sync.Mutex
+	headlineLinks     []string
 }
 
 // MetaData is the structure for the meta-tags.
@@ -86,7 +88,11 @@ func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (s
 	ctx, span := tracer.Start(ctx, "Renderer.RenderInRandomTemplate")
 	defer span.End()
 
-	tpl, err := template.New("t").Parse(r.getRandomTemplate(ctx))
+	tplContent, err := r.getRandomTemplate(ctx)
+	if err != nil {
+		return "", err
+	}
+	tpl, err := template.New("t").Parse(tplContent)
 	if err != nil {
 		return "", err
 	}
@@ -108,10 +114,26 @@ func (r *Renderer) RenderInRandomTemplate(ctx context.Context, rd RenderData) (s
 	return buffer.String(), nil
 }
 
+// SetTemplates sets the templates, at the moment only used for testing.
+func (r *Renderer) SetTemplates(templates []string) {
+	_, span := tracer.Start(context.Background(), "Renderer.SetTemplates")
+	defer span.End()
+	r.htmlTemplatesLock.Lock()
+	defer r.htmlTemplatesLock.Unlock()
+	r.htmlTemplates = templates
+}
+
 // getRandomTemplate returns a random template.
-func (r *Renderer) getRandomTemplate(ctx context.Context) string {
+func (r *Renderer) getRandomTemplate(ctx context.Context) (string, error) {
 	_, span := tracer.Start(ctx, "Renderer.getRandomTemplate")
 	defer span.End()
 
-	return r.htmlTemplates[rand.Intn(len(r.htmlTemplates))] //nolint:gosec
+	r.htmlTemplatesLock.Lock()
+	defer r.htmlTemplatesLock.Unlock()
+
+	if len(r.htmlTemplates) < 1 {
+		return "", errors.New("no templates found")
+	}
+
+	return r.htmlTemplates[rand.Intn(len(r.htmlTemplates))], nil //nolint:gosec
 }
