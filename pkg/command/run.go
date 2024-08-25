@@ -21,7 +21,10 @@ func Run(c *cli.Context) error { //nolint: funlen
 		return context.WithCancel(c.Context)
 	}()
 	defer cancel()
-	setTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
+	err := SetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
+	if err != nil {
+		return err
+	}
 	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)
 	st := statistics.NewStatistics(ctx, generateHeader(c, false))

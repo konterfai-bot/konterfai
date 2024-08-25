@@ -13,15 +13,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// setTraceProvider returns a new trace provider with the given endpoint and service name.
-func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
+// SetTraceProvider returns a new trace provider with the given endpoint and service name.
+func SetTraceProvider(ctx context.Context, endpoint, serviceName string) error {
 	if endpoint == "" {
 		fmt.Println("tracing is disabled")
 		otel.SetTracerProvider(trace.NewTracerProvider(
 			trace.WithSampler(trace.NeverSample()),
 		))
 
-		return
+		return nil
 	}
 
 	conn, err := grpc.NewClient(endpoint,
@@ -30,7 +30,7 @@ func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 	if err != nil {
 		fmt.Printf("failed to create grpc connection: %v\n", err)
 
-		return
+		return err
 	}
 
 	exporter, err := otlptracegrpc.New(
@@ -40,7 +40,7 @@ func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 	if err != nil {
 		fmt.Printf("failed to create trace exporter: %v\n", err)
 
-		return
+		return err
 	}
 
 	resources, err := resource.New(
@@ -53,7 +53,7 @@ func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 	if err != nil {
 		fmt.Printf("failed to create resource: %v\n", err)
 
-		return
+		return err
 	}
 
 	tp := trace.NewTracerProvider(
@@ -62,4 +62,6 @@ func setTraceProvider(ctx context.Context, endpoint, serviceName string) {
 		trace.WithResource(resources),
 	)
 	otel.SetTracerProvider(tp)
+
+	return nil
 }
