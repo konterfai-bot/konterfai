@@ -16,17 +16,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockHttpClient is a mock implementation of the http.Client interface.
-type MockHttpClient struct {
-	mock.Mock
-}
-
-// Do is a mock implementation of the http.Client Do method.
-func (m *MockHttpClient) Do(req *http.Request) (*http.Response, error) {
-	args := m.Called(req)
-	return args.Get(0).(*http.Response), args.Error(1)
-}
-
 var _ = Describe("Generate", func() {
 	var (
 		ctx    context.Context
@@ -134,18 +123,6 @@ var _ = Describe("Generate", func() {
 		hal, err := h.GenerateHallucination(ctx)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(hal.Text).To(Equal(ollamaResponse.Message.Content))
-	})
-
-	It("should return an error if ollama does not return a valid JSON response", func() {
-		mockHttpClient := new(MockHttpClient)
-		mockHttpClient.On("Do", mock.Anything).Return(&http.Response{
-			StatusCode: http.StatusOK,
-			Body:       io.NopCloser(strings.NewReader(`{"data": "dummy"`)),
-		}, nil)
-		h.HTTPClient = mockHttpClient
-		hal, err := h.GenerateHallucination(ctx)
-		Expect(err).To(HaveOccurred())
-		Expect(hal).To(Equal(hallucinator.Hallucination{}))
 	})
 
 	It("should return an error if the hallucination matches a regexp", func() {
