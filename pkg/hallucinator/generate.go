@@ -78,7 +78,7 @@ func (h *Hallucinator) GenerateHallucination(ctx context.Context) (Hallucination
 		return Hallucination{}, errors.New("ollama did not return 200 OK")
 	}
 
-	pl, err := h.validateBody(res.Body)
+	pl, err := h.validateBody(ctx, res.Body)
 	if err != nil {
 		return Hallucination{}, err
 	}
@@ -90,8 +90,11 @@ func (h *Hallucinator) GenerateHallucination(ctx context.Context) (Hallucination
 	return Hallucination{Text: pl, Prompt: prompt, RequestCount: h.hallucinationRequestCount}, nil
 }
 
-// isValidResult checks if the hallucination is valid.
-func (h *Hallucinator) validateBody(body io.ReadCloser) (string, error) {
+// validateBody checks if the hallucination is valid.
+func (h *Hallucinator) validateBody(ctx context.Context, body io.ReadCloser) (string, error) {
+	_, span := tracer.Start(ctx, "Hallucinator.validateBody")
+	defer span.End()
+
 	if body == nil {
 		fmt.Println("ollama did not return a body")
 
@@ -114,6 +117,12 @@ func (h *Hallucinator) validateBody(body io.ReadCloser) (string, error) {
 		fmt.Printf("could not concatenate ollama messages (%v)\n", err)
 
 		return "", err
+	}
+
+	if !h.isValidResult(ctx, pl) {
+		fmt.Println("ollama returned an invalid hallucination")
+
+		return "", errors.New("ollama returned an invalid hallucination")
 	}
 
 	return pl, nil

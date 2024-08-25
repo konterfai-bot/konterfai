@@ -123,14 +123,10 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 
 				continue
 			}
-			if h.isValidResult(ctx, hal.Text) {
-				h.AppendHallucination(ctx, hal)
+			h.AppendHallucination(ctx, hal)
 
-				// Update Prometheus metrics
-				statistics.PromptsGeneratedTotal.Inc()
-			} else {
-				fmt.Println("invalid hallucination, skipping...")
-			}
+			// Update Prometheus metrics
+			statistics.PromptsGeneratedTotal.Inc()
 
 			continue
 		}

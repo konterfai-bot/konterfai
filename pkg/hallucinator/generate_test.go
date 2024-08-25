@@ -3,7 +3,6 @@ package hallucinator_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -26,12 +25,6 @@ type MockHttpClient struct {
 func (m *MockHttpClient) Do(req *http.Request) (*http.Response, error) {
 	args := m.Called(req)
 	return args.Get(0).(*http.Response), args.Error(1)
-}
-
-func mockHttpServerDoResponse(args mock.Arguments) {
-	fmt.Println(args)
-	response := args.Get(1).(*http.Response)
-	response.StatusCode = http.StatusOK
 }
 
 var _ = Describe("Generate", func() {

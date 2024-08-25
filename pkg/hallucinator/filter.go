@@ -10,7 +10,7 @@ func (h *Hallucinator) isValidResult(ctx context.Context, txt string) bool {
 	_, span := tracer.Start(ctx, "Hallucinator.isValidResult")
 	defer span.End()
 
-	for _, re := range invalidResultsRegexps {
+	for _, re := range InvalidResultsRegexps {
 		r := regexp.MustCompile(re)
 		if r.MatchString(txt) {
 			return false

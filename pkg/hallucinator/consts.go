@@ -7,8 +7,8 @@ const (
 	DreamString       = "We are sorry, but the requested article could be not found!"
 )
 
-// invalidResultsRegexps is a list of regular expressions that are used to filter out invalid results.
-var invalidResultsRegexps = []string{
+// InvalidResultsRegexps is a list of regular expressions that are used to filter out invalid results.
+var InvalidResultsRegexps = []string{
 	"/^I apologize, but I'm sorry to inform you that as an AI language model*/",
 	"/^I cannot proceed as this question pertains to sensitive topics.*/",
 	"/^Sorry, I am sorry, but I can't assist you with that.*/",
