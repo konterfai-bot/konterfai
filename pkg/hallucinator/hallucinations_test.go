@@ -36,6 +36,7 @@ var _ = Describe("Hallucinator", func() {
 			10,
 			10,
 			10,
+			500,
 			10,
 			10,
 			10,
@@ -148,6 +149,50 @@ var _ = Describe("Hallucinator", func() {
 
 		It("does not fail when decreasing the hallucination count and the id is < 0", func() {
 			h.DecreaseHallucinationRequestCount(ctx, -1)
+		})
+
+		It("sets the hallucinationMinimalLength to math.MaxInt when the value is < 1", func() {
+			h := hallucinator.NewHallucinator(
+				ctx,
+				logger,
+				5,
+				10,
+				10,
+				10,
+				0,
+				10,
+				10,
+				10,
+				10,
+				10,
+				url.URL{
+					Scheme: "http",
+					Host:   "localhost:8080",
+				},
+				"http://localhost:11434",
+				"dummy",
+				10,
+				10,
+				10,
+				st,
+			)
+			Expect(h.GetHallucinationCount(ctx)).To(Equal(0))
+			for i := range 9 {
+				hal := hallucinator.Hallucination{
+					RequestCount: 1,
+					Prompt:       fmt.Sprintf("dummy hallucination prompt %0.2d", i),
+					Text:         fmt.Sprintf("dummy hallucination text %0.2d", i),
+				}
+				hals = append(hals, hal)
+				h.AppendHallucination(ctx, hal)
+			}
+			h.AppendHallucination(ctx, hallucinator.Hallucination{
+				RequestCount: 1,
+				Prompt:       "dummy hallucination prompt 10 with length > 255",
+				Text:         longHallucinationText,
+			})
+
+			Expect(h.GetHallucinationCount(ctx)).To(Equal(10))
 		})
 	})
 })

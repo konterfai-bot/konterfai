@@ -40,8 +40,9 @@ func Run(c *cli.Context) error { //nolint: funlen
 	}
 	hal := hallucinator.NewHallucinator(ctx, logger, c.Duration("generate-interval"),
 		c.Int("hallucination-cache-size"), c.Int("hallucination-prompt-word-count"),
-		c.Int("hallucination-request-count"), c.Int("hallucination-word-count"),
-		c.Int("hallucinator-link-percentage"), c.Int("hallucinator-link-max-subdirectory-depth"),
+		c.Int("hallucination-request-count"), c.Int("hallucination-minimal-length"),
+		c.Int("hallucination-word-count"), c.Int("hallucinator-link-percentage"),
+		c.Int("hallucinator-link-max-subdirectory-depth"),
 		c.Float64("hallucinator-link-has-variables-probability"), c.Int("hallucinator-link-max-variables"),
 		*hcURL, c.String("ollama-address"), c.String("ollama-model"),
 		c.Duration("ollama-request-timeout"), c.Float64("ai-temperature"), c.Int("ai-seed"), st)

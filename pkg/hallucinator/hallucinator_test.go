@@ -52,6 +52,7 @@ var _ = Describe("Hallucinator", func() {
 			1,
 			10,
 			10,
+			500,
 			10,
 			10,
 			10,

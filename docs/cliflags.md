@@ -82,6 +82,14 @@ The following flags are available for the konterfAI binary:
 | **Default:**     | 5                                                                                                                  |
 | **Description**  | Counter how many times the same hallucination should be presented. Use a high number here to reduce CPU-/GPU-load. |
 
+-- `--hallucination-minimal-length`
+
+|                 |                                                                                    |
+|-----------------|------------------------------------------------------------------------------------|
+| **Type:**       | int                                                                                |
+| **Default:**    | 500                                                                                |
+| **Description** | The minimal length of a hallucination in characters. Use <1 to disable this check. |
+
 - `--hallucinator-link-percentage`
 
 |                  |                                                                              |
@@ -185,6 +193,22 @@ The following flags are available for the konterfAI binary:
 | **Type:**       | string                                                                                                                                                                 |
 | **Default:**    |                                                                                                                                                                        |
 | **Description** | The endpoint for the tracing server (open telemetry, e.g. [Jaeger](https://www.jaegertracing.io/)).<br/> If empty, tracing is disabled.<br/>Example value for Jaeger: --tracing-endpoint=localhost:4317 |
+
+- `--log-level`
+
+|                 |                                                                                   |
+|-----------------|-----------------------------------------------------------------------------------|
+| **Type:**       | string                                                                            |
+| **Default:**    | info                                                                              |
+| **Description** | The log level for the application. Possible values are: debug, info, warn, error. |
+
+- `--log-format`
+
+|                 |                                                                           |
+|-----------------|---------------------------------------------------------------------------|
+| **Type:**       | string                                                                    |
+| **Default:**    | text                                                                      |
+| **Description** | The log format for the application. Possible values are: json, text, off. |
 
 <!-- Example table for easy copy & paste
 |                 |   |

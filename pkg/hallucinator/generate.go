@@ -125,6 +125,12 @@ func (h *Hallucinator) validateBody(ctx context.Context, body io.ReadCloser) (st
 		return "", errors.New("ollama returned an invalid hallucination")
 	}
 
+	if len(pl) < h.hallucinationMinimalLength {
+		h.Logger.ErrorContext(ctx, "ollama returned a hallucination that is too short")
+
+		return "", errors.New("ollama returned a hallucination that is too short")
+	}
+
 	return pl, nil
 }
 

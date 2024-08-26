@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -31,6 +32,7 @@ type Hallucinator struct {
 	hallucinationCountLock                  sync.Mutex
 	hallucinationCacheSize                  int
 	hallucinationRequestCount               int
+	hallucinationMinimalLength              int
 	hallucinationWordCount                  int
 	hallucinationLinkPercentage             int
 	hallucinatorLinkMaxSubdirectories       int
@@ -56,6 +58,7 @@ func NewHallucinator(ctx context.Context, logger *slog.Logger,
 	hallucinationCacheSize int,
 	hallucinatorPromptWordCount int,
 	hallucinationRequestCount int,
+	hallucinationMinimalLength int,
 	hallucinationWordCount int,
 	hallucinationLinkPercentage int,
 	hallucinatorLinkMaxSubdirectories int,
@@ -71,7 +74,6 @@ func NewHallucinator(ctx context.Context, logger *slog.Logger,
 ) *Hallucinator {
 	ctx, span := tracer.Start(ctx, "Hallucinator.NewHallucinator")
 	defer span.End()
-
 	headLineLinks := [10]string{}
 	for i := 0; i < len(headLineLinks); i++ {
 		headLineLinks[i] = links.RandomLink(ctx,
@@ -81,6 +83,9 @@ func NewHallucinator(ctx context.Context, logger *slog.Logger,
 			hallucinatorLinkHasVariablesProbability,
 		)
 	}
+	if hallucinationMinimalLength < 1 {
+		hallucinationMinimalLength = math.MaxInt
+	}
 
 	return &Hallucinator{
 		Interval:                                interval,
@@ -88,6 +93,7 @@ func NewHallucinator(ctx context.Context, logger *slog.Logger,
 		hallucinationCount:                      0,
 		hallucinationCacheSize:                  hallucinationCacheSize,
 		hallucinationRequestCount:               hallucinationRequestCount,
+		hallucinationMinimalLength:              hallucinationMinimalLength,
 		hallucinationWordCount:                  hallucinationWordCount,
 		hallucinationLinkPercentage:             hallucinationLinkPercentage,
 		hallucinatorLinkMaxSubdirectories:       hallucinatorLinkMaxSubdirectories,
@@ -116,7 +122,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 	for {
 		if h.GetHallucinationCount(ctx) < h.hallucinationCacheSize {
 			promptNeedsUpdate = true
-			h.Logger.Info(fmt.Sprintf("hallucinations cache has empty slots, generating more... [%d/%d]\n",
+			h.Logger.Info(fmt.Sprintf("hallucinations cache has empty slots, generating more... [%d/%d]",
 				len(h.hallucinations)+1, h.hallucinationCacheSize))
 			hal, err := h.GenerateHallucination(ctx)
 			if err != nil {

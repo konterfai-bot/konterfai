@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 
 	"go.opentelemetry.io/otel"
 )
@@ -19,7 +20,7 @@ func SetLogger(format, level string) (*slog.Logger, error) {
 	defer span.End()
 
 	var opts *slog.HandlerOptions
-	switch level {
+	switch strings.ToLower(level) {
 	case "debug":
 		opts = &slog.HandlerOptions{Level: slog.LevelDebug}
 	case "info":
@@ -32,7 +33,7 @@ func SetLogger(format, level string) (*slog.Logger, error) {
 		opts = &slog.HandlerOptions{Level: slog.LevelInfo}
 	}
 
-	switch format {
+	switch strings.ToLower(format) {
 	case "off":
 		return slog.New(slog.NewTextHandler(io.Discard, opts)), nil
 	case "json":

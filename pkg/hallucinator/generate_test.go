@@ -18,6 +18,17 @@ import (
 )
 
 var _ = Describe("Generate", func() {
+	const (
+		longHallucinationText = "dummy hallucination text " +
+			" Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod" +
+			" tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et" +
+			" justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum" +
+			" dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod" +
+			" tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam" +
+			" et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum" +
+			" dolor sit amet."
+	)
+
 	var (
 		ctx    context.Context
 		cancel context.CancelFunc
@@ -40,6 +51,7 @@ var _ = Describe("Generate", func() {
 			10,
 			10,
 			10,
+			500,
 			10,
 			10,
 			10,
@@ -100,7 +112,7 @@ var _ = Describe("Generate", func() {
 		mockHttpClient := new(MockHttpClient)
 		mockHttpClient.On("Do", mock.Anything).Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       io.NopCloser(strings.NewReader(`{"data": "dummy"}`)),
+			Body:       io.NopCloser(strings.NewReader(`{"message": {"content": "` + longHallucinationText + `"}}`)),
 		}, nil)
 		h.HTTPClient = mockHttpClient
 		hal, err := h.GenerateHallucination(ctx)
@@ -112,7 +124,7 @@ var _ = Describe("Generate", func() {
 		ollamaResponse := hallucinator.OllamaResponse{
 			Message: hallucinator.OllamaMessage{
 				Role:    "test",
-				Content: "a single message from the ollama mock",
+				Content: longHallucinationText,
 			},
 			Done: true,
 		}
@@ -151,6 +163,19 @@ var _ = Describe("Generate", func() {
 		hal, err := h.GenerateHallucination(ctx)
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("unexpected end of JSON input"))
+		Expect(hal).To(Equal(hallucinator.Hallucination{}))
+	})
+
+	It("should return an error if the hallucination is < 500 characters", func() {
+		mockHttpClient := new(MockHttpClient)
+		mockHttpClient.On("Do", mock.Anything).Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"message": {"content": "This is a short response"}}`)),
+		}, nil)
+		h.HTTPClient = mockHttpClient
+		hal, err := h.GenerateHallucination(ctx)
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("ollama returned a hallucination that is too short"))
 		Expect(hal).To(Equal(hallucinator.Hallucination{}))
 	})
 })

@@ -77,6 +77,13 @@ func Initialize() error { //nolint: funlen
 				DefaultText: "5",
 			},
 			&cli.IntFlag{
+				Name: "hallucination-minimal-length",
+				Usage: "The minimal length of a hallucination in characters." +
+					" Use <1 to disable this check.",
+				Value:       500,
+				DefaultText: "500",
+			},
+			&cli.IntFlag{
 				Name:        "hallucinator-link-percentage",
 				Usage:       "The percentage of links to add to the hallucination measured by total words.",
 				Value:       10,
@@ -160,8 +167,8 @@ func Initialize() error { //nolint: funlen
 			&cli.StringFlag{
 				Name:        "log-level",
 				Usage:       "The log level for the application. Possible values are: debug, info, warn, error.",
-				Value:       "INFO",
-				DefaultText: "INFO",
+				Value:       "info",
+				DefaultText: "info",
 			},
 			&cli.StringFlag{
 				Name:        "log-format",

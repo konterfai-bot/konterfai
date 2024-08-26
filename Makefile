@@ -32,7 +32,7 @@ coverage:
 
 .PHONY: coverage-ci
 coverage-ci:
-	@echo "Coverage..."
+	@echo "Coverage CI..."
 	@go test -v ./... -coverprofile=coverage.out
 	@go tool cover -html=coverage.out -o coverage.html
 	@echo "Done."
