@@ -49,7 +49,7 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 	}()
 	_, err := w.Write([]byte(hallucination))
 	if err != nil {
-		fmt.Println(fmt.Errorf("error writing hallucination: %w", err))
+		ws.Logger.ErrorContext(ctx, fmt.Sprintf("error writing hallucination (%v)", err.Error()))
 	}
 }
 

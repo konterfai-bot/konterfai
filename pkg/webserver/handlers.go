@@ -37,7 +37,7 @@ func (ws *WebServer) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 	}()
 	_, err := w.Write(responseData)
 	if err != nil {
-		fmt.Println(fmt.Errorf("error writing robots.txt: %w", err))
+		ws.Logger.ErrorContext(ctx, fmt.Sprintf("error writing robots.txt (%v)", err.Error()))
 	}
 }
 

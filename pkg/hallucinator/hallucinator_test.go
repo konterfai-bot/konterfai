@@ -3,11 +3,13 @@ package hallucinator_test
 import (
 	"context"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"github.com/stretchr/testify/mock"
@@ -33,6 +35,7 @@ var _ = Describe("Hallucinator", func() {
 		cancel context.CancelFunc
 		h      *hallucinator.Hallucinator
 		st     *statistics.Statistics
+		logger *slog.Logger
 	)
 
 	BeforeEach(func() {
@@ -40,9 +43,11 @@ var _ = Describe("Hallucinator", func() {
 			return context.WithCancel(context.Background())
 		}()
 		defer cancel()
-		st = statistics.NewStatistics(ctx, "this is just a dummy string")
+		logger, _ = command.SetLogger("off", "")
+		st = statistics.NewStatistics(ctx, logger, "this is just a dummy string")
 		h = hallucinator.NewHallucinator(
 			ctx,
+			logger,
 			5,
 			1,
 			10,
@@ -56,7 +61,7 @@ var _ = Describe("Hallucinator", func() {
 				Scheme: "http",
 				Host:   "localhost:8080",
 			},
-			"dummy",
+			"http://localhost:11434",
 			"dummy",
 			10,
 			10,

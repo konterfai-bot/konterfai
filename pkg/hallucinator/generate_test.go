@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 
@@ -22,6 +24,7 @@ var _ = Describe("Generate", func() {
 		cancel context.CancelFunc
 		h      *hallucinator.Hallucinator
 		st     *statistics.Statistics
+		logger *slog.Logger
 	)
 
 	BeforeEach(func() {
@@ -29,9 +32,11 @@ var _ = Describe("Generate", func() {
 			return context.WithCancel(context.Background())
 		}()
 		defer cancel()
-		st = statistics.NewStatistics(ctx, "this is just a dummy string")
+		logger, _ = command.SetLogger("off", "")
+		st = statistics.NewStatistics(ctx, logger, "this is just a dummy string")
 		h = hallucinator.NewHallucinator(
 			ctx,
+			logger,
 			5,
 			10,
 			10,

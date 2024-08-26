@@ -1,5 +1,7 @@
 package hallucinator
 
+import "go.opentelemetry.io/otel"
+
 const (
 	BackToStartString = "Back to start."
 	ContinueString    = "Continue reading..."
@@ -21,3 +23,6 @@ var invalidResultsRegexps = []string{
 	"Sorry, but I can't assist with that.*",
 	"Sure, I'll be glad to do that. However, due to privacy and confidentiality.*",
 }
+
+// tracer is the tracer for the hallucinator package.
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/hallucinator")

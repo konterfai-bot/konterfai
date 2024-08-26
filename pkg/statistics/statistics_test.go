@@ -3,6 +3,7 @@ package statistics_test
 import (
 	"context"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -37,7 +38,8 @@ var _ = Describe("Statistics", func() {
 		})
 
 		It("should return a new statistics", func() {
-			st := statistics.NewStatistics(ctx, configurationInfo)
+			logger, _ := command.SetLogger("off", "")
+			st := statistics.NewStatistics(ctx, logger, configurationInfo)
 			Expect(st).NotTo(BeNil())
 			Expect(st.ConfigurationInfo).To(Equal(configurationInfo))
 		})

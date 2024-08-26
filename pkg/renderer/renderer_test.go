@@ -2,8 +2,10 @@ package renderer_test
 
 import (
 	"context"
+	"log/slog"
 	"testing"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/renderer"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -16,12 +18,16 @@ func TestRenderer(t *testing.T) {
 }
 
 var _ = Describe("Renderer", func() {
-	var ctx context.Context
-	var r *renderer.Renderer
-	var rd renderer.RenderData
+	var (
+		ctx    context.Context
+		r      *renderer.Renderer
+		rd     renderer.RenderData
+		logger *slog.Logger
+	)
 	BeforeEach(func() {
 		ctx = context.Background()
-		r = renderer.NewRenderer(ctx, []string{})
+		logger, _ = command.SetLogger("off", "")
+		r = renderer.NewRenderer(ctx, logger, []string{})
 		rd = renderer.RenderData{
 			NewsAnchor:    "newsAnchor",
 			Headline:      "headline",
@@ -38,7 +44,7 @@ var _ = Describe("Renderer", func() {
 
 	Context("NewRenderer", func() {
 		It("should return a new renderer", func() {
-			Expect(renderer.NewRenderer(ctx, []string{})).NotTo(BeNil())
+			Expect(renderer.NewRenderer(ctx, logger, []string{})).NotTo(BeNil())
 		})
 	})
 
@@ -52,7 +58,7 @@ var _ = Describe("Renderer", func() {
 
 		It("should render a random template if headlineLinks are provided from the renderer", func() {
 			rd.HeadlineLinks = []string{}
-			r = renderer.NewRenderer(ctx, []string{"headLineLink0", "headLineLink1", "headLineLink2", "headLineLink3", "headLineLink4", "headLineLink5", "headLineLink6", "headLineLink7", "headLineLink8", "headLineLink9"})
+			r = renderer.NewRenderer(ctx, logger, []string{"headLineLink0", "headLineLink1", "headLineLink2", "headLineLink3", "headLineLink4", "headLineLink5", "headLineLink6", "headLineLink7", "headLineLink8", "headLineLink9"})
 			renderedTemplate, err := r.RenderInRandomTemplate(ctx, rd)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(renderedTemplate).NotTo(BeEmpty())

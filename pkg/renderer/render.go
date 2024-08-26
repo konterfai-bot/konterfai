@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"math/rand"
 	"os"
 	"runtime"
@@ -56,14 +57,14 @@ type RandomTopic struct {
 	Link  string
 }
 
-func NewRenderer(ctx context.Context, headLineLinks []string) *Renderer {
+func NewRenderer(ctx context.Context, logger *slog.Logger, headLineLinks []string) *Renderer {
 	_, span := tracer.Start(ctx, "NewRenderer")
 	defer span.End()
 
 	htmlTemplates := []string{}
 	templates, err := assets.ReadDir("assets")
 	if err != nil {
-		fmt.Printf("could not read assets directory (%v)\n", err)
+		logger.ErrorContext(ctx, fmt.Sprintf("could not read assets directory (%v)", err))
 		defer os.Exit(1)
 		runtime.Goexit()
 	}
@@ -73,7 +74,7 @@ func NewRenderer(ctx context.Context, headLineLinks []string) *Renderer {
 		}
 		f, err := assets.ReadFile("assets/" + file.Name())
 		if err != nil {
-			fmt.Printf("could not read asset file (%v)\n", err)
+			logger.ErrorContext(ctx, fmt.Sprintf("could not read asset file (%v)", err))
 			defer os.Exit(1)
 			runtime.Goexit()
 		}

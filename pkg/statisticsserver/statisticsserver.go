@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"runtime"
@@ -25,19 +26,21 @@ type StatisticsServer struct {
 	Host       string
 	Port       int
 	Statistics *statistics.Statistics
+	Logger     *slog.Logger
 
 	htmlTemplates map[string]string
 }
 
 // NewStatisticsServer creates a new StatisticsServer instance.
-func NewStatisticsServer(ctx context.Context, host string, port int, st *statistics.Statistics) *StatisticsServer {
+func NewStatisticsServer(ctx context.Context, logger *slog.Logger, host string, port int, st *statistics.Statistics,
+) *StatisticsServer {
 	_, span := tracer.Start(ctx, "NewStatisticsServer")
 	defer span.End()
 
 	htmlTemplates := map[string]string{}
 	templates, err := assets.ReadDir("assets")
 	if err != nil {
-		fmt.Printf("could not read assets directory (%v)\n", err)
+		logger.ErrorContext(ctx, fmt.Sprintf("could not read assets directory (%v)", err))
 		defer os.Exit(1)
 		runtime.Goexit()
 	}
@@ -47,7 +50,7 @@ func NewStatisticsServer(ctx context.Context, host string, port int, st *statist
 		}
 		f, err := assets.ReadFile("assets/" + file.Name())
 		if err != nil {
-			fmt.Printf("could not read asset file (%v)\n", err)
+			logger.ErrorContext(ctx, fmt.Sprintf("could not read asset file (%v)", err))
 			defer os.Exit(1)
 			runtime.Goexit()
 		}

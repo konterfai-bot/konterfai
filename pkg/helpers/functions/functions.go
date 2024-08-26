@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"strconv"
 	"time"
@@ -100,14 +101,14 @@ func RecalculateProbabilityWithUncertainity(ctx context.Context, baseProbability
 }
 
 // SleepWithContext sleeps for the given duration or until the context is done.
-func SleepWithContext(ctx context.Context, duration time.Duration) {
+func SleepWithContext(ctx context.Context, logger *slog.Logger, duration time.Duration) {
 	// No need to trace this function as it has a fixed runtime.
 
 	t := time.NewTimer(duration)
 	select {
 	case <-ctx.Done():
 		t.Stop()
-		fmt.Println("Context time interrupted")
+		logger.DebugContext(ctx, "Context time interrupted")
 	case <-t.C:
 	}
 }

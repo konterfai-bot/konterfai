@@ -2,9 +2,11 @@ package functions_test
 
 import (
 	"context"
+	"log/slog"
 	"testing"
 	"time"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -17,7 +19,9 @@ func TestFunctions(t *testing.T) {
 }
 
 var _ = Describe("Functions", func() {
-	var ctx context.Context
+	var (
+		ctx context.Context
+	)
 	BeforeEach(func() {
 		ctx = context.Background()
 	})
@@ -133,12 +137,17 @@ var _ = Describe("Functions", func() {
 	})
 
 	Context("SleepWithContext", func() {
+		var logger *slog.Logger
+		BeforeEach(func() {
+			logger, _ = command.SetLogger("off", "")
+		})
+
 		It("should sleep for the given duration", func() {
 			start := time.Now()
 			duration := 100 * time.Millisecond
 			ctx, cancel := context.WithTimeout(ctx, duration)
 			defer cancel()
-			functions.SleepWithContext(ctx, duration)
+			functions.SleepWithContext(ctx, logger, duration)
 			Expect(time.Since(start)).To(BeNumerically("~", duration, 10*time.Millisecond))
 		})
 
@@ -147,7 +156,7 @@ var _ = Describe("Functions", func() {
 			duration := 100 * time.Millisecond
 			ctx, cancel := context.WithTimeout(ctx, 0)
 			defer cancel()
-			functions.SleepWithContext(ctx, duration)
+			functions.SleepWithContext(ctx, logger, duration)
 			Expect(time.Since(start)).To(BeNumerically("<", duration))
 		})
 	})

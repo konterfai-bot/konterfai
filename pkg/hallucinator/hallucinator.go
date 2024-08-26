@@ -3,6 +3,7 @@ package hallucinator
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -14,7 +15,6 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
 	"codeberg.org/konterfai/konterfai/pkg/renderer"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
-	"go.opentelemetry.io/otel"
 )
 
 // httpClient is an interface for the http.Client.
@@ -46,12 +46,13 @@ type Hallucinator struct {
 	HTTPClient httpClient
 	renderer   *renderer.Renderer
 	statistics *statistics.Statistics
+
+	Logger *slog.Logger
 }
 
-var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/hallucinator")
-
 // NewHallucinator creates a new Hallucinator instance.
-func NewHallucinator(ctx context.Context, interval time.Duration,
+func NewHallucinator(ctx context.Context, logger *slog.Logger,
+	interval time.Duration,
 	hallucinationCacheSize int,
 	hallucinatorPromptWordCount int,
 	hallucinationRequestCount int,
@@ -102,8 +103,9 @@ func NewHallucinator(ctx context.Context, interval time.Duration,
 		HTTPClient: &http.Client{
 			Timeout: ollamaRequestTimeOut,
 		},
-		renderer:   renderer.NewRenderer(ctx, headLineLinks[:]),
+		renderer:   renderer.NewRenderer(ctx, logger, headLineLinks[:]),
 		statistics: statistics,
+		Logger:     logger,
 	}
 }
 
@@ -114,12 +116,12 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 	for {
 		if h.GetHallucinationCount(ctx) < h.hallucinationCacheSize {
 			promptNeedsUpdate = true
-			fmt.Printf("hallucinations cache has empty slots, generating more... [%d/%d]\n",
-				len(h.hallucinations)+1, h.hallucinationCacheSize)
+			h.Logger.Info(fmt.Sprintf("hallucinations cache has empty slots, generating more... [%d/%d]\n",
+				len(h.hallucinations)+1, h.hallucinationCacheSize))
 			hal, err := h.GenerateHallucination(ctx)
 			if err != nil {
-				functions.SleepWithContext(ctx, h.Interval)
-				fmt.Printf("could not generate hallucination (%v)\n", err)
+				functions.SleepWithContext(ctx, h.Logger, h.Interval)
+				h.Logger.ErrorContext(ctx, fmt.Sprintf("could not generate hallucination (%v)", err))
 
 				continue
 			}
@@ -130,7 +132,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 
 			continue
 		}
-		fmt.Println("hallucinations cache is full, waiting for next interval...")
+		h.Logger.InfoContext(ctx, "hallucinations cache is full, waiting for next interval...")
 		if promptNeedsUpdate {
 			go func() {
 				prompts := map[string]int{}
@@ -145,7 +147,7 @@ func (h *Hallucinator) Start(ctx context.Context) error {
 			}()
 			promptNeedsUpdate = false
 		}
-		functions.SleepWithContext(ctx, h.Interval)
+		functions.SleepWithContext(ctx, h.Logger, h.Interval)
 	}
 }
 

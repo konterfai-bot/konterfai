@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -14,9 +15,9 @@ import (
 )
 
 // SetTraceProvider returns a new trace provider with the given endpoint and service name.
-func SetTraceProvider(ctx context.Context, endpoint, serviceName string) error {
+func SetTraceProvider(ctx context.Context, logger *slog.Logger, endpoint, serviceName string) error {
 	if endpoint == "" {
-		fmt.Println("tracing is disabled")
+		logger.InfoContext(ctx, "tracing is disabled")
 		otel.SetTracerProvider(trace.NewTracerProvider(
 			trace.WithSampler(trace.NeverSample()),
 		))
@@ -28,7 +29,7 @@ func SetTraceProvider(ctx context.Context, endpoint, serviceName string) error {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		fmt.Printf("failed to create grpc connection: %v\n", err)
+		logger.ErrorContext(ctx, fmt.Sprintf("failed to create grpc connection (%v)", err))
 
 		return err
 	}
@@ -38,7 +39,7 @@ func SetTraceProvider(ctx context.Context, endpoint, serviceName string) error {
 		otlptracegrpc.WithGRPCConn(conn),
 	)
 	if err != nil {
-		fmt.Printf("failed to create trace exporter: %v\n", err)
+		logger.ErrorContext(ctx, fmt.Sprintf("failed to create trace exporter (%v)", err))
 
 		return err
 	}
@@ -51,7 +52,7 @@ func SetTraceProvider(ctx context.Context, endpoint, serviceName string) error {
 		),
 	)
 	if err != nil {
-		fmt.Printf("failed to create resource: %v\n", err)
+		logger.ErrorContext(ctx, fmt.Sprintf("failed to create resource (%v)", err))
 
 		return err
 	}

@@ -44,36 +44,36 @@ func (h *Hallucinator) GenerateHallucination(ctx context.Context) (Hallucination
 	defer span.End()
 	requestURL, err := url.JoinPath(h.ollamaAddress, "/api/chat")
 	if err != nil {
-		fmt.Printf("could not join url path (%v)", err)
+		h.Logger.ErrorContext(ctx, fmt.Sprintf("could not join url path (%v)", err))
 		defer os.Exit(1)
 		runtime.Goexit()
 	}
 	prompt := h.generatePrompt(ctx)
-	fmt.Printf("generating hallucination with prompt: \"%s\"\n", prompt)
+	h.Logger.InfoContext(ctx, "generating hallucination with prompt:"+prompt)
 	requestBody := ollamaJSONRequest{
 		Model: h.ollamaModel, Messages: []OllamaMessage{{Role: "user", Content: prompt}},
 		Options: ollamaOptions{Temperature: h.aiTemperature, Seed: h.aiSeed},
 	}
 	requestBodyJSON, err := json.Marshal(requestBody)
 	if err != nil {
-		fmt.Println("could not marshal request body")
+		h.Logger.ErrorContext(ctx, fmt.Sprintf("could not marshal request body (%v)", err))
 		defer os.Exit(1)
 		runtime.Goexit()
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestURL, bytes.NewReader(requestBodyJSON))
 	if err != nil {
-		fmt.Printf("could not create request (%v)\n", err)
+		h.Logger.ErrorContext(ctx, fmt.Sprintf("could not create request (%v)", err))
 
 		return Hallucination{}, err
 	}
 	res, err := h.HTTPClient.Do(req)
 	if err != nil {
-		fmt.Printf("could not get hallucination from ollama (%v)\n", err)
+		h.Logger.ErrorContext(ctx, fmt.Sprintf("could not get hallucination from ollama (%v)", err))
 
 		return Hallucination{}, err
 	}
 	if res.StatusCode != http.StatusOK {
-		fmt.Println("ollama did not return 200 OK")
+		h.Logger.ErrorContext(ctx, "ollama did not return 200 OK")
 
 		return Hallucination{}, errors.New("ollama did not return 200 OK")
 	}
@@ -84,7 +84,7 @@ func (h *Hallucinator) GenerateHallucination(ctx context.Context) (Hallucination
 	}
 
 	if err := res.Body.Close(); err != nil {
-		fmt.Printf("could not close response body (%v)\n", err)
+		h.Logger.ErrorContext(ctx, fmt.Sprintf("could not close response body (%v)", err))
 	}
 
 	return Hallucination{Text: pl, Prompt: prompt, RequestCount: h.hallucinationRequestCount}, nil
@@ -96,31 +96,31 @@ func (h *Hallucinator) validateBody(ctx context.Context, body io.ReadCloser) (st
 	defer span.End()
 
 	if body == nil {
-		fmt.Println("ollama did not return a body")
+		h.Logger.ErrorContext(ctx, "ollama did not return a body")
 
 		return "", errors.New("ollama did not return a body")
 	}
 	resBody, err := io.ReadAll(body)
 	if err != nil {
-		fmt.Println("could not read response body")
+		h.Logger.ErrorContext(ctx, "could not read response body")
 
 		return "", err
 	}
 	if len(resBody) == 0 {
-		fmt.Println("ollama did not return a body")
+		h.Logger.ErrorContext(ctx, "ollama did return an empty body")
 
 		return "", errors.New("ollama did return an empty body")
 	}
 
 	pl, err := concatOllamaMessages(resBody)
 	if err != nil {
-		fmt.Printf("could not concatenate ollama messages (%v)\n", err)
+		h.Logger.ErrorContext(ctx, fmt.Sprintf("could not concatenate ollama messages (%v)", err))
 
 		return "", err
 	}
 
 	if !h.isValidResult(ctx, pl) {
-		fmt.Println("ollama returned an invalid hallucination")
+		h.Logger.ErrorContext(ctx, "ollama returned an invalid hallucination")
 
 		return "", errors.New("ollama returned an invalid hallucination")
 	}

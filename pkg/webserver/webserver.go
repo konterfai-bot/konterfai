@@ -2,6 +2,7 @@ package webserver
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -26,6 +27,7 @@ type WebServer struct {
 	HTTPResponseCacheLock sync.Mutex
 	HTTPBaseURL           url.URL
 	ServeMux              *http.ServeMux
+	Logger                *slog.Logger
 }
 
 // ErrorCacheItem is the structure for the WebServer cache item.
@@ -37,9 +39,9 @@ type ErrorCacheItem struct {
 var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/webserver")
 
 // NewWebServer creates a new WebServer instance.
-func NewWebServer(ctx context.Context, host string, port int, hallucinator *hallucinator.Hallucinator,
-	statistics *statistics.Statistics, baseURL url.URL, httpOkProbability, uncertainty float64,
-	errorCacheSize int,
+func NewWebServer(ctx context.Context, logger *slog.Logger, host string, port int,
+	hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseURL url.URL, httpOkProbability,
+	uncertainty float64, errorCacheSize int,
 ) *WebServer {
 	_, span := tracer.Start(ctx, "NewWebServer")
 	defer span.End()
@@ -54,6 +56,7 @@ func NewWebServer(ctx context.Context, host string, port int, hallucinator *hall
 		HTTPResponseCache:     []ErrorCacheItem{},
 		HTTPResponseCacheSize: errorCacheSize,
 		HTTPBaseURL:           baseURL,
+		Logger:                logger,
 	}
 }
 

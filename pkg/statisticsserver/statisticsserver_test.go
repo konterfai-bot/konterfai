@@ -2,10 +2,12 @@ package statisticsserver_test
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/oklog/run"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"
 
@@ -19,15 +21,17 @@ var _ = Describe("Statisticsserver", func() {
 		Host       string
 		Port       int
 		Statistics *statistics.Statistics
+		logger     *slog.Logger
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
+		logger, _ = command.SetLogger("off", "")
 	})
 
 	Context("NewStatisticsServer", func() {
 		It("should return a new statistics server", func() {
-			ss := statisticsserver.NewStatisticsServer(ctx, Host, Port, Statistics)
+			ss := statisticsserver.NewStatisticsServer(ctx, logger, Host, Port, Statistics)
 			Expect(ss).NotTo(BeNil())
 		})
 	})
@@ -38,7 +42,7 @@ var _ = Describe("Statisticsserver", func() {
 			err error
 		)
 		BeforeEach(func() {
-			ss = statisticsserver.NewStatisticsServer(ctx, Host, Port, Statistics)
+			ss = statisticsserver.NewStatisticsServer(ctx, logger, Host, Port, Statistics)
 			syncer := make(chan error)
 			gr := run.Group{}
 			gr.Add(func() error {

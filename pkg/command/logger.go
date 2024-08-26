@@ -13,6 +13,8 @@ var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/command")
 
 // SetLogger sets the logger for the command package.
 func SetLogger(format, level string) (*slog.Logger, error) {
+	// NOTE: When runnning in CI always set the logger to off, otherwise it will blow up woodpecker!
+	//       If a test is failing, you have to debug it locally.
 	_, span := tracer.Start(context.Background(), "SetLogger")
 	defer span.End()
 

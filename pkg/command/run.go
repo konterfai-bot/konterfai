@@ -21,20 +21,25 @@ func Run(c *cli.Context) error { //nolint: funlen
 		return context.WithCancel(c.Context)
 	}()
 	defer cancel()
-	err := SetTraceProvider(ctx, c.String("tracing-endpoint"), "konterfai")
+	logger, err := SetLogger(c.String("log-format"), c.String("log-level"))
 	if err != nil {
 		return err
 	}
+	err = SetTraceProvider(ctx, logger, c.String("tracing-endpoint"), "konterfai")
+	if err != nil {
+		return err
+	}
+
 	fmt.Println(generateHeader(c, true))
 	syncer := make(chan error)
-	st := statistics.NewStatistics(ctx, generateHeader(c, false))
+	st := statistics.NewStatistics(ctx, logger, generateHeader(c, false))
 	hcURL, err := url.Parse(c.String("hallucinator-url"))
 	if err != nil {
-		fmt.Println("could not parse hallucinator-url")
+		logger.ErrorContext(ctx, fmt.Sprintf("could not parse hallucinator-url (%v)", err))
 
 		return err
 	}
-	hal := hallucinator.NewHallucinator(ctx, c.Duration("generate-interval"),
+	hal := hallucinator.NewHallucinator(ctx, logger, c.Duration("generate-interval"),
 		c.Int("hallucination-cache-size"), c.Int("hallucination-prompt-word-count"),
 		c.Int("hallucination-request-count"), c.Int("hallucination-word-count"),
 		c.Int("hallucinator-link-percentage"), c.Int("hallucinator-link-max-subdirectory-depth"),
@@ -50,11 +55,11 @@ func Run(c *cli.Context) error { //nolint: funlen
 			return <-syncer
 		}
 	}, func(_ error) {
-		fmt.Println("shutting down hallucinator")
+		logger.InfoContext(ctx, "shutting down hallucinator")
 		cancel()
 	})
 	gr.Add(func() error {
-		ws := webserver.NewWebServer(ctx, c.String("address"), c.Int("port"), hal, st, *hcURL,
+		ws := webserver.NewWebServer(ctx, logger, c.String("address"), c.Int("port"), hal, st, *hcURL,
 			c.Float64("webserver-200-probability"), c.Float64("random-uncertainty"),
 			c.Int("webserver-error-cache-size"))
 		select {
@@ -64,11 +69,11 @@ func Run(c *cli.Context) error { //nolint: funlen
 			return <-syncer
 		}
 	}, func(_ error) {
-		fmt.Println("shutting down webserver")
+		logger.InfoContext(ctx, "shutting down webserver")
 		cancel()
 	})
 	gr.Add(func() error {
-		ss := statisticsserver.NewStatisticsServer(ctx, c.String("address"), c.Int("statistics-port"), st)
+		ss := statisticsserver.NewStatisticsServer(ctx, logger, c.String("address"), c.Int("statistics-port"), st)
 		select {
 		case <-ctx.Done():
 			return nil
@@ -76,7 +81,7 @@ func Run(c *cli.Context) error { //nolint: funlen
 			return <-syncer
 		}
 	}, func(_ error) {
-		fmt.Println("shutting down statistics server")
+		logger.InfoContext(ctx, "shutting down statistics server")
 		cancel()
 	})
 

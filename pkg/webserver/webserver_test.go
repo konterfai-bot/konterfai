@@ -2,12 +2,14 @@ package webserver_test
 
 import (
 	"context"
+	"log/slog"
 	"net/url"
 	"testing"
 	"time"
 
 	"github.com/oklog/run"
 
+	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"codeberg.org/konterfai/konterfai/pkg/webserver"
@@ -31,6 +33,7 @@ var _ = Describe("Webserver", func() {
 		baseUrl                        url.URL
 		HttpOkProbability, Uncertainty float64
 		errorCacheSize                 int
+		logger                         *slog.Logger
 	)
 	BeforeEach(func() {
 		ctx = context.Background()
@@ -45,11 +48,12 @@ var _ = Describe("Webserver", func() {
 		HttpOkProbability = 0.5
 		Uncertainty = 0.5
 		errorCacheSize = 10
+		logger, _ = command.SetLogger("off", "")
 	})
 
 	Context("NewWebserver", func() {
 		It("should return a new webserver", func() {
-			ws := webserver.NewWebServer(ctx, host, port, hallucinator, statistics, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
+			ws := webserver.NewWebServer(ctx, logger, host, port, hallucinator, statistics, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
 			Expect(ws).NotTo(BeNil())
 			Expect(ws.Host).To(Equal(host))
 			Expect(ws.Port).To(Equal(port))
@@ -65,7 +69,7 @@ var _ = Describe("Webserver", func() {
 			err error
 		)
 		BeforeEach(func() {
-			ws = webserver.NewWebServer(ctx, host, port, hallucinator, statistics, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
+			ws = webserver.NewWebServer(ctx, logger, host, port, hallucinator, statistics, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
 			syncer := make(chan error)
 			gr := run.Group{}
 			gr.Add(func() error {
