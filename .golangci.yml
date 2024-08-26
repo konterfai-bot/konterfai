@@ -13,9 +13,7 @@ linters:
       - varnamelen
       # linters that need to be verified if they are useful
       - err113
-      - gci
       - wsl
-      - forbidigo # this must be reenabled it forbids fmt.Println atm, but we need a proper logger to work with this
       - wrapcheck # this must be reenabled at the moment error-handling is not consistent
 issues:
   exclude-use-default: true

@@ -6,13 +6,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/oklog/run"
-	"github.com/urfave/cli/v2"
-
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"
 	"codeberg.org/konterfai/konterfai/pkg/webserver"
+	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
 )
 
 // Run is the entry point for running konterfAI.
@@ -30,7 +29,7 @@ func Run(c *cli.Context) error { //nolint: funlen
 		return err
 	}
 
-	fmt.Println(generateHeader(c, true))
+	fmt.Println(generateHeader(c, true)) //nolint:forbidigo
 	syncer := make(chan error)
 	st := statistics.NewStatistics(ctx, logger, generateHeader(c, false))
 	hcURL, err := url.Parse(c.String("hallucinator-url"))

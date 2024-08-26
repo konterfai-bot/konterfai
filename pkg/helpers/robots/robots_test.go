@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"codeberg.org/konterfai/konterfai/pkg/helpers/robots"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -5,12 +5,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/oklog/run"
-
 	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"codeberg.org/konterfai/konterfai/pkg/statisticsserver"
-
+	"github.com/oklog/run"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

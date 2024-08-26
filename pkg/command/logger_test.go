@@ -2,7 +2,6 @@ package command_test
 
 import (
 	"codeberg.org/konterfai/konterfai/pkg/command"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

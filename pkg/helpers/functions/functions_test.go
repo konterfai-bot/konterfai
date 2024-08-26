@@ -8,7 +8,6 @@ import (
 
 	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

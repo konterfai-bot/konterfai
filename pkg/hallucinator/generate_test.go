@@ -12,7 +12,6 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"

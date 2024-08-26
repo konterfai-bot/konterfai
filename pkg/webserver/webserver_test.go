@@ -7,13 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oklog/run"
-
 	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 	"codeberg.org/konterfai/konterfai/pkg/webserver"
-
+	"github.com/oklog/run"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
