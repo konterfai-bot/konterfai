@@ -2,7 +2,6 @@
 when:
   - event: [ tag ]
     ref: refs/tags/v*
-    branch: main
 
 steps:
   - name: tag-docker-dry-run
@@ -29,7 +28,3 @@ steps:
           username: konterfai
           password:
             from_secret: quay_token
-
-depends_on:
-  - coverage
-  - all-arch-build
