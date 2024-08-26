@@ -1,7 +1,9 @@
 ---
 when:
-  - event: tag
+  - event: [ tag ]
     ref: refs/tags/v*
+  - event: [ manual ]
+    branch: main
 
 steps:
   - name: tag-docker-dry-run
