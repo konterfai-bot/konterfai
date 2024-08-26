@@ -1,0 +1,43 @@
+package command
+
+import (
+	"context"
+	"io"
+	"log/slog"
+	"os"
+
+	"go.opentelemetry.io/otel"
+)
+
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/command")
+
+// SetLogger sets the logger for the command package.
+func SetLogger(format, level string) (*slog.Logger, error) {
+	_, span := tracer.Start(context.Background(), "SetLogger")
+	defer span.End()
+
+	var opts *slog.HandlerOptions
+	switch level {
+	case "debug":
+		opts = &slog.HandlerOptions{Level: slog.LevelDebug}
+	case "info":
+		opts = &slog.HandlerOptions{Level: slog.LevelInfo}
+	case "warn":
+		opts = &slog.HandlerOptions{Level: slog.LevelWarn}
+	case "error":
+		fallthrough
+	default:
+		opts = &slog.HandlerOptions{Level: slog.LevelInfo}
+	}
+
+	switch format {
+	case "off":
+		return slog.New(slog.NewTextHandler(io.Discard, opts)), nil
+	case "json":
+		return slog.New(slog.NewJSONHandler(os.Stdout, opts)), nil
+	case "text":
+		fallthrough
+	default:
+		return slog.New(slog.NewTextHandler(os.Stdout, opts)), nil
+	}
+}

@@ -10,11 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestTracing(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Command Suite")
-}
-
 var _ = Describe("Tracing", func() {
 	var (
 		ctx      context.Context

@@ -157,6 +157,18 @@ func Initialize() error { //nolint: funlen
 					"Example value for Jaeger: --tracing-endpoint=localhost:4317",
 				Value: "",
 			},
+			&cli.StringFlag{
+				Name:        "log-level",
+				Usage:       "The log level for the application. Possible values are: debug, info, warn, error.",
+				Value:       "INFO",
+				DefaultText: "INFO",
+			},
+			&cli.StringFlag{
+				Name:        "log-format",
+				Usage:       "The log format for the application. Possible values are: json, text, off.",
+				Value:       "text",
+				DefaultText: "text",
+			},
 		},
 		Action: Run,
 	}
