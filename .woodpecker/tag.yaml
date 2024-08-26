@@ -2,7 +2,6 @@
 when:
   - event: [ tag ]
     ref: refs/tags/v*
-  - event: [ manual ]
     branch: main
 
 steps:
