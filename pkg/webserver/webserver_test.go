@@ -2,7 +2,9 @@ package webserver_test
 
 import (
 	"context"
+	"io"
 	"log/slog"
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -26,8 +28,8 @@ var _ = Describe("Webserver", func() {
 		ctx                            context.Context
 		host                           string
 		port                           int
-		hallucinator                   *hallucinator.Hallucinator
-		statistics                     *statistics.Statistics
+		hal                            *hallucinator.Hallucinator
+		st                             *statistics.Statistics
 		baseUrl                        url.URL
 		HttpOkProbability, Uncertainty float64
 		errorCacheSize                 int
@@ -37,8 +39,31 @@ var _ = Describe("Webserver", func() {
 		ctx = context.Background()
 		host = "localhost"
 		port = 8080
-		hallucinator = nil
-		statistics = nil
+		hal = hallucinator.NewHallucinator(
+			ctx,
+			logger,
+			5,
+			1,
+			10,
+			10,
+			500,
+			10,
+			10,
+			10,
+			10,
+			10,
+			url.URL{
+				Scheme: "http",
+				Host:   "localhost:8080",
+			},
+			"http://localhost:11434",
+			"dummy",
+			10,
+			10,
+			10,
+			st,
+		)
+		st = nil
 		baseUrl = url.URL{
 			Scheme: "http",
 			Host:   "localhost:8080",
@@ -51,7 +76,7 @@ var _ = Describe("Webserver", func() {
 
 	Context("NewWebserver", func() {
 		It("should return a new webserver", func() {
-			ws := webserver.NewWebServer(ctx, logger, host, port, hallucinator, statistics, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
+			ws := webserver.NewWebServer(ctx, logger, host, port, hal, st, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
 			Expect(ws).NotTo(BeNil())
 			Expect(ws.Host).To(Equal(host))
 			Expect(ws.Port).To(Equal(port))
@@ -67,7 +92,29 @@ var _ = Describe("Webserver", func() {
 			err error
 		)
 		BeforeEach(func() {
-			ws = webserver.NewWebServer(ctx, logger, host, port, hallucinator, statistics, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
+			host = "localhost"
+			port = 8080
+			st = statistics.NewStatistics(ctx, logger, "this is just a dummy string")
+			isRobotsTxt := false
+			for range 10 {
+				st.AppendRequest(ctx, statistics.Request{
+					UserAgent:   "test",
+					IPAddress:   "127.0.0.1",
+					Timestamp:   time.Now(),
+					IsRobotsTxt: isRobotsTxt,
+					Size:        0,
+				})
+				isRobotsTxt = !isRobotsTxt
+			}
+			st.AppendRequest(ctx, statistics.Request{
+				UserAgent:   "test",
+				IPAddress:   "127.0.0.2",
+				Timestamp:   time.Now(),
+				IsRobotsTxt: false,
+				Size:        0,
+			})
+			logger, _ = command.SetLogger("off", "")
+			ws = webserver.NewWebServer(ctx, logger, host, port, hal, st, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
 			syncer := make(chan error)
 			gr := run.Group{}
 			gr.Add(func() error {
@@ -93,6 +140,30 @@ var _ = Describe("Webserver", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		// TODO: In the future here could be more integration tests for actually checking the responses
+		It("should reply with body content", func() {
+			// status code is not deterministic, it could be anything
+			httpClient := http.Client{
+				Timeout: 5 * time.Second,
+			}
+			resp, err := httpClient.Get("http://localhost:8080")
+			Expect(err).NotTo(HaveOccurred())
+			bodyData, err := io.ReadAll(resp.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(len(bodyData)).To(BeNumerically(">", 0))
+			ctx.Done()
+		})
+
+		It("should reply with body content on the robots.txt endpoint", func() {
+			// status code is not deterministic, it could be anything
+			httpClient := http.Client{
+				Timeout: 5 * time.Second,
+			}
+			resp, err := httpClient.Get("http://localhost:8080/robots.txt")
+			Expect(err).NotTo(HaveOccurred())
+			bodyData, err := io.ReadAll(resp.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(len(bodyData)).To(BeNumerically(">", 0))
+			ctx.Done()
+		})
 	})
 })
