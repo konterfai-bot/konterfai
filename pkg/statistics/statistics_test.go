@@ -2,6 +2,7 @@ package statistics_test
 
 import (
 	"context"
+	"time"
 
 	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
@@ -38,9 +39,31 @@ var _ = Describe("Statistics", func() {
 
 		It("should return a new statistics", func() {
 			logger, _ := command.SetLogger("off", "")
-			st := statistics.NewStatistics(ctx, logger, configurationInfo)
-			Expect(st).NotTo(BeNil())
-			Expect(st.ConfigurationInfo).To(Equal(configurationInfo))
+			go func() {
+				st := statistics.NewStatistics(ctx, logger, configurationInfo)
+				Expect(st).NotTo(BeNil())
+				Expect(st.ConfigurationInfo).To(Equal(configurationInfo))
+				isRobotsTxt := false
+				for range 10 {
+					st.AppendRequest(ctx, statistics.Request{
+						UserAgent:   "test",
+						IPAddress:   "127.0.0.1",
+						Timestamp:   time.Now(),
+						IsRobotsTxt: isRobotsTxt,
+						Size:        0,
+					})
+					isRobotsTxt = !isRobotsTxt
+				}
+				st.AppendRequest(ctx, statistics.Request{
+					UserAgent:   "test",
+					IPAddress:   "127.0.0.2",
+					Timestamp:   time.Now(),
+					IsRobotsTxt: false,
+					Size:        0,
+				})
+			}()
+			time.Sleep(6 * time.Second) // updates to the prometheus statistics are hardcode to 5 seconds
+			ctx.Done()
 		})
 	})
 })
