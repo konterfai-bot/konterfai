@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"strings"
 
@@ -15,16 +16,13 @@ import (
 )
 
 // Run is the entry point for running konterfAI.
-func Run(c *cli.Context) error { //nolint: funlen
+func Run(c *cli.Context, logger *slog.Logger) error { //nolint: funlen
 	ctx, cancel := func() (context.Context, context.CancelFunc) {
 		return context.WithCancel(c.Context)
 	}()
 	defer cancel()
-	logger, err := SetLogger(c.String("log-format"), c.String("log-level"))
-	if err != nil {
-		return err
-	}
-	err = SetTraceProvider(ctx, logger, c.String("tracing-endpoint"), "konterfai")
+
+	err := SetTraceProvider(ctx, logger, c.String("tracing-endpoint"), "konterfai")
 	if err != nil {
 		return err
 	}

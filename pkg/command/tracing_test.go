@@ -30,7 +30,7 @@ var _ = Describe("Tracing", func() {
 	})
 
 	It("should not return an error if endpoint is empty (tracing disabled)", func() {
-		err := command.SetTraceProvider(ctx, logger, "", service)
+		err := command.SetTraceProvider(ctx, logger, endpoint, service)
 		Expect(err).To(BeNil())
 	})
 })

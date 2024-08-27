@@ -177,7 +177,14 @@ func Initialize() error { //nolint: funlen
 				DefaultText: "text",
 			},
 		},
-		Action: Run,
+		Action: func(c *cli.Context) error {
+			logger, err := SetLogger(c.String("log-format"), c.String("log-level"))
+			if err != nil {
+				return err
+			}
+
+			return Run(c, logger)
+		},
 	}
 
 	return app.Run(os.Args)
