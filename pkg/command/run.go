@@ -112,6 +112,8 @@ func generateHeader(c *cli.Context, withHeadline bool) string {
 		fmt.Sprintln("\t- AI Temperature: \t\t\t", c.Float64("ai-temperature")),
 		fmt.Sprintln("\t- AI Seed: \t\t\t\t", c.Int("ai-seed")),
 		fmt.Sprintln("\t- Hallucinator URL: \t\t\t", c.String("hallucinator-url")),
+		fmt.Sprintln("\t- Log Level: \t\t\t\t", c.String("log-level")),
+		fmt.Sprintln("\t- Log Format: \t\t\t\t", c.String("log-format")),
 	}, "")
 
 	if c.String("tracing-endpoint") != "" {

@@ -153,6 +153,21 @@ var _ = Describe("Webserver", func() {
 			ctx.Done()
 		})
 
+		It("should reply with body content on a subdir", func() {
+			// status code is not deterministic, it could be anything
+			httpClient := http.Client{
+				Timeout: 5 * time.Second,
+			}
+			for range 10 {
+				resp, err := httpClient.Get("http://localhost:8080/foobar")
+				Expect(err).NotTo(HaveOccurred())
+				bodyData, err := io.ReadAll(resp.Body)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(bodyData)).To(BeNumerically(">", 0))
+			}
+			ctx.Done()
+		})
+
 		It("should reply with body content on the robots.txt endpoint", func() {
 			// status code is not deterministic, it could be anything
 			httpClient := http.Client{
