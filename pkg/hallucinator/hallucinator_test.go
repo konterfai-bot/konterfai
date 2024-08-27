@@ -12,10 +12,9 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/command"
 	"codeberg.org/konterfai/konterfai/pkg/hallucinator"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
-	"github.com/stretchr/testify/mock"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 )
 
 // MockHttpClient is a mock implementation of the http.Client interface.
@@ -92,5 +91,27 @@ var _ = Describe("Hallucinator", func() {
 			Expect(err).To(BeNil())
 		}()
 		time.Sleep(2 * time.Second)
+		ctx.Done()
+	})
+
+	It("Starts the hallucinator with mocks and appends a hallucination", func() {
+		mockHttpClient := new(MockHttpClient)
+		mockHttpClient.On("Do", mock.Anything).Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"message": {"content": "This is a valid response"}}`)),
+		}, nil)
+		h.HTTPClient = mockHttpClient
+		go func() {
+			err := h.Start(ctx)
+			Expect(err).To(BeNil())
+		}()
+		time.Sleep(2 * time.Second)
+		h.AppendHallucination(ctx, hallucinator.Hallucination{
+			Text:         "This is a hallucination",
+			Prompt:       "this does not have a prompt",
+			RequestCount: 2,
+		})
+		time.Sleep(2 * time.Second)
+		ctx.Done()
 	})
 })
