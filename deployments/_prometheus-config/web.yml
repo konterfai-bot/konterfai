@@ -1,0 +1,2 @@
+basic_auth_users:
+  admin: $2y$10$Womu1fPvePpQOX2sIkr57.ItOairccPPCBkzjBGxGZ7Fm0zwjVc/S # admin:konterfai

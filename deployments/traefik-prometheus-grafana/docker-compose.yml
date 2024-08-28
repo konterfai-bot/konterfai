@@ -1,0 +1,186 @@
+---
+
+# This is an example configuration to use konterfAI as a tar-pit for ai-crawlers.
+# It uses traefik as a reverse proxy and ollama as AI backend.
+# If you want to experiment with it add the following to your /etc/hosts file:
+#
+# 127.0.0.1 konterfai.localhost traefik.localhost statistics.konterfai.localhost
+#
+# This example does not include the necessary configuration for HTTPS, you should add that if you want to use it in
+# production. See https://doc.traefik.io/traefik/https/tls/ for more information.
+
+services:
+  traefik:
+    image: traefik:v3.1
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - konterfai-net
+    # This configures the dashboard for traefik, you can remove this if you don't need it.
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=konterfai-net"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.constraint-label=traefik-public"
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`)
+      - --providers.docker.exposedbydefault=false
+      - --log
+      - --entrypoints.http.address=:80
+
+  # This is the AI backend.
+  ollama:
+    image: ollama/ollama:latest
+    environment:
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2:0.5b}
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - konterfai-net
+    healthcheck:
+      test: ollama --version || exit 1
+      interval: 10s
+    labels:
+      - "traefik.enable=false"
+    deploy:
+      # if you do not have a ollama capable GPU, you can remove the resources section
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ "gpu" ]
+              count: all
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        ollama serve &
+        sleep 5
+        ollama run "${OLLAMA_MODEL:-qwen2:0.5b}"
+        sleep infinity
+
+  # This is the tar-pit that is supposed to trap ai-crawlers.
+  konterfai:
+    image: konterfai/konterfai:${DOCKER_TAG:-latest-main}
+    restart: always
+    networks:
+      - konterfai-net
+    labels:
+      - "traefik.enable=true"
+      # Adjust the rule to match the hostname you want to use
+      - "traefik.http.routers.konterfai.rule=Host(`konterfai.localhost`)"
+      - "traefik.http.middlewares.useragent-intercept.headers.customrequestheaders.X-Intercepted-UserAgent: intercepted"
+      - "traefik.http.routers.konterfai.middlewares=useragent-intercept"
+      - "traefik.http.services.konterfai.loadbalancer.server.port=8080"
+      - "traefik.http.routers.konterfai.service=konterfai"
+
+      # You probably want to add some kind of authentication here, like auth-basic or your openid provider
+      # unless you are running this in an internal network.
+      - "traefik.http.routers.konterfai-statistics.rule=Host(`statistics.konterfai.localhost`)"
+      - "traefik.http.services.konterfai-statistics.loadbalancer.server.port=8081"
+      - "traefik.http.routers.konterfai-statistics.service=konterfai-statistics"
+
+      - "traefik.constraint-label=traefik-public"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - ADDRESS=${ADDRESS:-0.0.0.0}
+      - PORT=${PORT:-8080}
+      # Adjust the rule to match the hostname you want to use
+      - HALLUCINATOR_URL=${HALLUCINATOR_URL:-http://konterfai.localhost}
+      - STATISTICS_PORT=${STATISTICS_PORT:-8081}
+      - GENERATE_INTERVAL=${GENERATE_INTERVAL:-2s}
+      - HALLUCINATION_CACHE_SIZE=${HALLUCINATION_CACHE_SIZE:-10}
+      - HALLUCINATION_PROMPT_WORD_COUNT=${HALLUCINATION_PROMPT_WORD_COUNT:-5}
+      - HALLUCINATION_WORD_COUNT=${HALLUCINATION_WORD_COUNT:-500}
+      - HALLUCINATION_REQUEST_COUNT=${HALLUCINATION_REQUEST_COUNT:-5}
+      - HALLUCINATOR_LINK_PERCENTAGE=${HALLUCINATOR_LINK_PERCENTAGE:-10}
+      - HALLUCINATOR_LINK_MAX_SUBDIRECTORY_DEPTH=${HALLUCINATOR_LINK_MAX_SUBDIRECTORY_DEPTH:-5}
+      - HALLUCINATOR_LINK_HAS_VARIABLES_PROBABILITY=${HALLUCINATOR_LINK_HAS_VARIABLES_PROBABILITY:-0.5}
+      - HALLUCINATOR_LINK_MAX_VARIABLES=${HALLUCINATOR_LINK_MAX_VARIABLES:-5}
+      - OLLAMA_ADDRESS=${OLLAMA_ADDRESS:-http://ollama:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2:0.5b}
+      - OLLAMA_REQUEST_TIMEOUT=${OLLAMA_REQUEST_TIMEOUT:-60s}
+      - AI_TEMPERATURE=${AI_TEMPERATURE:-30.0}
+      - AI_SEED=${AI_SEED:-0}
+      - WEBSERVER_200_PROBABILITY=${WEBSERVER_200_PROBABILITY:-0.95}
+      - WEBSERVER_ERROR_CACHE_SIZE=${WEBSERVER_ERROR_CACHE_SIZE:-1000}
+      - RANDOM_UNCERTAINTY=${RANDOM_UNCERTAINTY:-0.1}
+
+  # This is the service we use to intercept user agents and block them from accessing the site
+  useragent-intercept:
+    # The image used here is not really important, it is not really used, use something slim.
+    image: containous/whoami
+    labels:
+      - "traefik.enable=true"
+      # this is an example regexp for testing that filters out chrome user agents
+      # you can use it to experiment with the system (e.g. use chrome to see the konterfAI output and firefox to see the real site)
+      #- "traefik.http.routers.useragent-intercept.rule=HeaderRegexp(`User-Agent`, `.*Chrome.*`)"
+      # this is an example regexp that is recommended for production use
+      - "traefik.http.routers.useragent-intercept.rule=HeaderRegexp(`User-Agent`, `.*(Amazonbot|Applebot-Extended|Bytespider|CCBot|ChatGPT-User|Claude-Web|ClaudeBot|FacebookBot|GPTBot|Google-Extended|ImagesiftBot|Omgili|Omgilibot|PerplexityBot|YouBot|anthropic-ai|anthropic-ai).*`)"
+      - "traefik.http.routers.useragent-intercept.priority=100"
+      - "traefik.http.routers.useragent-intercept.service=konterfai"
+      - "traefik.constraint-label=traefik-public"
+
+  # This is your awesome application that needs protection from ai-crawlers. Adapt the labels to your needs.
+  yourapplication:
+    image: containous/whoami
+    networks:
+      - konterfai-net
+    labels:
+      - "traefik.enable=true"
+      # Adjust the rule to match the hostname you want to use
+      - "traefik.http.routers.yourapplication.rule=Host(`konterfai.localhost`)"
+      - "traefik.http.services.yourapplication.loadbalancer.server.port=80"
+      - "traefik.constraint-label=traefik-public"
+
+  # This is the prometheus monitoring system
+  # credentials are admin:konterfai, can be changed in ../_prometheus-config/web.yml
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    networks:
+      - konterfai-net
+    volumes:
+      - ../_prometheus-config:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web.yml
+    labels:
+      - "traefik.enable=true"
+      # Adjust the rule to match the hostname you want to use
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.konterfai.localhost`)"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.constraint-label=traefik-public"
+
+  # This is the grafana monitoring system
+  grafana:
+    image: grafana/grafana-oss:latest
+    networks:
+      - konterfai-net
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ../_grafana-provisioning:/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=konterfai
+      - GF_PATHS_PROVISIONING=/provisioning
+    labels:
+      - "traefik.enable=true"
+      # Adjust the rule to match the hostname you want to use
+      - "traefik.http.routers.grafana.rule=Host(`grafana.konterfai.localhost`)"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.constraint-label=traefik-public"
+
+volumes:
+  ollama-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  konterfai-net:
