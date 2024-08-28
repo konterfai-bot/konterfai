@@ -9,7 +9,7 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/dictionaries"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/textblocks"
-	"codeberg.org/konterfai/konterfai/pkg/renderer"
+	"codeberg.org/konterfai/konterfai/pkg/renderer/v0"
 )
 
 // GetHallucinationCount returns the current hallucination count.

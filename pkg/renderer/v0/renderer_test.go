@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"codeberg.org/konterfai/konterfai/pkg/command"
-	"codeberg.org/konterfai/konterfai/pkg/renderer"
+	"codeberg.org/konterfai/konterfai/pkg/renderer/v0"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -21,7 +21,7 @@ import (
 //go:embed assets
 var assets embed.FS
 
-var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/renderer")
+var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/renderer/v0")
 
 // Renderer is the structure for the Renderer.
 type Renderer struct {

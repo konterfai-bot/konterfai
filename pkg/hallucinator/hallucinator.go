@@ -14,7 +14,7 @@ import (
 
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
-	"codeberg.org/konterfai/konterfai/pkg/renderer"
+	"codeberg.org/konterfai/konterfai/pkg/renderer/v0"
 	"codeberg.org/konterfai/konterfai/pkg/statistics"
 )
 

@@ -18,7 +18,7 @@ import (
 	"codeberg.org/konterfai/konterfai/pkg/helpers/functions"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/links"
 	"codeberg.org/konterfai/konterfai/pkg/helpers/textblocks"
-	"codeberg.org/konterfai/konterfai/pkg/renderer"
+	"codeberg.org/konterfai/konterfai/pkg/renderer/v0"
 )
 
 // generateFollowUpLink returns a follow-up link for the Hallucinator.
