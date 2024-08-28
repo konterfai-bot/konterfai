@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/codeberg.org/konterfai/konterfai)](https://goreportcard.com/report/codeberg.org/konterfai/konterfai)
 [![codecov](https://codecov.io/github/konterfai-bot/konterfai/graph/badge.svg?token=25T5Y462Q1)](https://codecov.io/github/konterfai-bot/konterfai)
 [![Codeberg Issues](https://img.shields.io/gitea/issues/open/konterfai/konterfai?gitea_url=https%3A%2F%2Fcodeberg.org)](https://codeberg.org/konterfai/konterfai)
-[![Codeberg Release](https://img.shields.io/gitea/v/release/konterfai/konterfai?gitea_url=https%3A%2F%2Fcodeberg.org&sort=semver)](https://codeberg.org/konterfai/konterfai)
+[![Codeberg Release](https://img.shields.io/gitea/v/release/konterfai/konterfai?gitea_url=https%3A%2F%2Fcodeberg.org&sort=semver)](https://codeberg.org/konterfai/konterfai/releases)
 
 # konterfAI
 
