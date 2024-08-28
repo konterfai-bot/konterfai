@@ -13,6 +13,12 @@ Default credentials for Grafana are `admin:kponterfai` for prometheus and grafan
 You need to change these credentials in the docker-compose files in the deployment folders and in the 
 `_prometheus-config` folder. The prometheus folder requjires a bcrypt hash of the password.
 
+If you run this for testing purposes, you might want to add the following to your `/etc/hosts` file:
+
+```txt
+127.0.0.1 konterfai.localhost statistics.konterfai.localhost grafana.konterfai.localhost prometheus.konterfai.localhost
+```
+
 **Note:** These examples are not intended for copy & paste usage.
 Make sure to read them carefully and adjust them to your needs.
 

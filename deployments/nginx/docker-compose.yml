@@ -4,7 +4,7 @@
 # It uses nginx as a reverse proxy and ollama as AI backend.
 # If you want to experiment with it add the following to your /etc/hosts file:
 #
-# 127.0.0.1 konterfai.localhost statistics.konterfai.localhost
+# 127.0.0.1 konterfai.localhost statistics.konterfai.localhost grafana.konterfai.localhost prometheus.konterfai.localhost
 
 services:
   nginx:
