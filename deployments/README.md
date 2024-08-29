@@ -9,9 +9,7 @@ There are two folders in this directory that are used by the `traefik-prometheus
 `nginx-prometheus-grafana` examples. These folders contain the configuration files for the Prometheus and Grafana
 services. The folders in question are `_prometheus-config` and `_grafana-provisioning`.
 
-Default credentials for Grafana are `admin:kponterfai` for prometheus and grafana. 
-You need to change these credentials in the docker-compose files in the deployment folders and in the 
-`_prometheus-config` folder. The prometheus folder requjires a bcrypt hash of the password.
+Default credentials for Grafana and Prometheus are `admin:konterfai`. You need to change these credentials in the docker-compose files in the deployment folders and in the `_prometheus-config` folder. The prometheus folder requjires a bcrypt hash of the password.
 
 If you run this for testing purposes, you might want to add the following to your `/etc/hosts` file:
 
