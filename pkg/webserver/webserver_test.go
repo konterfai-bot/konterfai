@@ -76,7 +76,7 @@ var _ = Describe("Webserver", func() {
 
 	Context("NewWebserver", func() {
 		It("should return a new webserver", func() {
-			ws := webserver.NewWebServer(ctx, logger, host, port, hal, st, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
+			ws := webserver.NewWebServer(ctx, logger, host, port, hal, st, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize, 0)
 			Expect(ws).NotTo(BeNil())
 			Expect(ws.Host).To(Equal(host))
 			Expect(ws.Port).To(Equal(port))
@@ -114,7 +114,7 @@ var _ = Describe("Webserver", func() {
 				Size:        0,
 			})
 			logger, _ = command.SetLogger("off", "")
-			ws = webserver.NewWebServer(ctx, logger, host, port, hal, st, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize)
+			ws = webserver.NewWebServer(ctx, logger, host, port, hal, st, baseUrl, HttpOkProbability, Uncertainty, errorCacheSize, 0)
 			syncer := make(chan error)
 			gr := run.Group{}
 			gr.Add(func() error {
