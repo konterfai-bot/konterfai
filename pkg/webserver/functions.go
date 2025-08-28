@@ -54,9 +54,10 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 		})
 	}()
 
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano())) // nolint:gosec
 	actualSleep := time.Duration(rnd.Intn(int(ws.MaxPageDeliveryDelay.Nanoseconds() + 1)))
 	time.Sleep(actualSleep)
+
 	_, err := w.Write([]byte(hallucination))
 	if err != nil {
 		ws.Logger.ErrorContext(ctx, fmt.Sprintf("error writing hallucination (%v)", err.Error()))
