@@ -145,18 +145,18 @@ func Initialize() error { //nolint: funlen
 				Value:       0.95,
 				DefaultText: "0.95",
 			},
-			&cli.DurationFlag{
-				Name:        "webserver-max-page-delivery-delay",
-				Usage:       "The maximum duration the client will be waiting for the page to be delivered.",
-				Value:       2 * time.Second,
-				DefaultText: "2s",
-			},
 			&cli.IntFlag{
 				Name: "webserver-error-cache-size",
 				Usage: "The number of error responses to cache (as long as an url is cached there," +
 					" the request to that url would return the same error code if requested multiple times.",
 				Value:       1000,
 				DefaultText: "1000",
+			},
+			&cli.DurationFlag{
+				Name:        "webserver-max-page-delivery-delay",
+				Usage:       "The maximum duration the client will be waiting for the page to be delivered.",
+				Value:       2 * time.Second,
+				DefaultText: "2s",
 			},
 			&cli.Float64Flag{
 				Name:  "random-uncertainty",

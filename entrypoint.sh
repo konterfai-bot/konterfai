@@ -21,4 +21,5 @@
     --ai-seed=${AI_SEED:-0} \
     --webserver-200-probability=${WEBSERVER_200_PROBABILITY:-0.95} \
     --webserver-error-cache-size=${WEBSERVER_ERROR_CACHE_SIZE:-1000} \
+    --webserver-max-page-delivery-delay=${WEBSERVER_MAX_PAGE_DELIVERY_DELAY:-2s} \
     --random-uncertainty=${RANDOM_UNCERTAINTY:-0.1}

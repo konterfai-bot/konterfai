@@ -84,6 +84,7 @@ services:
       - AI_SEED=${AI_SEED:-0}
       - WEBSERVER_200_PROBABILITY=${WEBSERVER_200_PROBABILITY:-0.95}
       - WEBSERVER_ERROR_CACHE_SIZE=${WEBSERVER_ERROR_CACHE_SIZE:-1000}
+      - WEBSERVER_MAX_PAGE_DELIVERY_DELAY=${WEBSERVER_MAX_PAGE_DELIVERY_DELAY:-2s}
       - RANDOM_UNCERTAINTY=${RANDOM_UNCERTAINTY:-0.1}
 
   # This is your awesome application that needs protection from ai-crawlers. Adapt the labels to your needs.
