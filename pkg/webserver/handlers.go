@@ -48,7 +48,6 @@ func (ws *WebServer) handleRoot(w http.ResponseWriter, r *http.Request) { //noli
 	span.SetAttributes(attribute.String("http.method", r.Method), attribute.String("http.url", r.URL.String()),
 		attribute.String("http.user-agent", r.UserAgent()), attribute.String("http.remote-addr", r.RemoteAddr))
 	r = r.WithContext(ctx)
-
 	httpCode := ws.getErrorFromCache(ctx, r.URL)
 	if httpCode < 1 {
 		if r.URL.Path == "/" || r.URL.Path == ws.HTTPBaseURL.Path || r.URL.Path == "" {

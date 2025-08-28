@@ -35,18 +35,28 @@ func (ws *WebServer) handleHallucination(w http.ResponseWriter, r *http.Request)
 		attribute.String("http.user-agent", r.UserAgent()),
 		attribute.String("http.remote-addr", r.RemoteAddr),
 	)
+
 	r = r.WithContext(ctx)
 
 	hallucination := ws.Hallucinator.PopRandomHallucination(ctx)
 	go func() {
+		ipAddr := r.RemoteAddr
+		// Check for X-Forwarded-For header if behind a proxy
+		if r.Header.Get("X-Forwarded-For") != "" {
+			ipAddr = r.Header.Get("X-Forwarded-For")
+		}
 		ws.Statistics.AppendRequest(ctx, statistics.Request{
-			IPAddress:   r.RemoteAddr,
+			IPAddress:   ipAddr,
 			Timestamp:   time.Now(),
 			UserAgent:   r.Header.Get("User-Agent"),
 			IsRobotsTxt: false,
 			Size:        len(hallucination),
 		})
 	}()
+
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	actualSleep := time.Duration(rnd.Intn(int(ws.MaxPageDeliveryDelay.Nanoseconds() + 1)))
+	time.Sleep(actualSleep)
 	_, err := w.Write([]byte(hallucination))
 	if err != nil {
 		ws.Logger.ErrorContext(ctx, fmt.Sprintf("error writing hallucination (%v)", err.Error()))

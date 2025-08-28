@@ -123,8 +123,8 @@ func Initialize() error { //nolint: funlen
 			&cli.DurationFlag{
 				Name:        "ollama-request-timeout",
 				Usage:       "The timeout for the ollama service.",
-				Value:       60 * time.Second,
-				DefaultText: "60s",
+				Value:       120 * time.Second,
+				DefaultText: "120s",
 			},
 			&cli.Float64Flag{
 				Name: "ai-temperature",
@@ -144,6 +144,12 @@ func Initialize() error { //nolint: funlen
 				Usage:       "The probability of returning a 200 status code for a request.",
 				Value:       0.95,
 				DefaultText: "0.95",
+			},
+			&cli.DurationFlag{
+				Name:        "webserver-max-page-delivery-delay",
+				Usage:       "The maximum duration the client will be waiting for the page to be delivered.",
+				Value:       2 * time.Second,
+				DefaultText: "2s",
 			},
 			&cli.IntFlag{
 				Name: "webserver-error-cache-size",

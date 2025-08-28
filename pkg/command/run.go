@@ -59,7 +59,7 @@ func Run(c *cli.Context, logger *slog.Logger) error { //nolint: funlen
 	gr.Add(func() error {
 		ws := webserver.NewWebServer(ctx, logger, c.String("address"), c.Int("port"), hal, st, *hcURL,
 			c.Float64("webserver-200-probability"), c.Float64("random-uncertainty"),
-			c.Int("webserver-error-cache-size"))
+			c.Int("webserver-error-cache-size"), c.Duration("webserver-max-page-delivery-delay"))
 		select {
 		case <-ctx.Done():
 			return nil
@@ -109,11 +109,13 @@ func generateHeader(c *cli.Context, withHeadline bool) string {
 		fmt.Sprintln("\t- Hallucination Request Count:  \t", c.Int("hallucination-request-count")),
 		fmt.Sprintln("\t- Ollama Address: \t\t\t", c.String("ollama-address")),
 		fmt.Sprintln("\t- Ollama Model: \t\t\t", c.String("ollama-model")),
+		fmt.Sprintln("\t- Ollama Timeout: \t\t\t", c.String("ollama-request-timeout")),
 		fmt.Sprintln("\t- AI Temperature: \t\t\t", c.Float64("ai-temperature")),
 		fmt.Sprintln("\t- AI Seed: \t\t\t\t", c.Int("ai-seed")),
 		fmt.Sprintln("\t- Hallucinator URL: \t\t\t", c.String("hallucinator-url")),
 		fmt.Sprintln("\t- Log Level: \t\t\t\t", c.String("log-level")),
 		fmt.Sprintln("\t- Log Format: \t\t\t\t", c.String("log-format")),
+		fmt.Sprintln("\t- Webserver delivery delay max: \t", c.Duration("webserver-max-page-delivery-delay")),
 	}, "")
 
 	if c.String("tracing-endpoint") != "" {

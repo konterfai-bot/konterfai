@@ -28,6 +28,7 @@ type WebServer struct {
 	HTTPBaseURL           url.URL
 	ServeMux              *http.ServeMux
 	Logger                *slog.Logger
+	MaxPageDeliveryDelay  time.Duration
 }
 
 // ErrorCacheItem is the structure for the WebServer cache item.
@@ -41,7 +42,7 @@ var tracer = otel.Tracer("codeberg.org/konterfai/konterfai/pkg/webserver")
 // NewWebServer creates a new WebServer instance.
 func NewWebServer(ctx context.Context, logger *slog.Logger, host string, port int,
 	hallucinator *hallucinator.Hallucinator, statistics *statistics.Statistics, baseURL url.URL, httpOkProbability,
-	uncertainty float64, errorCacheSize int,
+	uncertainty float64, errorCacheSize int, maxPageDeliveryDelay time.Duration,
 ) *WebServer {
 	_, span := tracer.Start(ctx, "NewWebServer")
 	defer span.End()
@@ -57,6 +58,7 @@ func NewWebServer(ctx context.Context, logger *slog.Logger, host string, port in
 		HTTPResponseCacheSize: errorCacheSize,
 		HTTPBaseURL:           baseURL,
 		Logger:                logger,
+		MaxPageDeliveryDelay:  maxPageDeliveryDelay,
 	}
 }
 
